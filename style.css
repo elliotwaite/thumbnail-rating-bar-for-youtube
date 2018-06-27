@@ -12,3 +12,7 @@
   left: 0;
   background-color: #3095e3;
 }
+
+#thumbnail-container {
+  position: relative;
+}
