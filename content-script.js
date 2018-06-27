@@ -5,7 +5,7 @@ let videoRatings = {}
 let unseenMutations = false
 let isThrottled = false
 
-let observer = new MutationObserver(handleMutations);
+let observer = new MutationObserver(handleMutations)
 observer.observe(document.body, {childList: true, subtree: true})
 
 function handleMutations() {
@@ -16,7 +16,7 @@ function handleMutations() {
     isThrottled = true
     unseenMutations = false
     checkForNewThumbnails()
-    setTimeout(function() {
+    setTimeout(function () {
       isThrottled = false
       if (unseenMutations) {
         handleMutations()
@@ -27,15 +27,32 @@ function handleMutations() {
 
 function checkForNewThumbnails() {
   // Check for any unprocessed thumbnails.
-  let thumbnails = $('ytd-thumbnail:not([data-ytrb-added])')
+  let thumbnails = $(
+    // For: https://www.youtube.com/user/TheSpiritualCatalyst/videos
+    'ytd-thumbnail:not([data-ytrb-added]), ' +
+
+    // For: https://www.youtube.com/playlist?list=PLiDGSQiS-Y3T9Y4KPrBpjECtrrTTqgADq&disable_polymer=true
+    '.pl-header-thumb:not([data-ytrb-added]), ' +
+    '.pl-video-thumb:not([data-ytrb-added]), ' +
+
+    // For: https://www.youtube.com/user/TheSpiritualCatalyst/videos?disable_polymer=1
+    '.yt-lockup-thumbnail:not([data-ytrb-added]), ' +
+
+    // For: https://gaming.youtube.com/
+    '#thumbnail-container:not([data-ytrb-added])',
+  )
   if (thumbnails.length) {
     let ids = []
     let elements = []
     $.each(thumbnails, function (i, thumbnail) {
       $(thumbnail).attr('data-ytrb-added', true)
-      let id = $(thumbnail).find('a').attr('href').split('=')[1]
-      ids.push(id)
-      elements.push(thumbnail)
+      let url = $(thumbnail).find('a:lt(1)').attr('href')
+      let match = url.match(/.*[?&]v=([^&]+).*/)
+      if (match && match.length >= 1) {
+        let id = match[1]
+        ids.push(id)
+        elements.push(thumbnail)
+      }
     })
     getRatings(ids, elements)
   }
@@ -75,7 +92,7 @@ function getRatings(ids, elements) {
   }
 
   // Once we've got the ratings, add the rating bars.
-  Promise.all(promises).then(function() {
+  Promise.all(promises).then(function () {
     addRatingBars(ids, elements)
   })
 }
@@ -86,10 +103,8 @@ function addRatingBars(ids, elements) {
     let rating
     if (ids[i] in videoRatings) {
       rating = videoRatings[ids[i]]
-    } else {
-      rating = 0.5
+      $(elements[i]).prepend('<div class="ytrb-bar"><div class="ytrb-likes" ' +
+        'style="width: ' + (rating * 100) + '%"></div></div>')
     }
-    $(elements[i]).prepend('<div class="ytrb-bar"><div class="ytrb-likes" ' +
-      'style="width: ' + (rating * 100) + '%"></div></div>')
   }
 }
