@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "YouTube™ Thumbnail Rating Bar",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Show the rating bar (likes/dislikes) on the bottom of every YouTube thumbnail.",
 	"icons": {
 		"96": "icon96.png",
