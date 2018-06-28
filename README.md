@@ -19,7 +19,7 @@ Using YouTube usually involves browsing through many video previews. These video
 * Creator’s subscriber count (sometimes)
 * View count
 * Short description (sometimes)
-Video length
+* Video length
 
 We use this information to try to estimate the value of the content before exploring it further. A useful indicator of value is how valuable other viewers found this content. The view count has some correlation to this value, but on its own is unreliable. By being able to also see the video’s rating, users are able to much more accurately estimate the value of the content, resulting in finding higher quality content, saving time, and avoiding being clickbaited.
 
