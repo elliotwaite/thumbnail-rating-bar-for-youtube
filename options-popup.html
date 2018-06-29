@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="libraries/material.min.css">
+  <script src="libraries/material.min.js"></script>
+  <script src="libraries/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="options-style.css">
+</head>
+<body>
+  <div class="content-container">
+    <h4>Rating Bar Color</h4>
+
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleBlueGray">
+      <input type="radio" id="barColorStyleBlueGray" class="mdl-radio__button" name="barColorStyle" value="blueGray">
+      <span class="mdl-radio__label">
+        <div class="bar-bg bar-blue-gray"><div class="bar-likes"></div></div>
+      </span>
+    </label>
+
+    <br />
+
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleGreenRed">
+      <input type="radio" id="barColorStyleGreenRed" class="mdl-radio__button" name="barColorStyle" value="greenRed">
+      <span class="mdl-radio__label">
+        <div class="bar-bg bar-green-red"><div class="bar-likes"></div></div>
+      </span>
+    </label>
+
+    <br />
+    <br />
+
+    <button id="save-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+      Save
+    </button>
+    </div>
+
+  <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+    <div class="mdl-snackbar__text"></div>
+    <button class="mdl-snackbar__action" type="button"></button>
+  </div>
+
+  <script src="options-script.js"></script>
+</body>
+</html>

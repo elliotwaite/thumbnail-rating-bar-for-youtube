@@ -1,0 +1,53 @@
+/* The thumbnail rating bar. */
+.ytrb-bar {
+  position: absolute;
+  z-index: 999;
+  width: 100%;
+  height: 4px;
+  bottom: 0;
+  background-color: #cfcfcf;
+  border-top: 1px solid #fff;
+}
+
+.ytrb-bar>div {
+  height: 4px;
+  left: 0;
+  background-color: #3095e3;
+}
+
+.ytrb-green-red .ytrb-bar {
+  background-color: #c00;
+}
+
+.ytrb-green-red .ytrb-bar>div {
+  background-color: #060;
+  box-shadow: 1px 0 0 0 #fff;
+}
+
+/* The video's main page rating bar. */
+.ytrb-green-red #container.ytd-sentiment-bar-renderer,
+.ytrb-green-red .video-extras-sparkbar-dislikes /* For classic mode */ {
+  background-color: #c00;
+}
+
+.ytrb-green-red #like-bar.ytd-sentiment-bar-renderer ,
+.ytrb-green-red .video-extras-sparkbar-likes /* For classic mode */ {
+  background-color: #060;
+  box-shadow: 1px 0 #fff;
+  position: relative;
+}
+
+.ytrb-green-red #container.ytd-sentiment-bar-renderer
+.video-extras-sparkbar-likes
+
+/* Keeps the rating bar contained in the thumbnail. For: gaming.youtube.com */
+#thumbnail-container {
+  position: relative;
+}
+
+/* Move the watch history progress bar to the top of the thumbnail. */
+ytd-thumbnail-overlay-resume-playback-renderer,
+.resume-playback-background,
+.resume-playback-progress-bar {
+  top: 0 !important;
+}

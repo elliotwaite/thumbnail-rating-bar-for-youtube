@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - YouTube Thumbnail Rating Bar Options</title>
+  <link rel="stylesheet" href="libraries/material.min.css">
+  <script src="libraries/material.min.js"></script>
+  <script src="libraries/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="options-style.css">
+</head>
+<body>
+
+  <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+    <div class="demo-ribbon"></div>
+    <main class="demo-main mdl-layout__content">
+      <div class="demo-container mdl-grid">
+        <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+        <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+          <h3>YouTube&trade; Thumbnail Rating Bar</h3>
+
+          <h4>Rating Bar Color</h4>
+
+          <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleBlueGray">
+            <input type="radio" id="barColorStyleBlueGray" class="mdl-radio__button" name="barColorStyle" value="blueGray">
+            <span class="mdl-radio__label">
+              <div class="bar-bg bar-blue-gray"><div class="bar-likes"></div></div>
+            </span>
+          </label>
+
+          <br />
+
+          <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleGreenRed">
+            <input type="radio" id="barColorStyleGreenRed" class="mdl-radio__button" name="barColorStyle" value="greenRed">
+            <span class="mdl-radio__label">
+              <div class="bar-bg bar-green-red"><div class="bar-likes"></div></div>
+            </span>
+          </label>
+
+          <br />
+
+          <!--<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleCustom">-->
+            <!--<input type="radio" id="barColorStyleCustom" class="mdl-radio__button" name="barColorStyle" value="custom">-->
+            <!--<span class="mdl-radio__label">Custom</span>-->
+          <!--</label>-->
+          <!--<div class="color-palette mdl-shadow&#45;&#45;2dp">-->
+            <!--<div>-->
+              <!--<div style="background:#FFEBEE"></div>-->
+              <!--<div style="background:#FFCDD2"></div>-->
+              <!--<div style="background:#EF9A9A"></div>-->
+              <!--<div style="background:#E57373"></div>-->
+              <!--<div style="background:#EF5350"></div>-->
+              <!--<div style="background:#F44336"></div>-->
+              <!--<div style="background:#E53935"></div>-->
+              <!--<div style="background:#D32F2F"></div>-->
+              <!--<div style="background:#C62828"></div>-->
+              <!--<div style="background:#B71C1C"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FCE4EC"></div>-->
+              <!--<div style="background:#F8BBD0"></div>-->
+              <!--<div style="background:#F48FB1"></div>-->
+              <!--<div style="background:#F06292"></div>-->
+              <!--<div style="background:#EC407A"></div>-->
+              <!--<div style="background:#E91E63"></div>-->
+              <!--<div style="background:#D81B60"></div>-->
+              <!--<div style="background:#C2185B"></div>-->
+              <!--<div style="background:#AD1457"></div>-->
+              <!--<div style="background:#880E4F"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#F3E5F5"></div>-->
+              <!--<div style="background:#E1BEE7"></div>-->
+              <!--<div style="background:#CE93D8"></div>-->
+              <!--<div style="background:#BA68C8"></div>-->
+              <!--<div style="background:#AB47BC"></div>-->
+              <!--<div style="background:#9C27B0"></div>-->
+              <!--<div style="background:#8E24AA"></div>-->
+              <!--<div style="background:#7B1FA2"></div>-->
+              <!--<div style="background:#6A1B9A"></div>-->
+              <!--<div style="background:#4A148C"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#EDE7F6"></div>-->
+              <!--<div style="background:#D1C4E9"></div>-->
+              <!--<div style="background:#B39DDB"></div>-->
+              <!--<div style="background:#9575CD"></div>-->
+              <!--<div style="background:#7E57C2"></div>-->
+              <!--<div style="background:#673AB7"></div>-->
+              <!--<div style="background:#5E35B1"></div>-->
+              <!--<div style="background:#512DA8"></div>-->
+              <!--<div style="background:#4527A0"></div>-->
+              <!--<div style="background:#311B92"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E8EAF6"></div>-->
+              <!--<div style="background:#C5CAE9"></div>-->
+              <!--<div style="background:#9FA8DA"></div>-->
+              <!--<div style="background:#7986CB"></div>-->
+              <!--<div style="background:#5C6BC0"></div>-->
+              <!--<div style="background:#3F51B5"></div>-->
+              <!--<div style="background:#3949AB"></div>-->
+              <!--<div style="background:#303F9F"></div>-->
+              <!--<div style="background:#283593"></div>-->
+              <!--<div style="background:#1A237E"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E3F2FD"></div>-->
+              <!--<div style="background:#BBDEFB"></div>-->
+              <!--<div style="background:#90CAF9"></div>-->
+              <!--<div style="background:#64B5F6"></div>-->
+              <!--<div style="background:#42A5F5"></div>-->
+              <!--<div style="background:#2196F3"></div>-->
+              <!--<div style="background:#1E88E5"></div>-->
+              <!--<div style="background:#1976D2"></div>-->
+              <!--<div style="background:#1565C0"></div>-->
+              <!--<div style="background:#0D47A1"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E1F5FE"></div>-->
+              <!--<div style="background:#B3E5FC"></div>-->
+              <!--<div style="background:#81D4FA"></div>-->
+              <!--<div style="background:#4FC3F7"></div>-->
+              <!--<div style="background:#29B6F6"></div>-->
+              <!--<div style="background:#03A9F4"></div>-->
+              <!--<div style="background:#039BE5"></div>-->
+              <!--<div style="background:#0288D1"></div>-->
+              <!--<div style="background:#0277BD"></div>-->
+              <!--<div style="background:#01579B"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E0F7FA"></div>-->
+              <!--<div style="background:#B2EBF2"></div>-->
+              <!--<div style="background:#80DEEA"></div>-->
+              <!--<div style="background:#4DD0E1"></div>-->
+              <!--<div style="background:#26C6DA"></div>-->
+              <!--<div style="background:#00BCD4"></div>-->
+              <!--<div style="background:#00ACC1"></div>-->
+              <!--<div style="background:#0097A7"></div>-->
+              <!--<div style="background:#00838F"></div>-->
+              <!--<div style="background:#006064"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E0F2F1"></div>-->
+              <!--<div style="background:#B2DFDB"></div>-->
+              <!--<div style="background:#80CBC4"></div>-->
+              <!--<div style="background:#4DB6AC"></div>-->
+              <!--<div style="background:#26A69A"></div>-->
+              <!--<div style="background:#009688"></div>-->
+              <!--<div style="background:#00897B"></div>-->
+              <!--<div style="background:#00796B"></div>-->
+              <!--<div style="background:#00695C"></div>-->
+              <!--<div style="background:#004D40"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#E8F5E9"></div>-->
+              <!--<div style="background:#C8E6C9"></div>-->
+              <!--<div style="background:#A5D6A7"></div>-->
+              <!--<div style="background:#81C784"></div>-->
+              <!--<div style="background:#66BB6A"></div>-->
+              <!--<div style="background:#4CAF50"></div>-->
+              <!--<div style="background:#43A047"></div>-->
+              <!--<div style="background:#388E3C"></div>-->
+              <!--<div style="background:#2E7D32"></div>-->
+              <!--<div style="background:#1B5E20"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#F1F8E9"></div>-->
+              <!--<div style="background:#DCEDC8"></div>-->
+              <!--<div style="background:#C5E1A5"></div>-->
+              <!--<div style="background:#AED581"></div>-->
+              <!--<div style="background:#9CCC65"></div>-->
+              <!--<div style="background:#8BC34A"></div>-->
+              <!--<div style="background:#7CB342"></div>-->
+              <!--<div style="background:#689F38"></div>-->
+              <!--<div style="background:#558B2F"></div>-->
+              <!--<div style="background:#33691E"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#F9FBE7"></div>-->
+              <!--<div style="background:#F0F4C3"></div>-->
+              <!--<div style="background:#E6EE9C"></div>-->
+              <!--<div style="background:#DCE775"></div>-->
+              <!--<div style="background:#D4E157"></div>-->
+              <!--<div style="background:#CDDC39"></div>-->
+              <!--<div style="background:#C0CA33"></div>-->
+              <!--<div style="background:#AFB42B"></div>-->
+              <!--<div style="background:#9E9D24"></div>-->
+              <!--<div style="background:#827717"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FFFDE7"></div>-->
+              <!--<div style="background:#FFF9C4"></div>-->
+              <!--<div style="background:#FFF59D"></div>-->
+              <!--<div style="background:#FFF176"></div>-->
+              <!--<div style="background:#FFEE58"></div>-->
+              <!--<div style="background:#FFEB3B"></div>-->
+              <!--<div style="background:#FDD835"></div>-->
+              <!--<div style="background:#FBC02D"></div>-->
+              <!--<div style="background:#F9A825"></div>-->
+              <!--<div style="background:#F57F17"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FFF8E1"></div>-->
+              <!--<div style="background:#FFECB3"></div>-->
+              <!--<div style="background:#FFE082"></div>-->
+              <!--<div style="background:#FFD54F"></div>-->
+              <!--<div style="background:#FFCA28"></div>-->
+              <!--<div style="background:#FFC107"></div>-->
+              <!--<div style="background:#FFB300"></div>-->
+              <!--<div style="background:#FFA000"></div>-->
+              <!--<div style="background:#FF8F00"></div>-->
+              <!--<div style="background:#FF6F00"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FFF3E0"></div>-->
+              <!--<div style="background:#FFE0B2"></div>-->
+              <!--<div style="background:#FFCC80"></div>-->
+              <!--<div style="background:#FFB74D"></div>-->
+              <!--<div style="background:#FFA726"></div>-->
+              <!--<div style="background:#FF9800"></div>-->
+              <!--<div style="background:#FB8C00"></div>-->
+              <!--<div style="background:#F57C00"></div>-->
+              <!--<div style="background:#EF6C00"></div>-->
+              <!--<div style="background:#E65100"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FBE9E7"></div>-->
+              <!--<div style="background:#FFCCBC"></div>-->
+              <!--<div style="background:#FFAB91"></div>-->
+              <!--<div style="background:#FF8A65"></div>-->
+              <!--<div style="background:#FF7043"></div>-->
+              <!--<div style="background:#FF5722"></div>-->
+              <!--<div style="background:#F4511E"></div>-->
+              <!--<div style="background:#E64A19"></div>-->
+              <!--<div style="background:#D84315"></div>-->
+              <!--<div style="background:#BF360C"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#EFEBE9"></div>-->
+              <!--<div style="background:#D7CCC8"></div>-->
+              <!--<div style="background:#BCAAA4"></div>-->
+              <!--<div style="background:#A1887F"></div>-->
+              <!--<div style="background:#8D6E63"></div>-->
+              <!--<div style="background:#795548"></div>-->
+              <!--<div style="background:#6D4C41"></div>-->
+              <!--<div style="background:#5D4037"></div>-->
+              <!--<div style="background:#4E342E"></div>-->
+              <!--<div style="background:#3E2723"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#FAFAFA"></div>-->
+              <!--<div style="background:#F5F5F5"></div>-->
+              <!--<div style="background:#EEEEEE"></div>-->
+              <!--<div style="background:#E0E0E0"></div>-->
+              <!--<div style="background:#BDBDBD"></div>-->
+              <!--<div style="background:#9E9E9E"></div>-->
+              <!--<div style="background:#757575"></div>-->
+              <!--<div style="background:#616161"></div>-->
+              <!--<div style="background:#424242"></div>-->
+              <!--<div style="background:#212121"></div>-->
+            <!--</div>-->
+            <!--<div>-->
+              <!--<div style="background:#ECEFF1"></div>-->
+              <!--<div style="background:#CFD8DC"></div>-->
+              <!--<div style="background:#B0BEC5"></div>-->
+              <!--<div style="background:#90A4AE"></div>-->
+              <!--<div style="background:#78909C"></div>-->
+              <!--<div style="background:#607D8B"></div>-->
+              <!--<div style="background:#546E7A"></div>-->
+              <!--<div style="background:#455A64"></div>-->
+              <!--<div style="background:#37474F"></div>-->
+              <!--<div style="background:#263238"></div>-->
+            <!--</div>-->
+          <!--</div>-->
+
+          <br />
+          <br />
+
+          <button id="save-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+            Save
+          </button>
+
+          <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="options-script.js"></script>
+</body>
+</html>
