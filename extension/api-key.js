@@ -1,5 +1,5 @@
 // If you'd like to help develop this extension, you'll need to get a
-// YouTube Data API key to run this Chrome extension locally. To get one:
+// YouTube Data API v3 key to run this Chrome extension locally. To get one:
 //
 // 1. Sign up for a Google Cloud account (if you don't already have one):
 //    https://cloud.google.com
