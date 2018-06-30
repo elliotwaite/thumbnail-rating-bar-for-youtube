@@ -10,5 +10,3 @@ Known issues:
 
 On YouTube Gaming playlist pages, the big icon link at the top doesn't show a
 rating bar.
-
-On YouTube Gaming,
