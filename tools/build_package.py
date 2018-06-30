@@ -1,23 +1,13 @@
-"""Build the _package.zip file that will be uploaded to the Chrome Web Store."""
+"""Build the package.zip file that will be uploaded to the Chrome Web Store."""
 
+import os
 import zipfile
 
-PACKAGE_FILES = [
-  '../images/icon96.png',
-  '../images/icon128.png',
-  '../libraries/jquery-3.3.1.min.js',
-  '../libraries/material.min.css',
-  '../libraries/material.min.js',
-  '../api-key.js',
-  '../content-script.js',
-  '../content-style.css',
-  '../manifest.json',
-  '../options-page.html',
-  '../options-popup.html',
-  '../options-script.js',
-  '../options-style.css',
-]
+EXTENSION_DIR = '../extension/'
 
-with zipfile.ZipFile('../_package.zip', 'w') as z:
-  for path in PACKAGE_FILES:
-    z.write(path, compress_type=zipfile.ZIP_DEFLATED)
+with zipfile.ZipFile('package.zip', 'w') as z:
+  for dir_path, dir_names, filenames in os.walk(EXTENSION_DIR):
+    for filename in filenames:
+      path = os.path.join(dir_path, filename)
+      path_in_zip = path[len(EXTENSION_DIR):]
+      z.write(path, path_in_zip)

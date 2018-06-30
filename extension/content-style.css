@@ -37,12 +37,15 @@
   position: relative;
 }
 
-.ytrb-green-red #container.ytd-sentiment-bar-renderer
-.video-extras-sparkbar-likes
-
-/* Keeps the rating bar contained in the thumbnail. For: gaming.youtube.com */
+/* For YouTube Gaming. Keeps the rating bar contained in the thumbnail. */
 #thumbnail-container {
   position: relative;
+}
+
+/* For YouTube Gaming. Prevents the rating bar from showing over the top
+   menu bar. */
+ytg-thumbnail .ytrb-bar {
+  z-index: 1;
 }
 
 /* Move the watch history progress bar to the top of the thumbnail. */

@@ -1,0 +1,14 @@
+Dev tips:
+
+To have the developer tools window auto open for new tabs:
+  On Mac, quite chrome, then reopen it by running this command in a terminal:
+    open -a "Google Chrome" --args --auto-open-devtools-for-tabs
+  On Window, quite chrome, then reopen it by running this command in a terminal:
+    "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --auto-open-devtools-for-tabs
+
+Known issues:
+
+On YouTube Gaming playlist pages, the big icon link at the top doesn't show a
+rating bar.
+
+On YouTube Gaming,
