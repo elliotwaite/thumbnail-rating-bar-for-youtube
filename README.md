@@ -29,4 +29,4 @@ When a user browses a page on YouTube, the Chrome extension script searches the 
 
 ## Design
 
-The current design uses the same colors and height of the rating bar that is shown on the video’s page. The blue and grey colors and the 4px height seem to be a good balance between being easily visible but not too distracting. However, different colors and bar heights may be preferable to different users, and perhaps these settings could be made customizable in the future.
+The current design uses the same colors and height of the rating bar that is shown on the video’s page. The blue and grey colors and the 4px height seem to be a good balance between being easily visible but not too distracting. There is also the option to use the classic green and red colors that YouTube used for the rating bar prior to changing it to the modern blue and gray. In the extension's settings, users can also adjust the thickness of the rating bar, and can optionally add a separation line above the rating bar to differentiate it more from the thumbnail image.
