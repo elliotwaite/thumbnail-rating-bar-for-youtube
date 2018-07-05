@@ -9,4 +9,7 @@ To have the developer tools window auto open for new tabs:
 Known issues:
 
 On YouTube Gaming playlist pages, the big icon link at the top doesn't show a
-rating bar.
+rating bar. This is due to complications in finding the video ID associated
+with the thumbnail, and since the ratings for the videos are shown in the
+thumbnails listed just below it, it doesn't add much value to also show the
+rating for the first video again in the top big thumbnail.
