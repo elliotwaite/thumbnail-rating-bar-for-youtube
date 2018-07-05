@@ -9,38 +9,65 @@
   <link rel="stylesheet" href="options-style.css">
 </head>
 <body>
+
   <div class="content-container">
-    <h4>Rating Bar Color</h4>
 
-    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleBlueGray">
-      <input type="radio" id="barColorStyleBlueGray" class="mdl-radio__button" name="barColorStyle" value="blueGray">
+    <div id="thumbnail-preview" class="thumbnail-preview  ytrb-bar-color-green-red">
+      <img src="options-thumbnail.jpg">
+      <div class="ytrb-bar"><div style="width:62%"></div></div>
+    </div>
+
+    <h6 class="h6">Color</h6>
+
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-blue-gray">
+      <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
       <span class="mdl-radio__label">
-        <div class="bar-bg bar-blue-gray"><div class="bar-likes"></div></div>
+        <div class="ytrb-bar"><div style="width:62%"></div></div>
       </span>
+    </label>
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-green-red">
+      <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
+      <span class="mdl-radio__label ytrb-bar-color-green-red">
+        <div class="ytrb-bar"><div style="width:62%"></div></div>
+      </span>
+    </label>
+
+    <h6>Thickness</h6>
+
+    <label class="slider-label">
+      <span id="bar-thickness-text" class="slider-bubble">4 px</span>
+      <div class="slider-input-container">
+        <input id="bar-thickness" class="mdl-slider mdl-js-slider" type="range" min="0" max="16" value="4">
+      </div>
     </label>
 
     <br />
 
-    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="barColorStyleGreenRed">
-      <input type="radio" id="barColorStyleGreenRed" class="mdl-radio__button" name="barColorStyle" value="greenRed">
-      <span class="mdl-radio__label">
-        <div class="bar-bg bar-green-red"><div class="bar-likes"></div></div>
-      </span>
+    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
+      <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
+      <span class="mdl-checkbox__label">Add a separation line above the rating bar.</span>
     </label>
 
     <br />
     <br />
+    <br />
+
+    <button id="restore-defaults-btn" class="mdl-button mdl-js-button mdl-button--primary">
+      Restore Defaults
+    </button>
 
     <button id="save-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
       Save
     </button>
-    </div>
 
-  <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+  </div>
+
+  <div id="toast" class="mdl-js-snackbar mdl-snackbar">
     <div class="mdl-snackbar__text"></div>
     <button class="mdl-snackbar__action" type="button"></button>
   </div>
 
   <script src="options-script.js"></script>
+
 </body>
 </html>

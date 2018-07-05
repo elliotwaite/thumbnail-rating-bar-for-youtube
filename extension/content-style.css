@@ -1,37 +1,103 @@
 /* The thumbnail rating bar. */
-.ytrb-bar {
+ytrb-bar {
+  display: block;
   position: absolute;
-  z-index: 999;
+  bottom: 0;
   width: 100%;
   height: 4px;
-  bottom: 0;
+  z-index: 999;
   background-color: #cfcfcf;
-  border-top: 1px solid #fff;
 }
 
-.ytrb-bar>div {
+ytrb-rating {
+  display: block;
   height: 4px;
   left: 0;
   background-color: #3095e3;
 }
 
-.ytrb-green-red .ytrb-bar {
+/* No ratings yet. */
+ytrb-bar.ytrb-bar-no-rating,
+.ytrb-bar-color-green-red ytrb-bar.ytrb-bar-no-rating {
+  background-color: #888;
+}
+
+.ytrb-bar-color-green-red ytrb-bar {
   background-color: #c00;
 }
 
-.ytrb-green-red .ytrb-bar>div {
+.ytrb-bar-color-green-red ytrb-rating {
   background-color: #060;
   box-shadow: 1px 0 0 0 #fff;
 }
 
+.ytrb-bar-separator ytrb-bar {
+  border-top: 1px solid #fff;
+}
+
+ytrb-tooltip {
+  display: flex;
+  justify-content: center;
+}
+ytrb-tooltip>div {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  bottom: 8px;
+  max-width: calc(100% - 24px);
+  padding: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  background-color: #616161;
+  border-radius: 2px;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-out 0.2s;
+}
+ytrb-bar:hover ytrb-tooltip>div {
+  visibility: visible;
+  opacity: 0.9;
+}
+
+/* Video page tooltip for classic theme. */
+.video-extras-sparkbars {
+  overflow: visible;
+}
+ytrb-classic-tooltip {
+  position: absolute;
+  bottom: 8px;
+  right: 0;
+  padding: 8px;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  background-color: #616161;
+  border-radius: 2px;
+  font-family: 'Roboto', 'Noto', sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease-out 0.2s;
+}
+.video-extras-sparkbars:hover ytrb-classic-tooltip {
+  visibility: visible;
+  opacity: 0.9;
+}
+
 /* The video's main page rating bar. */
-.ytrb-green-red #container.ytd-sentiment-bar-renderer,
-.ytrb-green-red .video-extras-sparkbar-dislikes /* For classic mode */ {
+.ytrb-bar-color-green-red #container.ytd-sentiment-bar-renderer,
+.ytrb-bar-color-green-red .video-extras-sparkbar-dislikes /* For classic mode */ {
   background-color: #c00;
 }
 
-.ytrb-green-red #like-bar.ytd-sentiment-bar-renderer ,
-.ytrb-green-red .video-extras-sparkbar-likes /* For classic mode */ {
+.ytrb-bar-color-green-red #like-bar.ytd-sentiment-bar-renderer ,
+.ytrb-bar-color-green-red .video-extras-sparkbar-likes /* For classic mode */ {
   background-color: #060;
   box-shadow: 1px 0 #fff;
   position: relative;
@@ -49,8 +115,207 @@ ytg-thumbnail .ytrb-bar {
 }
 
 /* Move the watch history progress bar to the top of the thumbnail. */
-ytd-thumbnail-overlay-resume-playback-renderer,
-.resume-playback-background,
-.resume-playback-progress-bar {
+ytd-thumbnail-overlay-resume-playback-renderer,  /* Modern */
+.resume-playback-background,  /* Classic */
+.resume-playback-progress-bar,  /* Classic */
+ytg-thumbnail-overlay-resume-playback-renderer  /* Gaming */
+{
   top: 0 !important;
 }
+#bottom-thumbnail-overlay-badges  /* Gaming */
+{
+  height: calc(100% - 8px);
+}
+ytg-thumbnail-overlay-time-status-renderer /* Gaming */
+{
+  position: absolute;
+  bottom: 4px;
+  height: 15px;
+}
+
+/* Prevent the video page rating bar tooltip from wrapping to multiple lines. */
+.ytd-sentiment-bar-renderer {
+  white-space: nowrap;
+}
+
+
+.ytrb-bar-thickness-0 ytrb-bar, .ytrb-bar-thickness-0 ytrb-rating { height: 0px }
+.ytrb-bar-thickness-1 ytrb-bar, .ytrb-bar-thickness-1 ytrb-rating { height: 1px }
+.ytrb-bar-thickness-2 ytrb-bar, .ytrb-bar-thickness-2 ytrb-rating { height: 2px }
+.ytrb-bar-thickness-3 ytrb-bar, .ytrb-bar-thickness-3 ytrb-rating { height: 3px }
+.ytrb-bar-thickness-5 ytrb-bar, .ytrb-bar-thickness-5 ytrb-rating { height: 5px }
+.ytrb-bar-thickness-6 ytrb-bar, .ytrb-bar-thickness-6 ytrb-rating { height: 6px }
+.ytrb-bar-thickness-7 ytrb-bar, .ytrb-bar-thickness-7 ytrb-rating { height: 7px }
+.ytrb-bar-thickness-8 ytrb-bar, .ytrb-bar-thickness-8 ytrb-rating { height: 8px }
+.ytrb-bar-thickness-9 ytrb-bar, .ytrb-bar-thickness-9 ytrb-rating { height: 9px }
+.ytrb-bar-thickness-10 ytrb-bar, .ytrb-bar-thickness-10 ytrb-rating { height: 10px }
+.ytrb-bar-thickness-11 ytrb-bar, .ytrb-bar-thickness-11 ytrb-rating { height: 11px }
+.ytrb-bar-thickness-12 ytrb-bar, .ytrb-bar-thickness-12 ytrb-rating { height: 12px }
+.ytrb-bar-thickness-13 ytrb-bar, .ytrb-bar-thickness-13 ytrb-rating { height: 13px }
+.ytrb-bar-thickness-14 ytrb-bar, .ytrb-bar-thickness-14 ytrb-rating { height: 14px }
+.ytrb-bar-thickness-15 ytrb-bar, .ytrb-bar-thickness-15 ytrb-rating { height: 15px }
+.ytrb-bar-thickness-16 ytrb-bar, .ytrb-bar-thickness-16 ytrb-rating { height: 16px }
+
+.ytrb-bar-thickness-0 ytrb-tooltip>div { bottom: 4px }
+.ytrb-bar-thickness-1 ytrb-tooltip>div { bottom: 5px }
+.ytrb-bar-thickness-2 ytrb-tooltip>div { bottom: 6px }
+.ytrb-bar-thickness-3 ytrb-tooltip>div { bottom: 7px }
+.ytrb-bar-thickness-5 ytrb-tooltip>div { bottom: 9px }
+.ytrb-bar-thickness-6 ytrb-tooltip>div { bottom: 10px }
+.ytrb-bar-thickness-7 ytrb-tooltip>div { bottom: 11px }
+.ytrb-bar-thickness-8 ytrb-tooltip>div { bottom: 12px }
+.ytrb-bar-thickness-9 ytrb-tooltip>div { bottom: 13px }
+.ytrb-bar-thickness-10 ytrb-tooltip>div { bottom: 14px }
+.ytrb-bar-thickness-11 ytrb-tooltip>div { bottom: 15px }
+.ytrb-bar-thickness-12 ytrb-tooltip>div { bottom: 16px }
+.ytrb-bar-thickness-13 ytrb-tooltip>div { bottom: 17px }
+.ytrb-bar-thickness-14 ytrb-tooltip>div { bottom: 18px }
+.ytrb-bar-thickness-15 ytrb-tooltip>div { bottom: 19px }
+.ytrb-bar-thickness-16 ytrb-tooltip>div { bottom: 20px }
+
+/* Reposition the thumbnail time (modern theme). */
+.ytrb-bar-thickness-0 ytd-thumbnail-overlay-time-status-renderer { bottom: 0 }
+.ytrb-bar-thickness-1 ytd-thumbnail-overlay-time-status-renderer { bottom: 1px }
+.ytrb-bar-thickness-2 ytd-thumbnail-overlay-time-status-renderer { bottom: 2px }
+.ytrb-bar-thickness-3 ytd-thumbnail-overlay-time-status-renderer { bottom: 3px }
+.ytrb-bar-thickness-4 ytd-thumbnail-overlay-time-status-renderer { bottom: 4px }
+.ytrb-bar-thickness-5 ytd-thumbnail-overlay-time-status-renderer { bottom: 5px }
+.ytrb-bar-thickness-6 ytd-thumbnail-overlay-time-status-renderer { bottom: 6px }
+.ytrb-bar-thickness-7 ytd-thumbnail-overlay-time-status-renderer { bottom: 7px }
+.ytrb-bar-thickness-8 ytd-thumbnail-overlay-time-status-renderer { bottom: 8px }
+.ytrb-bar-thickness-9 ytd-thumbnail-overlay-time-status-renderer { bottom: 9px }
+.ytrb-bar-thickness-10 ytd-thumbnail-overlay-time-status-renderer { bottom: 10px }
+.ytrb-bar-thickness-11 ytd-thumbnail-overlay-time-status-renderer { bottom: 11px }
+.ytrb-bar-thickness-12 ytd-thumbnail-overlay-time-status-renderer { bottom: 12px }
+.ytrb-bar-thickness-13 ytd-thumbnail-overlay-time-status-renderer { bottom: 13px }
+.ytrb-bar-thickness-14 ytd-thumbnail-overlay-time-status-renderer { bottom: 14px }
+.ytrb-bar-thickness-15 ytd-thumbnail-overlay-time-status-renderer { bottom: 15px }
+.ytrb-bar-thickness-16 ytd-thumbnail-overlay-time-status-renderer { bottom: 16px }
+
+.ytrb-bar-thickness-0 ytd-thumbnail-overlay-playback-status-renderer { bottom: 0 }
+.ytrb-bar-thickness-1 ytd-thumbnail-overlay-playback-status-renderer { bottom: 1px }
+.ytrb-bar-thickness-2 ytd-thumbnail-overlay-playback-status-renderer { bottom: 2px }
+.ytrb-bar-thickness-3 ytd-thumbnail-overlay-playback-status-renderer { bottom: 3px }
+.ytrb-bar-thickness-4 ytd-thumbnail-overlay-playback-status-renderer { bottom: 4px }
+.ytrb-bar-thickness-5 ytd-thumbnail-overlay-playback-status-renderer { bottom: 5px }
+.ytrb-bar-thickness-6 ytd-thumbnail-overlay-playback-status-renderer { bottom: 6px }
+.ytrb-bar-thickness-7 ytd-thumbnail-overlay-playback-status-renderer { bottom: 7px }
+.ytrb-bar-thickness-8 ytd-thumbnail-overlay-playback-status-renderer { bottom: 8px }
+.ytrb-bar-thickness-9 ytd-thumbnail-overlay-playback-status-renderer { bottom: 9px }
+.ytrb-bar-thickness-10 ytd-thumbnail-overlay-playback-status-renderer { bottom: 10px }
+.ytrb-bar-thickness-11 ytd-thumbnail-overlay-playback-status-renderer { bottom: 11px }
+.ytrb-bar-thickness-12 ytd-thumbnail-overlay-playback-status-renderer { bottom: 12px }
+.ytrb-bar-thickness-13 ytd-thumbnail-overlay-playback-status-renderer { bottom: 13px }
+.ytrb-bar-thickness-14 ytd-thumbnail-overlay-playback-status-renderer { bottom: 14px }
+.ytrb-bar-thickness-15 ytd-thumbnail-overlay-playback-status-renderer { bottom: 15px }
+.ytrb-bar-thickness-16 ytd-thumbnail-overlay-playback-status-renderer { bottom: 16px }
+
+/* Reposition the thumbnail time (classic theme). */
+.ytrb-bar-thickness-0 .video-time { margin-bottom: 1px !important }
+.ytrb-bar-thickness-1 .video-time { margin-bottom: 2px !important }
+.ytrb-bar-thickness-2 .video-time { margin-bottom: 3px !important }
+.ytrb-bar-thickness-3 .video-time { margin-bottom: 4px !important }
+.ytrb-bar-thickness-4 .video-time { margin-bottom: 5px !important }
+.ytrb-bar-thickness-5 .video-time { margin-bottom: 6px !important }
+.ytrb-bar-thickness-6 .video-time { margin-bottom: 7px !important }
+.ytrb-bar-thickness-7 .video-time { margin-bottom: 8px !important }
+.ytrb-bar-thickness-8 .video-time { margin-bottom: 9px !important }
+.ytrb-bar-thickness-9 .video-time { margin-bottom: 10px !important }
+.ytrb-bar-thickness-10 .video-time { margin-bottom: 11px !important }
+.ytrb-bar-thickness-11 .video-time { margin-bottom: 12px !important }
+.ytrb-bar-thickness-12 .video-time { margin-bottom: 13px !important }
+.ytrb-bar-thickness-13 .video-time { margin-bottom: 14px !important }
+.ytrb-bar-thickness-14 .video-time { margin-bottom: 15px !important }
+.ytrb-bar-thickness-15 .video-time { margin-bottom: 16px !important }
+.ytrb-bar-thickness-16 .video-time { margin-bottom: 17px !important }
+
+.ytrb-bar-thickness-0 .video-time-overlay { margin-bottom: 1px !important }
+.ytrb-bar-thickness-1 .video-time-overlay { margin-bottom: 2px !important }
+.ytrb-bar-thickness-2 .video-time-overlay { margin-bottom: 3px !important }
+.ytrb-bar-thickness-3 .video-time-overlay { margin-bottom: 4px !important }
+.ytrb-bar-thickness-4 .video-time-overlay { margin-bottom: 5px !important }
+.ytrb-bar-thickness-5 .video-time-overlay { margin-bottom: 6px !important }
+.ytrb-bar-thickness-6 .video-time-overlay { margin-bottom: 7px !important }
+.ytrb-bar-thickness-7 .video-time-overlay { margin-bottom: 8px !important }
+.ytrb-bar-thickness-8 .video-time-overlay { margin-bottom: 9px !important }
+.ytrb-bar-thickness-9 .video-time-overlay { margin-bottom: 10px !important }
+.ytrb-bar-thickness-10 .video-time-overlay { margin-bottom: 11px !important }
+.ytrb-bar-thickness-11 .video-time-overlay { margin-bottom: 12px !important }
+.ytrb-bar-thickness-12 .video-time-overlay { margin-bottom: 13px !important }
+.ytrb-bar-thickness-13 .video-time-overlay { margin-bottom: 14px !important }
+.ytrb-bar-thickness-14 .video-time-overlay { margin-bottom: 15px !important }
+.ytrb-bar-thickness-15 .video-time-overlay { margin-bottom: 16px !important }
+.ytrb-bar-thickness-16 .video-time-overlay { margin-bottom: 17px !important }
+
+.ytrb-bar-thickness-0 .addto-button { margin-bottom: 1px !important }
+.ytrb-bar-thickness-1 .addto-button { margin-bottom: 2px !important }
+.ytrb-bar-thickness-2 .addto-button { margin-bottom: 3px !important }
+.ytrb-bar-thickness-3 .addto-button { margin-bottom: 4px !important }
+.ytrb-bar-thickness-4 .addto-button { margin-bottom: 5px !important }
+.ytrb-bar-thickness-5 .addto-button { margin-bottom: 6px !important }
+.ytrb-bar-thickness-6 .addto-button { margin-bottom: 7px !important }
+.ytrb-bar-thickness-7 .addto-button { margin-bottom: 8px !important }
+.ytrb-bar-thickness-8 .addto-button { margin-bottom: 9px !important }
+.ytrb-bar-thickness-9 .addto-button { margin-bottom: 10px !important }
+.ytrb-bar-thickness-10 .addto-button { margin-bottom: 11px !important }
+.ytrb-bar-thickness-11 .addto-button { margin-bottom: 12px !important }
+.ytrb-bar-thickness-12 .addto-button { margin-bottom: 13px !important }
+.ytrb-bar-thickness-13 .addto-button { margin-bottom: 14px !important }
+.ytrb-bar-thickness-14 .addto-button { margin-bottom: 15px !important }
+.ytrb-bar-thickness-15 .addto-button { margin-bottom: 16px !important }
+.ytrb-bar-thickness-16 .addto-button { margin-bottom: 17px !important }
+
+.ytrb-bar-thickness-0 .addto-queue-button { margin-bottom: 1px !important }
+.ytrb-bar-thickness-1 .addto-queue-button { margin-bottom: 2px !important }
+.ytrb-bar-thickness-2 .addto-queue-button { margin-bottom: 3px !important }
+.ytrb-bar-thickness-3 .addto-queue-button { margin-bottom: 4px !important }
+.ytrb-bar-thickness-4 .addto-queue-button { margin-bottom: 5px !important }
+.ytrb-bar-thickness-5 .addto-queue-button { margin-bottom: 6px !important }
+.ytrb-bar-thickness-6 .addto-queue-button { margin-bottom: 7px !important }
+.ytrb-bar-thickness-7 .addto-queue-button { margin-bottom: 8px !important }
+.ytrb-bar-thickness-8 .addto-queue-button { margin-bottom: 9px !important }
+.ytrb-bar-thickness-9 .addto-queue-button { margin-bottom: 10px !important }
+.ytrb-bar-thickness-10 .addto-queue-button { margin-bottom: 11px !important }
+.ytrb-bar-thickness-11 .addto-queue-button { margin-bottom: 12px !important }
+.ytrb-bar-thickness-12 .addto-queue-button { margin-bottom: 13px !important }
+.ytrb-bar-thickness-13 .addto-queue-button { margin-bottom: 14px !important }
+.ytrb-bar-thickness-14 .addto-queue-button { margin-bottom: 15px !important }
+.ytrb-bar-thickness-15 .addto-queue-button { margin-bottom: 16px !important }
+.ytrb-bar-thickness-16 .addto-queue-button { margin-bottom: 17px !important }
+
+/* YouTube Gaming video time. */
+.ytrb-bar-thickness-0 ytg-thumbnail-overlay-time-status-renderer { bottom: 4px }
+.ytrb-bar-thickness-1 ytg-thumbnail-overlay-time-status-renderer { bottom: 5px }
+.ytrb-bar-thickness-2 ytg-thumbnail-overlay-time-status-renderer { bottom: 6px }
+.ytrb-bar-thickness-3 ytg-thumbnail-overlay-time-status-renderer { bottom: 7px }
+.ytrb-bar-thickness-4 ytg-thumbnail-overlay-time-status-renderer { bottom: 8px }
+.ytrb-bar-thickness-5 ytg-thumbnail-overlay-time-status-renderer { bottom: 9px }
+.ytrb-bar-thickness-6 ytg-thumbnail-overlay-time-status-renderer { bottom: 10px }
+.ytrb-bar-thickness-7 ytg-thumbnail-overlay-time-status-renderer { bottom: 11px }
+.ytrb-bar-thickness-8 ytg-thumbnail-overlay-time-status-renderer { bottom: 12px }
+.ytrb-bar-thickness-9 ytg-thumbnail-overlay-time-status-renderer { bottom: 13px }
+.ytrb-bar-thickness-10 ytg-thumbnail-overlay-time-status-renderer { bottom: 14px }
+.ytrb-bar-thickness-11 ytg-thumbnail-overlay-time-status-renderer { bottom: 15px }
+.ytrb-bar-thickness-12 ytg-thumbnail-overlay-time-status-renderer { bottom: 16px }
+.ytrb-bar-thickness-13 ytg-thumbnail-overlay-time-status-renderer { bottom: 17px }
+.ytrb-bar-thickness-14 ytg-thumbnail-overlay-time-status-renderer { bottom: 18px }
+.ytrb-bar-thickness-15 ytg-thumbnail-overlay-time-status-renderer { bottom: 19px }
+.ytrb-bar-thickness-16 ytg-thumbnail-overlay-time-status-renderer { bottom: 20px }
+
+.ytrb-bar-thickness-0 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 4px }
+.ytrb-bar-thickness-1 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 5px }
+.ytrb-bar-thickness-2 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 6px }
+.ytrb-bar-thickness-3 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 7px }
+.ytrb-bar-thickness-4 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 8px }
+.ytrb-bar-thickness-5 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 9px }
+.ytrb-bar-thickness-6 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 10px }
+.ytrb-bar-thickness-7 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 11px }
+.ytrb-bar-thickness-8 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 12px }
+.ytrb-bar-thickness-9 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 13px }
+.ytrb-bar-thickness-10 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 14px }
+.ytrb-bar-thickness-11 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 15px }
+.ytrb-bar-thickness-12 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 16px }
+.ytrb-bar-thickness-13 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 17px }
+.ytrb-bar-thickness-14 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 18px }
+.ytrb-bar-thickness-15 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 19px }
+.ytrb-bar-thickness-16 .ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer { bottom: 20px }

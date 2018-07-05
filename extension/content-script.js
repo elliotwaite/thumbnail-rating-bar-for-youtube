@@ -1,164 +1,245 @@
-const MAX_VIDEO_RESULTS = 50
-const THROTTLE_MS = 200
-const LIKES_BLUE = '3095e3'
-const DISLIKES_GRAY = 'cfcfcf'
-
-let barPrefix = '<div class="ytrb-bar"><div style="width:'
-let barSuffix = '%"></div></div>'
-
-let videoRatingsCache = {}
-let missingIds = new Set()
-let unseenMutations = false
-let isThrottled = false
+// Setting debug to true will turn on console.log messages used for debugging.
 let debug = false
 
+// Variables for handling throttling DOM searches.
+const THROTTLE_MS = 100
+let hasUnseenMutations = false
+let isThrottled = false
+
+// The YouTube API limit of the number of video IDs you can pass in per request.
+const MAX_IDS_PER_API_CALL = 50
+
+// A cache to store video ratings, to limit API calls and improve performance.
+let videoCache = {}
+
+// Enum values for which YouTube theme is currently begin viewed.
+let curTheme = 0  // No theme set yet.
+const THEME_MODERN = 1  // The new Material Design theme.
+const THEME_CLASSIC = 2  // The classic theme.
+const THEME_GAMING = 3  // The YouTube Gaming theme.
+const NUM_THEMES = 3
+
+// We use these JQuery selectors to find new thumbnails on the page. We use
+// :not([data-ytrb-found]) to make sure these aren't thumbnails that we've
+// already added a rating bar to. We need to check all combinations of these
+// modes and types:
+//   Modes:
+//     * Classic (Can be enabled by add &disable_polymer=true to the URL)
+//     * Modern (The new Material Design theme)
+//     * Gaming (YouTube Gaming)
+//   Types:
+//     * Search results videos
+//     * Search results playlist
+//     * Creator's videos
+//     * Creator's playlist
+//     * Sidebar suggested videos
+//     * Sidebar suggested playlists
+//     * Playlist page big thumbnail
+//     * Playlist page small thumbnails
+//     * Playing playlist small icons
+//     * Video wall (suggested videos after the video ends)
+//
+// (Note: the gaming playlist page big thumbnail will be ignored due to
+//  complications in getting the associated video ID from the thumbnail.
+//  Also, since the ratings for the videos in the playlist are shown in the
+//  smaller icons right below the big icon, adding a rating bar to the
+//  big icon doesn't add much value.)
+//
+// Listed below are which type of thumbnails that part of selector identifies,
+// and where the link tag element is relative to the thumbnail element for
+// figuring out the video ID associated with that thumbnail.
+const THUMBNAIL_SELECTORS = []
+THUMBNAIL_SELECTORS[THEME_MODERN] = '' +
+  // All types except the video wall. The URL is on the selected a link.
+  'a#thumbnail'
+
+THUMBNAIL_SELECTORS[THEME_CLASSIC] = '' +
+  // Search results videos. (url on parent)
+  // Creator's videos. (url on parent)
+  // Playlist page small thumbnails. (url on parent)
+  // Sidebar suggested playlist. (url on grandparent)
+  // Playing playlist small thumbnails. (url on parent)
+  '.video-thumb' +
+  ':not(.yt-thumb-20)' +
+  ':not(.yt-thumb-27)' +
+  ':not(.yt-thumb-32)' +
+  ':not(.yt-thumb-36)' +
+  ':not(.yt-thumb-48)' +
+  ':not(.yt-thumb-64), ' +
+  // (For search results, if a channel is in the results, it's thumbnail will
+  //  be caught by this selector, but won't have an matchable video URL.
+  //  Since this does not cause an error, it should be fine to ignore it.)
+
+  // Sidebar suggested video. (url on first child)
+  '.thumb-wrapper, ' +
+
+  // Playlist page big thumbnail. (url on second child)
+  '.pl-header-thumb'
+
+THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
+  // Gaming all types except video wall. URL is on the great grandparent,
+  // except for search result playlists it is on the grandparent.
+  'ytg-thumbnail' +
+  ':not([avatar])' +
+  ':not(.avatar)' +
+  ':not(.ytg-user-avatar)' +
+  ':not(.ytg-box-art)' +
+  ':not(.ytg-compact-gaming-event-renderer)' +
+  ':not(.ytg-playlist-header-renderer)'
+
+// All themes use this selector for video wall videos.
+const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
+  'a.ytp-videowall-still'
+
+// Set the current theme.
+// function setCurrentTheme() {
+//   console.log('debug')
+//   console.log($('head'))
+//   console.log($('head>meta'))
+//   console.log($('head>meta[property="og:site_name"]'))
+//   console.log($('head>meta[property="og:site_name"]').attr('content'))
+//   let siteName = $('head>meta[property="og:site_name"]').attr('content')
+//   if (siteName === 'YouTube') {
+//     curTheme = THEME_MODERN
+//   } else if (siteName === 'YouTube Gaming') {
+//     curTheme = THEME_GAMING
+//   } else {
+//     // siteName will be undefined.
+//     curTheme = THEME_CLASSIC
+//   }
+//   console.log('set theme', siteName, curTheme)
+//   curTheme = 1
+// }
+
+// An observer for watching changes to the body element.
 let observer = new MutationObserver(handleMutations)
 
 function handleMutations() {
-  // Throttle calling `checkForNewThumbnails` to at most every `THROTTLE_MS`.
+  // When the DOM is updated, we search for items that should be modified.
+  // However, we throttle these searches to not over tax the CPU.
   if (isThrottled) {
-    unseenMutations = true
+    // If updates are currently being throttled, we'll remember to handle
+    // them later.
+    hasUnseenMutations = true
   } else {
-    isThrottled = true
-    unseenMutations = false
+    // Run the updates.
     checkForNewThumbnails()
-    checkForRatingBarTooltip()
+    checkForNewRatingBarTooltips()
+
+    hasUnseenMutations = false
+
+    // Turn on throttle.
+    isThrottled = true
+
     setTimeout(function () {
+      // After `THROTTLE_MS` milliseconds, turn off the throttle.
       isThrottled = false
-      if (unseenMutations) {
+
+      // If any mutations occurred while being throttled, handle them now.
+      if (hasUnseenMutations) {
         handleMutations()
       }
+
     }, THROTTLE_MS)
   }
 }
 
 function checkForNewThumbnails() {
-  let ids = []
+  // Get new thumbnails, and set the theme if it hasn't been set yet.
   let thumbnails = []
-  // Check for any new thumbnails.
-  // We need to check all combinations of these modes and types:
-  //   Modes:
-  //     * Modern
-  //     * Classic
-  //     * Gaming (YouTube Gaming)
-  //   Types:
-  //     * Search results
-  //     * Creators videos
-  //     * Suggested videos
-  //     * Suggested playlists
-  //     * Playlist page (big icon)
-  //     * Playlist page (small icons)
-  //     * Playing playlist (small icons)
-  // (However, gaming playlist page (big icon) will be ignored since there
-  //  isn't an easy way to get it's associated video ID, and since the ratings
-  //  for the videos are right below it, it doesn't add much value.)
-  $(
-    // Modern search results:
-    //   https://www.youtube.com/user/TheSpiritualCatalyst/videos
-    // Modern creators videos:
-    //   https://www.youtube.com/user/TheSpiritualCatalyst/videos
-    // Modern suggested videos:
-    //   https://www.youtube.com/watch?v=_FYqpvii9ok
-    // Modern suggested playlists:
-    //   https://www.youtube.com/watch?v=_FYqpvii9ok
-    // Modern playlist page (small icons):
-    //   https://www.youtube.com/playlist?list=PLiDGSQiS-Y3T9Y4KPrBpjECtrrTTqgADq&disable_polymer=0&disable_polymer=true
-    // Modern playing playlist (small icons):
-    //   https://www.youtube.com/watch?v=DkeiKbqa02g&list=PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG&index=1
-    // (URL is on the first child.)
-    'ytd-thumbnail:not([data-ytrb-found]), ' +
-
-    // Modern playlist page (big icon):
-    //   https://www.youtube.com/playlist?list=PLiDGSQiS-Y3T9Y4KPrBpjECtrrTTqgADq&disable_polymer=0&disable_polymer=true
-    // (URL is on the first child.)
-    'ytd-playlist-thumbnail:not([data-ytrb-found]), ' +
-
-    // Classic search results:
-    //   https://www.youtube.com/results?search_query=test&disable_polymer=1
-    // Classic creators videos:
-    //   https://www.youtube.com/user/TheSpiritualCatalyst/videos?disable_polymer=1
-    // Classic playlist page (small icons):
-    //   https://www.youtube.com/playlist?list=PLiDGSQiS-Y3T9Y4KPrBpjECtrrTTqgADq&disable_polymer=true
-    // Classic suggested playlists:
-    //   https://www.youtube.com/watch?v=_FYqpvii9ok&disable_polymer=1
-    // Classic playing playlist (small icons):
-    //   https://www.youtube.com/watch?v=aJOTlE1K90k&list=PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG&disable_polymer=1
-    // (URL is on the parent, except for the classic suggested playlists it
-    //  is on the grandparent.)
-    '.video-thumb:not([data-ytrb-found])' +
-    ':not(.yt-thumb-20)' +
-    ':not(.yt-thumb-27)' +
-    ':not(.yt-thumb-32)' +
-    ':not(.yt-thumb-36)' +
-    ':not(.yt-thumb-48)' +
-    ':not(.yt-thumb-64), ' +
-    // (For classic search results, if a channel is in the results, its will
-    //  be caught here, but won't have an available URL. Since this is a rare
-    //  case and does not cause an error, it should be fine to ignore it.)
-
-    // Classic suggested videos:
-    //   https://www.youtube.com/watch?v=_FYqpvii9ok&disable_polymer=1
-    // (URL is on first child.)
-    '.thumb-wrapper:not([data-ytrb-found]), ' +
-
-    // Classic playlist page (big icon):
-    //   https://www.youtube.com/playlist?list=PLiDGSQiS-Y3T9Y4KPrBpjECtrrTTqgADq&disable_polymer=true
-    // (URL is on second child.)
-    '.pl-header-thumb:not([data-ytrb-found]), ' +
-
-    // Gaming all types:
-    //   https://gaming.youtube.com/
-    // (URL is on great grandparent, except for the suggested playlists it is
-    //  on the grandparent, and for the playlist page (big icon) there is no
-    //  convenient way to get the video ID so it will be skipped.)
-    'ytg-thumbnail:not([data-ytrb-found])' +
-    ':not([avatar])' +
-    ':not(.avatar)' +
-    ':not(.ytg-user-avatar)' +
-    ':not(.ytg-box-art)' +
-    ':not(.ytg-compact-gaming-event-renderer)' +
-    ':not(.ytg-playlist-header-renderer)'
-
-  ).each(function (_, thumbnail) {
-    // if (debug) console.log('found', thumbnail)
-
-    // Add a tag marking this thumbnail as having been found.
-    $(thumbnail).attr('data-ytrb-found', '')
-
-    // Find the URL for this thumbnail. Check the first child, then the parent,
-    // then the grandparent, then the second child, then the great grandparent.
-    // This is in the order of most to least common.
-    let url = $(thumbnail).children(':first').attr('href')
-      || $(thumbnail).parent().attr('href')
-      || $(thumbnail).parent().parent().attr('href')
-      || $(thumbnail).children(':first').next().attr('href')
-      || $(thumbnail).parent().parent().parent().attr('href')
-
-    // If we've successfully found a url, extract the video ID from that URL.
-    if (url) {
-      // Check for the id in the href URL, or in the style image URL.
-      let match = url.match(/.*[?&]v=([^&]+).*/)
-      if (match) {
-        let id = match[1]
-        ids.push(id)
-        thumbnails.push(thumbnail)
-      } else if (debug) {
-        console.log('match not found', thumbnail, url)
+  if (curTheme) {
+    thumbnails = $(THUMBNAIL_SELECTORS[curTheme])
+  } else {
+    for (let i = 1; i <= NUM_THEMES; i++) {
+      thumbnails = $(THUMBNAIL_SELECTORS[i])
+      if (thumbnails.length) {
+        curTheme = i
       }
-    } else if (debug) {
-      console.log('url not found', thumbnail, url)
+    }
+  }
+
+  // Add the videowall thumbnails.
+  thumbnails = $.merge(thumbnails, $(THUMBNAIL_SELECTOR_VIDEOWALL))
+
+  let thumbnails_and_ids = []
+  $(thumbnails).each(function (_, thumbnail) {
+    // Find the link tag element of the thumbnail and its URL.
+    let url
+    if (curTheme === THEME_MODERN) {
+      // The URL should be on the current element.
+      url = $(thumbnail).attr('href')
+
+    } else if (curTheme === THEME_CLASSIC) {
+      // Check the current element, then the parent, then the grandparent,
+      // then the first child, then the second child.
+      url = $(thumbnail).attr('href')
+        || $(thumbnail).parent().attr('href')
+        || $(thumbnail).parent().parent().attr('href')
+        || $(thumbnail).children(':first').attr('href')
+        || $(thumbnail).children(':first').next().attr('href')
+
+    } else if (curTheme === THEME_GAMING) {
+      // Check the current element, then the grandparent.
+      url = $(thumbnail).attr('href')
+        || $(thumbnail).parent().parent().attr('href')
+        || $(thumbnail).parent().parent().parent().attr('href')
+
+      // Unless the element is a video wall thumbnail, change the thumbnail
+      // element to the parent element, so that it will show over the thumbnail
+      // preview video that plays when you hover over the thumbnail.
+      if (!$(thumbnail).is('a')) {
+        thumbnail = $(thumbnail).parent()
+      }
+
+    } else {
+      // The theme may not be set if only videowall thumbnails were found.
+      url = $(thumbnail).attr('href')
+    }
+
+    if (!url) {
+      if (debug) console.log('url not found', thumbnail, url)
+      return true
+    }
+
+    // Check if this thumbnail was previously found.
+    let previousUrl = $(thumbnail).attr('data-ytrb-found')
+    if (previousUrl) {
+      // Check if this thumbnail is for the same URL as previously.
+      if (previousUrl === url) {
+        // If so, continue the next thumbnail.
+        return true
+      } else {
+        // If not, remove the old rating bar.
+        $(thumbnail).children('ytrb-bar').remove()
+      }
+    }
+    // Add an attribute that marks this thumbnail as found, and give it the
+    // value of the URL the thumbnail is for.
+    $(thumbnail).attr('data-ytrb-found', url)
+
+    // Extract the video ID from the URL.
+    let match = url.match(/.*[?&]v=([^&]+).*/)
+    if (match) {
+      let id = match[1]
+      thumbnails_and_ids.push([thumbnail, id])
+    } else {
+      if (debug) console.log('match not found', thumbnail, url)
     }
   })
-  if (ids) {
-    getRatings(ids, thumbnails)
+
+  if (thumbnails_and_ids.length) {
+    addRatingsToCache(thumbnails_and_ids).then(function () {
+      addRatingBars(thumbnails_and_ids)
+    })
   }
 }
 
-function getRatings(ids, thumbnails) {
+function addRatingsToCache(thumbnails_and_ids) {
   // Get the set of all IDs we haven't seen yet.
   let unseenIds = new Set()
-  for (id of ids) {
-    if (!(id in videoRatingsCache)) {
+  for (let thumbnail_and_id of thumbnails_and_ids) {
+    let id = thumbnail_and_id[1]
+    if (!(id in videoCache)) {
       unseenIds.add(id)
     }
   }
@@ -166,75 +247,152 @@ function getRatings(ids, thumbnails) {
   // Go through the unseen IDs in batches of 50 and get their ratings.
   let unseenIdsArray = Array.from(unseenIds)
   let promises = []
-  for (let i = 0; i < unseenIdsArray.length; i += MAX_VIDEO_RESULTS) {
-    let unseenIdsBatch = unseenIdsArray.slice(i, i + MAX_VIDEO_RESULTS)
+  for (let i = 0; i < unseenIdsArray.length; i += MAX_IDS_PER_API_CALL) {
+    let unseenIdsBatch = unseenIdsArray.slice(i, i + MAX_IDS_PER_API_CALL)
     let url = 'https://www.googleapis.com/youtube/v3/videos?id=' +
       unseenIdsBatch.join(',') + '&part=statistics&key=' + YOUTUBE_API_KEY
     let promise = $.get(url, function (data) {
       for (item of data.items) {
-        let likes = parseInt(item.statistics.likeCount)
-        let dislikes = parseInt(item.statistics.dislikeCount)
-        let total = likes + dislikes
-        let rating = 0.5
-        if (total) {
-          rating = likes / total
-        }
-        videoRatingsCache[item.id] = rating
+        let video = getVideoObject(
+          item.statistics.likeCount || 0,
+          item.statistics.dislikeCount || 0)
+        videoCache[item.id] = video
       }
     })
     promises.push(promise)
   }
 
-  // Once we've got all the ratings, add the rating bars.
-  Promise.all(promises).then(function () {
-    addRatingBars(ids, thumbnails)
-  })
+  // Return a promise that resolves once all data has been retrieved and saved
+  // to the cache.
+  return Promise.all(promises)
 }
 
-function addRatingBars(ids, thumbnails) {
+function addRatingBars(thumbnails_and_ids) {
   // Add a rating bar to each thumbnail.
-  for (let i = 0; i < ids.length; i++) {
-    let id = ids[i]
-    let thumbnail = thumbnails[i]
-    let rating
-    if (id in videoRatingsCache) {
-      rating = videoRatingsCache[id]
-      $(thumbnail).prepend(barPrefix + (rating * 100) + barSuffix)
+  for (let thumbnail_and_id of thumbnails_and_ids) {
+    let thumbnail = thumbnail_and_id[0]
+    let id = thumbnail_and_id[1]
+    if (id in videoCache) {
+      $(thumbnail).prepend(getRatingBarHtml(videoCache[id]))
     } else {
       if (debug) console.log('missing id', id, thumbnail)
-      // // If the video data isn't retrieved on the first try, allow a second
-      // // try, but after the second failed attempt, don't try again.
-      // if (!missingIds.has(id)) {
-      //   if (debug) console.log('missing 1', id, thumbnail)
-      //   missingIds.add(id)
-      //   $(thumbnail).removeAttr('data-ytrb-found')
-      //   handleMutations()
-      // } else {
-      //   if (debug) console.log('missing 2', id, thumbnail)
-      // }
     }
   }
 }
 
-function checkForRatingBarTooltip() {
-  $('.ytd-sentiment-bar-renderer #tooltip:not([data-ytrb-found])')
-    .each(function (tooltip) {
-      $(tooltip).attr('data-ytrb-found', '')
-      likesDislikes = $(tooltip).text().split(' / ')
-    })
+function getVideoObject(likes, dislikes) {
+  likes = parseInt(likes)
+  dislikes = parseInt(dislikes)
+  let total = likes + dislikes
+  let ratingStyle = ''
+  let ratingText = ''
+  if (total) {
+    let rating = (likes / total * 100)
+    ratingStyle = rating + '%'
+    if (likes !== total && rating >= 99.95) {
+      ratingText = '>99.9%'
+    } else {
+      ratingText = rating.toFixed(1) + '%'
+    }
+  }
+  return {
+    likes: likes.toLocaleString(),
+    dislikes: dislikes.toLocaleString(),
+    total: total.toLocaleString(),
+    ratingStyle: ratingStyle,
+    ratingText: ratingText,
+  }
+}
+
+function getRatingBarHtml(video) {
+  if (video.ratingStyle) {
+    return '<ytrb-bar>' +
+      '<ytrb-rating style="width:' + video.ratingStyle + '"></ytrb-rating>' +
+      '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>' +
+      '</ytrb-bar>'
+  } else {
+    return '<ytrb-bar class="ytrb-bar-no-rating">' +
+      '<ytrb-tooltip><div>No ratings yet.</div></ytrb-tooltip>' +
+      '</ytrb-bar>'
+  }
+}
+
+function getToolTipText(video) {
+  return video.likes + '&nbsp;/&nbsp;' + video.dislikes + ' &nbsp;&nbsp; '
+    + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
+}
+
+function checkForNewRatingBarTooltips() {
+  // For modern theme.
+  if (curTheme === THEME_MODERN || !curTheme) {
+    $('.ytd-sentiment-bar-renderer #tooltip')
+      .each(function (_, tooltip) {
+        let text
+        try {
+          text = $(tooltip).text().split('  ')[3]
+          // If the tooltip is empty, continue.
+          if (text.length < 3) {
+            return true
+          }
+        } catch(e) {
+          if (debug) console.log('tooltip likes not found', tooltip)
+          return true
+        }
+        let previousText = $(tooltip).attr('data-ytrb-found')
+        if (previousText) {
+          if (previousText === text) {
+            // This tooltip has already been processed.
+            return true
+          }
+          $(tooltip).children('span').remove()
+        }
+
+        // Mark this tooltip as found, and remember the text it is for.
+        $(tooltip).attr('data-ytrb-found', text)
+
+        // Extract the likes and dislikes from the tooltip's text.
+        let match = text.match(/([0-9,]+) \/ ([0-9,]+)/)
+        if (match) {
+          let likes = match[1].replace(/\D/g, '')
+          let dislikes = match[2].replace(/\D/g, '')
+          let video = getVideoObject(likes, dislikes)
+          if (video.ratingStyle) {
+            $(tooltip).append('<span> &nbsp;&nbsp; ' + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total</span>')
+          } else {
+            $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
+          }
+        } else {
+          if (debug) console.log('tooltip match not found', text, tooltip, $(tooltip))
+        }
+      })
+  }
+
+  // For classic theme.
+  if (curTheme === THEME_CLASSIC || !curTheme) {
+    $('#watch8-sentiment-actions:not([data-ytrb-found])')
+      .each(function (_, tooltip) {
+        $(tooltip).attr('data-ytrb-found', '')
+        let likes = $(tooltip).find('.like-button-renderer-like-button:first>span').text().replace(/\D/g, '')
+        let dislikes = $(tooltip).find('.like-button-renderer-dislike-button:first>span').text().replace(/\D/g, '')
+        let video = getVideoObject(likes, dislikes)
+        $(tooltip).find('.video-extras-sparkbars').append('<ytrb-classic-tooltip>' + getToolTipText(video) + '</ytrb-classic-tooltip>')
+      })
+  }
 }
 
 chrome.storage.sync.get({
-  barColorStyle: 'blueGray',
-  likesColor: LIKES_BLUE,
-  dislikesColor: DISLIKES_GRAY,
+  barColor: 'blue-gray',
+  barThickness: 4,
+  barSeparator: false
 }, function (settings) {
-  if (settings.barColorStyle === 'greenRed') {
-    $('html').addClass('ytrb-green-red')
-  } else if (settings.barColorStyle === 'custom') {
-    barPrefix = '<div class="ytrb-bar" ' +
-      'style="background-color:#' + settings.dislikesColor + '"><div ' +
-      'style="background-color:#' + settings.likesColor + ';width:'
+  if (settings.barColor !== 'blue-gray') {
+    $('html').addClass('ytrb-bar-color-' + settings.barColor)
+  }
+  if (settings.barThickness !== 4) {
+    $('html').addClass('ytrb-bar-thickness-' + settings.barThickness)
+  }
+  if (settings.barSeparator) {
+    $('html').addClass('ytrb-bar-separator')
   }
   handleMutations()
   observer.observe(document.body, {childList: true, subtree: true})
