@@ -17,10 +17,12 @@ https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
 ## Screenshots
 
-A rating bar is added to every thumbnail.
+**A rating bar is added to every thumbnail.**
+
 ![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-1.jpg)
 
-Access the settings by click the extension icon in the toolbar.
+**Access the settings by clicking the extension's icon in the toolbar.**
+
 ![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-2.jpg)
 
 ## Why

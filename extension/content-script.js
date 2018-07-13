@@ -111,6 +111,13 @@ const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
 //   curTheme = 1
 // }
 
+// The initial user settings. This variable is replaced with the stored user's
+// settings once they are loaded.
+let userSettings = {
+  barTooltip: false,
+  timeSincePublished: false,
+}
+
 // An observer for watching changes to the body element.
 let observer = new MutationObserver(handleMutations)
 
@@ -123,8 +130,10 @@ function handleMutations() {
     hasUnseenMutations = true
   } else {
     // Run the updates.
-    checkForNewThumbnails()
-    checkForNewRatingBarTooltips()
+    updateThumbnailRatingBars()
+    updateVideoRatingBarTooltips()
+    if (addTimeSincePublished)
+      updateTimeSincePublishedElements()
 
     hasUnseenMutations = false
 
@@ -144,7 +153,7 @@ function handleMutations() {
   }
 }
 
-function checkForNewThumbnails() {
+function updateThumbnailRatingBars() {
   // Get new thumbnails, and set the theme if it hasn't been set yet.
   let thumbnails = []
   if (curTheme) {
@@ -305,16 +314,15 @@ function getVideoObject(likes, dislikes) {
 }
 
 function getRatingBarHtml(video) {
-  if (video.ratingStyle) {
-    return '<ytrb-bar>' +
-      '<ytrb-rating style="width:' + video.ratingStyle + '"></ytrb-rating>' +
-      '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>' +
-      '</ytrb-bar>'
-  } else {
-    return '<ytrb-bar class="ytrb-bar-no-rating">' +
-      '<ytrb-tooltip><div>No ratings yet.</div></ytrb-tooltip>' +
-      '</ytrb-bar>'
-  }
+  return '<ytrb-bar' +
+    (video.ratingStyle
+      ? '>' +
+        '<ytrb-rating style="width:' + video.ratingStyle + '"></ytrb-rating>'
+      : ' class="ytrb-bar-no-rating">') +
+    (userSettings.barTooltip
+      ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
+      : '') +
+    '</ytrb-bar>'
 }
 
 function getToolTipText(video) {
@@ -322,7 +330,65 @@ function getToolTipText(video) {
     + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
 }
 
-function checkForNewRatingBarTooltips() {
+function updateVideoRatingBarTooltips() {
+  // For modern theme.
+  if (curTheme === THEME_MODERN || !curTheme) {
+    $('.ytd-sentiment-bar-renderer #tooltip')
+      .each(function (_, tooltip) {
+        let text
+        try {
+          text = $(tooltip).text().split('  ')[3]
+          // If the tooltip is empty, continue.
+          if (text.length < 3) {
+            return true
+          }
+        } catch(e) {
+          if (debug) console.log('tooltip likes not found', tooltip)
+          return true
+        }
+        let previousText = $(tooltip).attr('data-ytrb-found')
+        if (previousText) {
+          if (previousText === text) {
+            // This tooltip has already been processed.
+            return true
+          }
+          $(tooltip).children('span').remove()
+        }
+
+        // Mark this tooltip as found, and remember the text it is for.
+        $(tooltip).attr('data-ytrb-found', text)
+
+        // Extract the likes and dislikes from the tooltip's text.
+        let match = text.match(/([0-9,]+) \/ ([0-9,]+)/)
+        if (match) {
+          let likes = match[1].replace(/\D/g, '')
+          let dislikes = match[2].replace(/\D/g, '')
+          let video = getVideoObject(likes, dislikes)
+          if (video.ratingStyle) {
+            $(tooltip).append('<span> &nbsp;&nbsp; ' + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total</span>')
+          } else {
+            $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
+          }
+        } else {
+          if (debug) console.log('tooltip match not found', text, tooltip, $(tooltip))
+        }
+      })
+  }
+
+  // For classic theme.
+  if (curTheme === THEME_CLASSIC || !curTheme) {
+    $('#watch8-sentiment-actions:not([data-ytrb-found])')
+      .each(function (_, tooltip) {
+        $(tooltip).attr('data-ytrb-found', '')
+        let likes = $(tooltip).find('.like-button-renderer-like-button:first>span').text().replace(/\D/g, '')
+        let dislikes = $(tooltip).find('.like-button-renderer-dislike-button:first>span').text().replace(/\D/g, '')
+        let video = getVideoObject(likes, dislikes)
+        $(tooltip).find('.video-extras-sparkbars').append('<ytrb-classic-tooltip>' + getToolTipText(video) + '</ytrb-classic-tooltip>')
+      })
+  }
+}
+
+function checkForNew() {
   // For modern theme.
   if (curTheme === THEME_MODERN || !curTheme) {
     $('.ytd-sentiment-bar-renderer #tooltip')
@@ -383,8 +449,11 @@ function checkForNewRatingBarTooltips() {
 chrome.storage.sync.get({
   barColor: 'blue-gray',
   barThickness: 4,
-  barSeparator: false
+  barSeparator: false,
+  barTooltip: true,
+  timeSincePublished: true,
 }, function (settings) {
+  userSettings = settings
   if (settings.barColor !== 'blue-gray') {
     $('html').addClass('ytrb-bar-color-' + settings.barColor)
   }

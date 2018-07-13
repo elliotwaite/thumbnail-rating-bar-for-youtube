@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "YouTube™ Thumbnail Rating Bar",
-	"version": "0.0.31",
+	"version": "0.0.32",
 	"description": "Show the rating bar (likes/dislikes) on the bottom of every YouTube thumbnail.",
   "author": "Elliot Waite",
 	"icons": {

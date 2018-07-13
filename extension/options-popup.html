@@ -10,11 +10,16 @@
 </head>
 <body>
 
-  <div class="content-container">
+  <div class="left-options">
+
+    <!--<h5>Rating Bar Settings</h5>-->
 
     <div id="thumbnail-preview" class="thumbnail-preview  ytrb-bar-color-green-red">
       <img src="options-thumbnail.jpg">
-      <div class="ytrb-bar"><div style="width:62%"></div></div>
+      <ytrb-bar>
+        <ytrb-rating style="width:61.8%"></ytrb-rating>
+        <ytrb-tooltip><div>34&nbsp;/&nbsp;21 &nbsp;&nbsp; 61.8% &nbsp;&nbsp; 54&nbsp;total</div></ytrb-tooltip>
+      </ytrb-bar>
     </div>
 
     <h6 class="h6">Color</h6>
@@ -22,13 +27,17 @@
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-blue-gray">
       <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
       <span class="mdl-radio__label">
-        <div class="ytrb-bar"><div style="width:62%"></div></div>
+        <ytrb-bar>
+          <ytrb-rating style="width:61.8%"></ytrb-rating>
+        </ytrb-bar>
       </span>
     </label>
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-green-red">
       <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
       <span class="mdl-radio__label ytrb-bar-color-green-red">
-        <div class="ytrb-bar"><div style="width:62%"></div></div>
+        <ytrb-bar>
+          <ytrb-rating style="width:61.8%"></ytrb-rating>
+        </ytrb-bar>
       </span>
     </label>
 
@@ -51,6 +60,36 @@
     <br />
     <br />
     <br />
+
+    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-tooltip">
+      <input type="checkbox" id="bar-tooltip" class="mdl-checkbox__input">
+      <span class="mdl-checkbox__label">Hover your mouse over the rating bar to reveal a tooltip of rating info.</span>
+    </label>
+
+    <br />
+    <br />
+    <br />
+
+  </div>
+  <div class="right-options">
+
+    <h5>Additional Features</h5>
+
+
+    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="time-since-published">
+      <input type="checkbox" id="time-since-published" class="mdl-checkbox__input">
+      <span class="mdl-checkbox__label">Add the time since published (ex. 2 days ago) to the current video's info section and to the sidebar suggested videos.</span>
+    </label>
+
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+  </div>
+  <div class="buttons-container">
 
     <button id="restore-defaults-btn" class="mdl-button mdl-js-button mdl-button--primary">
       Restore Defaults
