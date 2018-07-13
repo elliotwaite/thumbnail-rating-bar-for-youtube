@@ -15,9 +15,11 @@ https://chrome.google.com/webstore/detail/youtube-thumbnail-rating/cmlddjbnoehmi
 For Firefox:  
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
-## Screenshot
+## Screenshots
 
 ![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-1.jpg)
+
+![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-2.jpg)
 
 ## Why
 Using YouTube usually involves browsing through many video previews. These video previews usually contain the following:
