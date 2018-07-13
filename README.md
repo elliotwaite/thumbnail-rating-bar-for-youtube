@@ -5,9 +5,17 @@
 
 </div>
 
-This Chrome extension adds the likes/dislikes rating bar to the bottom of every YouTube the video thumbnail, so you can find higher quality content and avoid getting clickbaited.
+This extension adds the likes/dislikes rating bar to the bottom of every YouTube the video thumbnail, so you can find higher quality content and avoid getting clickbaited.
 
-**Download it here: [YouTube&trade; Thumbnail Rating Bar - Chrome Extension](https://chrome.google.com/webstore/detail/youtube-thumbnail-rating/cmlddjbnoehmihdmfhaacemlpgfbpoeb)**
+## Install
+
+For Chrome:  
+https://chrome.google.com/webstore/detail/youtube-thumbnail-rating/cmlddjbnoehmihdmfhaacemlpgfbpoeb
+
+For Firefox:  
+https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
+
+## Screenshot
 
 ![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-1.jpg)
 
