@@ -114,6 +114,7 @@ const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
 // The initial user settings. This variable is replaced with the stored user's
 // settings once they are loaded.
 let userSettings = {
+  barOpacity: 100,
   barTooltip: false,
   timeSincePublished: false,
 }
@@ -132,8 +133,8 @@ function handleMutations() {
     // Run the updates.
     updateThumbnailRatingBars()
     updateVideoRatingBarTooltips()
-    if (addTimeSincePublished)
-      updateTimeSincePublishedElements()
+    // if (userSettings.timeSincePublished)
+    //   updateTimeSincePublishedElements()
 
     hasUnseenMutations = false
 
@@ -315,13 +316,19 @@ function getVideoObject(likes, dislikes) {
 
 function getRatingBarHtml(video) {
   return '<ytrb-bar' +
+    (userSettings.barOpacity !== 100
+      ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
+      : ''
+    ) +
     (video.ratingStyle
       ? '>' +
         '<ytrb-rating style="width:' + video.ratingStyle + '"></ytrb-rating>'
-      : ' class="ytrb-bar-no-rating">') +
+      : ' class="ytrb-bar-no-rating">'
+    ) +
     (userSettings.barTooltip
       ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
-      : '') +
+      : ''
+    ) +
     '</ytrb-bar>'
 }
 
@@ -388,67 +395,27 @@ function updateVideoRatingBarTooltips() {
   }
 }
 
-function checkForNew() {
-  // For modern theme.
-  if (curTheme === THEME_MODERN || !curTheme) {
-    $('.ytd-sentiment-bar-renderer #tooltip')
-      .each(function (_, tooltip) {
-        let text
-        try {
-          text = $(tooltip).text().split('  ')[3]
-          // If the tooltip is empty, continue.
-          if (text.length < 3) {
-            return true
-          }
-        } catch(e) {
-          if (debug) console.log('tooltip likes not found', tooltip)
-          return true
-        }
-        let previousText = $(tooltip).attr('data-ytrb-found')
-        if (previousText) {
-          if (previousText === text) {
-            // This tooltip has already been processed.
-            return true
-          }
-          $(tooltip).children('span').remove()
-        }
-
-        // Mark this tooltip as found, and remember the text it is for.
-        $(tooltip).attr('data-ytrb-found', text)
-
-        // Extract the likes and dislikes from the tooltip's text.
-        let match = text.match(/([0-9,]+) \/ ([0-9,]+)/)
-        if (match) {
-          let likes = match[1].replace(/\D/g, '')
-          let dislikes = match[2].replace(/\D/g, '')
-          let video = getVideoObject(likes, dislikes)
-          if (video.ratingStyle) {
-            $(tooltip).append('<span> &nbsp;&nbsp; ' + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total</span>')
-          } else {
-            $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
-          }
-        } else {
-          if (debug) console.log('tooltip match not found', text, tooltip, $(tooltip))
-        }
-      })
-  }
-
-  // For classic theme.
-  if (curTheme === THEME_CLASSIC || !curTheme) {
-    $('#watch8-sentiment-actions:not([data-ytrb-found])')
-      .each(function (_, tooltip) {
-        $(tooltip).attr('data-ytrb-found', '')
-        let likes = $(tooltip).find('.like-button-renderer-like-button:first>span').text().replace(/\D/g, '')
-        let dislikes = $(tooltip).find('.like-button-renderer-dislike-button:first>span').text().replace(/\D/g, '')
-        let video = getVideoObject(likes, dislikes)
-        $(tooltip).find('.video-extras-sparkbars').append('<ytrb-classic-tooltip>' + getToolTipText(video) + '</ytrb-classic-tooltip>')
-      })
-  }
-}
+// function updateTimeSincePublishedElements() {
+//   // For modern theme.
+//   if (curTheme === THEME_MODERN || !curTheme) {
+//     $('#upload-info .date:not([data-ytrb-found])')
+//       .each(function (_, dateSpan) {
+//         let dateText = $(dateSpan).text().substring(13)
+//         // let prevDateText = $(dateSpan).attr('data-ytrb-found')
+//
+//         $(dateSpan).attr('data-ytrb-found', dateText)
+//
+//         let dateFromNow = moment(dateText).fromNow()
+//         console.log(dateText, dateFromNow, dateSpan)
+//         $(dateSpan).append('<span class="ytrb-time-since">' + dateFromNow + '</span>')
+//       })
+//   }
+// }
 
 chrome.storage.sync.get({
   barColor: 'blue-gray',
   barThickness: 4,
+  barOpacity: 100,
   barSeparator: false,
   barTooltip: true,
   timeSincePublished: true,

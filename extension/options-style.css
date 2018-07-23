@@ -17,7 +17,7 @@ body {
 
 .buttons-container {
   clear: both;
-  padding: 14px 16px;
+  padding: 16px 16px 12px;
   border-top: 1px solid #ccc;
 }
 
@@ -93,6 +93,7 @@ ytrb-bar {
   height: 4px;
   z-index: 999;
   background-color: #cfcfcf;
+  transition: opacity 0.2s ease-out 0.2s;
 }
 
 ytrb-rating {
@@ -142,7 +143,10 @@ ytrb-tooltip>div {
   text-align: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease-out 0.2s;
+  transition: opacity 0.2s ease-out 0.2s;
+}
+ytrb-bar:hover {
+  opacity: 1 !important;
 }
 ytrb-bar:hover ytrb-tooltip>div {
   visibility: visible;

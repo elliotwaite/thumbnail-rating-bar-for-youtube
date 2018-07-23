@@ -7,6 +7,7 @@ ytrb-bar {
   height: 4px;
   z-index: 999;
   background-color: #cfcfcf;
+  transition: opacity 0.2s ease-out 0.2s;
 }
 
 ytrb-rating {
@@ -57,7 +58,10 @@ ytrb-tooltip>div {
   text-align: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease-out 0.2s;
+  transition: opacity 0.2s ease-out 0.2s;
+}
+ytrb-bar:hover {
+  opacity: 1 !important;
 }
 ytrb-bar:hover ytrb-tooltip>div {
   visibility: visible;
@@ -93,12 +97,12 @@ ytrb-classic-tooltip {
 /* The video's main page rating bar. */
 .ytrb-bar-color-green-red #container.ytd-sentiment-bar-renderer,
 .ytrb-bar-color-green-red .video-extras-sparkbar-dislikes /* For classic mode */ {
-  background-color: #c00;
+  background-color: #c00 !important;
 }
 
 .ytrb-bar-color-green-red #like-bar.ytd-sentiment-bar-renderer ,
 .ytrb-bar-color-green-red .video-extras-sparkbar-likes /* For classic mode */ {
-  background-color: #060;
+  background-color: #060 !important;
   box-shadow: 1px 0 #fff;
   position: relative;
 }
@@ -138,6 +142,13 @@ ytg-thumbnail-overlay-time-status-renderer /* Gaming */
   white-space: nowrap;
 }
 
+
+.ytrb-time-since::before{
+  content: '•';
+  margin: 0 4px;
+}
+
+/* Thickness styles. */
 
 .ytrb-bar-thickness-0 ytrb-bar, .ytrb-bar-thickness-0 ytrb-rating { height: 0px }
 .ytrb-bar-thickness-1 ytrb-bar, .ytrb-bar-thickness-1 ytrb-rating { height: 1px }
