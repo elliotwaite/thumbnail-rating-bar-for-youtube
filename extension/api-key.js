@@ -19,5 +19,4 @@
 //
 // 7. Then you'll see an API key that you can copy and paste here.
 
-const YOUTUBE_API_KEY = 'AIzaSyB72UAFIP7jAR6KzbvfMA0CnandiUXwRfE'
-
+const YOUTUBE_API_KEY = 'paste-your-api-key-here'
