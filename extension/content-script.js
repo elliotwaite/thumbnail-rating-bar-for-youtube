@@ -1,6 +1,10 @@
 // Setting debug to true will turn on console.log messages used for debugging.
 let debug = false
 
+// Distribute the load over multiple APIs by selecting one randomly.
+const YOUTUBE_API_KEY = YOUTUBE_API_KEYS[
+  Math.floor(Math.random() * YOUTUBE_API_KEYS.length)]
+
 // Variables for handling throttling DOM searches.
 const THROTTLE_MS = 100
 let hasUnseenMutations = false

@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
-	"name": "YouTube™ Thumbnail Rating Bar",
-	"version": "0.0.35",
+	"name": "Thumbnail Rating Bar for YouTube™",
+	"version": "0.0.37",
 	"description": "Show the rating bar (likes/dislikes) on the bottom of every YouTube thumbnail.",
   "author": "Elliot Waite",
 	"icons": {
@@ -19,7 +19,7 @@
 		"js": [
 			"libraries/jquery-3.3.1.min.js",
 			"libraries/moment.js",
-			"api-key.js",
+			"api-keys.js",
 			"content-script.js"
 		],
 		"run_at": "document_end"
