@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/extension/icons/icon128.png" />
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/extension/icons/icon128.png" />
 
 # Thumbnail Rating Bar for YouTube&trade;
 
@@ -19,11 +19,11 @@ https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
 **A rating bar is added to every thumbnail.**
 
-![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-1.jpg)
+![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg)
 
 **Access the settings by clicking the extension's icon in the toolbar.**
 
-![](https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/images/screenshot-2.jpg)
+![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg)
 
 ## Why
 Using YouTube usually involves browsing through many video previews. These video previews usually contain the following:
