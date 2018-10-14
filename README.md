@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://raw.githubusercontent.com/elliotwaite/youtube-thumbnail-rating-bar/master/extension/icons/icon128.png" />
 
-# YouTube&trade; Thumbnail Rating Bar
+# Thumbnail Rating Bar for YouTube&trade;
 
 </div>
 
