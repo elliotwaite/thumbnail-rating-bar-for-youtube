@@ -1,4 +1,4 @@
-.git
-.idea
-extension/api-keys.js
-tools/package.zip
+/.git/
+/.idea/
+/extension/api-keys.js
+/tools/package.zip
