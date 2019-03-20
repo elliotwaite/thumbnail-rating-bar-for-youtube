@@ -13,12 +13,17 @@
 		"default_title": "Settings",
 		"default_popup": "options-popup.html"
 	},
+	"background": {
+    "scripts": [
+			"api-keys.js",
+			"background.js"],
+    "persistent": false
+  },
 	"content_scripts": [{
 		"matches": ["*://*.youtube.com/*"],
 		"css": ["content-style.css"],
 		"js": [
 			"libraries/jquery-3.3.1.min.js",
-			"api-keys.js",
 			"content-script.js"
 		],
 		"run_at": "document_end"

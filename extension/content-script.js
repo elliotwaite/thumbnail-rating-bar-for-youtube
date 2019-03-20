@@ -1,10 +1,6 @@
 // Setting debug to true will turn on console.log messages used for debugging.
 let debug = false
 
-// Distribute the load over multiple APIs by selecting one randomly.
-const YOUTUBE_API_KEY = YOUTUBE_API_KEYS[
-  Math.floor(Math.random() * YOUTUBE_API_KEYS.length)]
-
 // Variables for handling throttling DOM searches.
 const THROTTLE_MS = 100
 let hasUnseenMutations = false
@@ -263,16 +259,21 @@ function addRatingsToCache(thumbnails_and_ids) {
   let promises = []
   for (let i = 0; i < unseenIdsArray.length; i += MAX_IDS_PER_API_CALL) {
     let unseenIdsBatch = unseenIdsArray.slice(i, i + MAX_IDS_PER_API_CALL)
-    let url = 'https://www.googleapis.com/youtube/v3/videos?id=' +
-      unseenIdsBatch.join(',') + '&part=statistics&key=' + YOUTUBE_API_KEY
-    let promise = $.get(url, function (data) {
-      for (item of data.items) {
-        let video = getVideoObject(
-          item.statistics.likeCount || 0,
-          item.statistics.dislikeCount || 0)
-        videoCache[item.id] = video
-      }
+
+    let promise = new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {contentScriptQuery: 'videoStatistics', videoIds: unseenIdsBatch},
+        function(data) {
+          for (let item of data.items) {
+            let video = getVideoObject(
+              item.statistics.likeCount || 0,
+              item.statistics.dislikeCount || 0)
+            videoCache[item.id] = video
+            resolve()
+          }
+        })
     })
+
     promises.push(promise)
   }
 
