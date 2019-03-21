@@ -27,4 +27,4 @@
 const YOUTUBE_API_KEYS = [
   'paste-your-api-key-here',
   'you-can-paste-one-or-multiple',
-  'one-will-randomly-be-selected-from-this-list']
+  'one-will-be-randomly-selected-from-this-list-when-the-extension-is-loaded']
