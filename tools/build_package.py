@@ -27,12 +27,12 @@ def main():
   # Build the Chrome package.
   zip_dir(EXTENSION_DIR, 'chrome-package.zip')
 
+  # TODO: Remove this separate build process once Firefox supports
+  #       nonpersistent background scripts.
+  #       https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background
   # Build the Firefox package (removing the `"persistent": false` line from the
   # manifest.json file, since Firefox does not support persistent background
   # scripts).
-  # TODO: remove this separate build process once Firefox supports
-  #       nonpersistent background scripts.
-  #       https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background
   tmp_dir = 'tmp'
   shutil.copytree(EXTENSION_DIR, tmp_dir)
   manifest_path = os.path.join(tmp_dir, 'manifest.json')
