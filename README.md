@@ -83,7 +83,7 @@ To get a free YouTube Data API key, follow these simple steps:
    locally on your computer using local storage. This can be confirmed by 
    viewing the source code.
    
-![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true)
+![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2)
 
 **The extension adds a rating bar to the bottom of every thumbnail.**
 
