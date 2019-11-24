@@ -82,16 +82,12 @@ To get a free YouTube Data API key, follow these simple steps:
    Note: To keep your API key private, the extension only stores your API key
    locally on your computer using local storage. This can be confirmed by 
    viewing the source code.
+   
+![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true)
 
-## Screenshots
-
-**A rating bar is added to every thumbnail.**
+**The extension adds a rating bar to the bottom of every thumbnail.**
 
 ![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true)
-
-**Access the settings by clicking the extension's icon in the toolbar.**
-
-![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true)
 
 ## Why
 Using YouTube usually involves browsing through many video previews. These video previews usually contain the following:
