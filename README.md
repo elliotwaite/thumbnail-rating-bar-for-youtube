@@ -85,7 +85,7 @@ To get a free YouTube Data API key, follow these simple steps:
    
 ![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2)
 
-**The extension adds a rating bar to the bottom of every thumbnail.**
+The extension adds a rating bar to the bottom of every video's thumbnail.
 
 ![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true)
 
