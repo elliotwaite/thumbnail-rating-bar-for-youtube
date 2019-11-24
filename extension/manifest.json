@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "Thumbnail Rating Bar for YouTube™",
-	"version": "0.0.41",
-	"description": "Show the rating bar (likes/dislikes) on the bottom of every YouTube™ thumbnail.",
+	"version": "0.1.1",
+	"description": "Displays a rating bar (likes/dislikes) on the bottom of every YouTube™ video thumbnail.",
   "author": "Elliot Waite",
 	"icons": {
 		"96": "icons/icon96.png",
@@ -14,9 +14,7 @@
 		"default_popup": "options-popup.html"
 	},
 	"background": {
-    "scripts": [
-			"api-keys.js",
-			"background.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
 	"content_scripts": [{

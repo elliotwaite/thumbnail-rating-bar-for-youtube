@@ -2,6 +2,15 @@ body {
   width: 581px;
 }
 
+h5 {
+  margin-top: 0;
+  text-align: center;
+}
+
+a {
+  color: rgb(33,150,243)
+}
+
 .left-options {
   float: left;
   width: 258px;
@@ -19,11 +28,6 @@ body {
   clear: both;
   padding: 16px 16px 12px;
   border-top: 1px solid #ccc;
-}
-
-h5 {
-  margin-top: 0;
-  text-align: center;
 }
 
 .thumbnail-preview {
@@ -74,13 +78,16 @@ h5 {
   padding-right: 24px;
 }
 
-
-#restore-defaults-btn {
+#save-btn {
   float: right;
 }
 
 .mdl-snackbar__action {
   display: none;
+}
+
+.mdl-textfield--floating-label.is-invalid:not(.is-focused) .mdl-textfield__label {
+  font-size: 16px;
 }
 
 /* Copied from content.style.css. */

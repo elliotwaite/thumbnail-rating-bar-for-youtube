@@ -5,7 +5,7 @@
 
 </div>
 
-This extension adds the likes/dislikes rating bar to the bottom of every YouTube the video thumbnail, so you can find higher quality content and avoid getting clickbaited.
+This extension adds a likes/dislikes rating bar to the bottom of every YouTube video thumbnail, so you can find higher quality content and avoid getting clickbaited.
 
 ## Install
 
@@ -14,6 +14,74 @@ https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmi
 
 For Firefox:  
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
+
+This extension also requires you to setup a YouTube Data API key. More details below.
+
+## Setup a YouTube Data API Key
+
+Providing your own YouTube Data API Key through the extension's settings page
+is now required for this extension to work. Hopefully this will be resolved in
+the future, but currently the quota for the extensions shared API key has been
+restricted, for find more details about this issue [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17).
+
+To get a free YouTube Data API key, follow these simple steps:
+
+1. Sign up for a Google Cloud account (if you don't already have one).
+
+   * Go to: https://cloud.google.com
+   
+   * Click the "Get started for free" button, and follow the instructions.
+
+2. Create a new project.
+
+   * Go to: https://console.developers.google.com/projectcreate
+     
+   * Enter a name for the project (can be anything you want, for example "YouTube Data API Key").
+   
+   * Then click the "CREATE" button.
+
+3. Enable the YouTube Data API v3.
+   
+   * Go to: https://console.cloud.google.com/apis/library/youtube.googleapis.com
+
+   * Then Click the "ENABLE" button.
+
+4. Create an API Key.
+   
+   * Go to: https://console.cloud.google.com/apis/credentials
+
+   * Click the "Create credentials" dropdown button, then choose "API key".
+
+   * This will create your API key and display a dialog box. At the bottom 
+     right of that dialog box, click the "RESTRICT API" button.
+
+   * Then under the "API restrictions" section, click the "Restrict key" radio 
+     button, and then below it, open the "Select APIs" dropdown menu and check
+     the "YouTube Data API v3" checkbox.
+
+   * Then click the "SAVE" button at the bottom of that page.
+   
+   * Then copy your listed API key.
+    
+     Note: If you need to access your API key in the future, it will be
+     available here:
+     https://console.cloud.google.com/apis/credentials
+
+5. Copy your API key to the extension's settings page.
+ 
+   * Go to the extension's settings page, which is accessible by clicking the
+     extension's icon in your browser's toolbar.
+     
+   * Paste your API key into the available text field.
+   
+   * Click the "SAVE" button.
+   
+   You're all set. Refresh any previously opened YouTube tabs to see the
+   changes.
+   
+   Note: To keep your API key private, the extension only stores your API key
+   locally on your computer using local storage. This can be confirmed by 
+   viewing the source code.
 
 ## Screenshots
 

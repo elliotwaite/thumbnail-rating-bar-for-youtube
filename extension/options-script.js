@@ -52,13 +52,18 @@ $('#save-btn').click(function() {
     barOpacity: $('#bar-opacity').val(),
     barSeparator: $('#bar-separator').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
-    timeSincePublished: $('#time-since-published').prop('checked'),
+    apiKey: $('#api-key').val(),
+    // timeSincePublished: $('#time-since-published').prop('checked'),
   }, function() {
     // Show "Settings saved" message.
     document.querySelector('#toast').MaterialSnackbar.showSnackbar({
       message: 'Settings saved. Refresh the page.',
       timeout: 2000,
     })
+  })
+  chrome.runtime.sendMessage({
+    contentScriptQuery: 'apiKey',
+    apiKey: $('#api-key').val(),
   })
 })
 
@@ -75,9 +80,9 @@ $('#restore-defaults-btn').click(function() {
   if (!$('#bar-tooltip').prop('checked')) {
     $('#bar-tooltip').click()
   }
-  if (!$('#time-since-published').prop('checked')) {
-    $('#time-since-published').click()
-  }
+  // if (!$('#time-since-published').prop('checked')) {
+  //   $('#time-since-published').click()
+  // }
 })
 
 // Load saved settings.
@@ -89,8 +94,8 @@ function restoreOptions() {
     barSeparator: false,
     barTooltip: true,
     timeSincePublished: true,
+    apiKey: '',
   }, function(settings) {
-    console.log('settings', settings)
     $('#bar-color-' + settings.barColor).click()
     $('#bar-thickness')[0].MaterialSlider.change(settings.barThickness)
     $('#bar-thickness').change()
@@ -102,9 +107,16 @@ function restoreOptions() {
     if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
       $('#bar-tooltip').click()
     }
-    if ($('#time-since-published').prop('checked') !== settings.timeSincePublished) {
-      $('#time-since-published').click()
+    if ($('#api-key').val() !== settings.apiKey) {
+      $('#api-key').val(settings.apiKey)
+      if (settings.apiKey.length) {
+        $('#api-key-container').removeClass('is-invalid')
+        $('#api-key-container').addClass('is-dirty')
+      }
     }
+    // if ($('#time-since-published').prop('checked') !== settings.timeSincePublished) {
+    //   $('#time-since-published').click()
+    // }
   })
 }
 
