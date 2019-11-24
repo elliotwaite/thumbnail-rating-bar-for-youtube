@@ -21,8 +21,8 @@ This extension also requires you to setup a YouTube Data API key. More details b
 
 Providing your own YouTube Data API Key through the extension's settings page
 is now required for this extension to work. Hopefully this will be resolved in
-the future, but currently the quota for the extensions shared API key has been
-restricted, for find more details about this issue [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17).
+the future, but currently the quota for the extension's shared API key has been
+restricted, you can find more details about this issue [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17).
 
 To get a free YouTube Data API key, follow these simple steps:
 
