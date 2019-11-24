@@ -24,7 +24,7 @@ is now required for this extension to work. This is because the quota for the
 extension's shared API key is currently restricted (more details available 
 [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17)).
 Hopefully this will get resolved in the future, but for now using personal
-API keys resolves the issue.
+API keys resolves this issue.
 
 To setup a free YouTube Data API key, follow these steps:
 
