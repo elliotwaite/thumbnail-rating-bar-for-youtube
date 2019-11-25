@@ -72,7 +72,7 @@ To setup a free YouTube Data API key, follow these steps:
      available here:
      https://console.cloud.google.com/apis/credentials
 
-4. Paste your API key into the text field on the extension's settings page.
+4. Paste in your API key on the settings page.
  
    * Go to the extension's settings page, which is accessible by clicking the
      extension's icon in your browser's toolbar.
