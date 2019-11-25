@@ -30,15 +30,25 @@ To setup a free YouTube Data API key, follow these steps:
 
    * Go to: https://console.developers.google.com/projectcreate
      
-   * Enter a name for the project (can be anything you want, for example "YouTube Data API Key").
+   * For "Project name" enter any name you want, for example "YouTube Data API Key".
+   
+   * For "Location" leave it as "No organization".
    
    * Then click the "CREATE" button.
+   
+   * This will start creating a project and you'll see a progress wheel around
+     the notification icon. Once the project has finished being created,
+     continue to the next step.
 
 2. Enable the YouTube Data API v3.
    
    * Go to: https://console.cloud.google.com/apis/library/youtube.googleapis.com
 
    * Then Click the "ENABLE" button.
+   
+   * This will display a progress wheel, and then take you to a page with a 
+     button that says "CREATE CREDENTIALS", but DON'T CLICK IT, instead follow
+     the link in the next step.
 
 3. Create an API Key.
    
@@ -55,13 +65,14 @@ To setup a free YouTube Data API key, follow these steps:
 
    * Then click the "SAVE" button at the bottom of that page.
    
-   * Then copy your listed API key.
+   * Then copy your listed API key (it should look something like this: 
+     AIzaSyAylQ59uKlkZt2EgRPoygscGb_AHBQ5MEY).
     
      Note: If you need to access your API key in the future, it will be
      available here:
      https://console.cloud.google.com/apis/credentials
 
-4. Copy your API key to the extension's settings page.
+4. Paste your API key into the text field on extension's settings page.
  
    * Go to the extension's settings page, which is accessible by clicking the
      extension's icon in your browser's toolbar.
