@@ -44,7 +44,7 @@ To setup a free YouTube Data API key, follow these steps:
    
    * Go to: https://console.cloud.google.com/apis/library/youtube.googleapis.com
 
-   * Then Click the "ENABLE" button.
+   * Then click the "ENABLE" button.
    
    * Note: This may end up navigating you to another page that displays a 
      "CREATE CREDENTIALS" button. But if that happens, just ignore that button 
@@ -65,8 +65,8 @@ To setup a free YouTube Data API key, follow these steps:
 
    * Then click the "SAVE" button at the bottom of that page.
    
-   * Then copy your listed API key (it should look something like this: 
-     AIzaSyAylQ59uKlkZt2EgRPoygscGb_AHBQ5MEY).
+   * Then copy your listed API key to your clipboard (it should look something 
+     like this: AIzaSyAylQ59uKlkZt2EgRPoygscGb_AHBQ5MEY).
     
      Note: If you need to access your API key in the future, it will be
      available here:
@@ -79,10 +79,10 @@ To setup a free YouTube Data API key, follow these steps:
      
    * Paste your API key into the available text field.
    
-   * Click the "SAVE" button.
+   * Then click the "SAVE" button.
    
-   You're all set. Refresh any previously opened YouTube tabs to see the
-   changes.
+   Now you should be good to go. Refresh any previously opened YouTube tabs to
+   see the changes.
    
    Note: To keep your API key private, the extension only stores your API key
    locally on your computer using local storage. This can be confirmed by 
