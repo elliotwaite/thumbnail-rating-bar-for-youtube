@@ -46,9 +46,9 @@ To setup a free YouTube Data API key, follow these steps:
 
    * Then Click the "ENABLE" button.
    
-   * Note: For some users, this ends up navigating them to another page
-     that displays a "CREATE CREDENTIALS" button. But if that happens, just
-     ignore that button and follow the instructions in the next step.
+   * Note: This may end up navigating you to another page that displays a 
+     "CREATE CREDENTIALS" button. But if that happens, just ignore that button 
+     and follow the instructions in the next step.
 
 3. Create an API Key.
    
