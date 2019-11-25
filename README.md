@@ -26,13 +26,7 @@ the extension's shared API key is currently restricted (more details available
 
 To setup a free YouTube Data API key, follow these steps:
 
-1. Sign up for a Google Cloud account (if you don't already have one).
-
-   * Go to: https://cloud.google.com
-   
-   * Click the "Get started for free" button, and follow the instructions.
-
-2. Create a new project.
+1. Create a new project.
 
    * Go to: https://console.developers.google.com/projectcreate
      
@@ -40,13 +34,13 @@ To setup a free YouTube Data API key, follow these steps:
    
    * Then click the "CREATE" button.
 
-3. Enable the YouTube Data API v3.
+2. Enable the YouTube Data API v3.
    
    * Go to: https://console.cloud.google.com/apis/library/youtube.googleapis.com
 
    * Then Click the "ENABLE" button.
 
-4. Create an API Key.
+3. Create an API Key.
    
    * Go to: https://console.cloud.google.com/apis/credentials
 
@@ -67,7 +61,7 @@ To setup a free YouTube Data API key, follow these steps:
      available here:
      https://console.cloud.google.com/apis/credentials
 
-5. Copy your API key to the extension's settings page.
+4. Copy your API key to the extension's settings page.
  
    * Go to the extension's settings page, which is accessible by clicking the
      extension's icon in your browser's toolbar.
