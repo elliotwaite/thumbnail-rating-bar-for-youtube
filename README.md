@@ -15,22 +15,33 @@ https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmi
 For Firefox:  
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
-This extension also requires you to setup a YouTube Data API key. More details below.
+This extension also requires you to set up a YouTube Data API key. More details below.
 
-## Setup a YouTube Data API Key
+## Set Up a YouTube Data API Key
 
 This extension now requires users to provide their own personal YouTube Data 
-API Key through the extension's settings page. This is because the quota for
+API key through the extension's settings page. This is because the quota for
 the extension's shared API key is currently restricted (more details available 
 [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17)).
 
-To setup a free YouTube Data API key, follow these steps:
+Note: Alternatively, if you don't want to set up a personal API key, there is
+now an alternative option, however this option is much less performant and you
+will notice a significant lag between when a page loads and when the rating
+bars are displayed. To try out this alternative, you can set the API key to 
+"invidious" on the extension's settings page. This will cause the extension
+to use the public
+[invidious API](https://github.com/omarroth/invidious/wiki/API), however this
+API is much slower than the YouTube Data API, so it is highly recommended that
+you set up a YouTube Data API key by following the instructions below.
+
+#### Set up a free YouTube Data API key:
 
 1. Create a new project.
 
    * Go to: https://console.developers.google.com/projectcreate
      
-   * For "Project name" enter any name you want, for example "YouTube Data API Key".
+   * For "Project name" enter any name you want, for example
+     "YouTube Data API Key".
    
    * For "Location" leave it as "No organization".
    

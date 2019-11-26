@@ -283,6 +283,7 @@ function addRatingsToCache(thumbnails_and_ids) {
                   'key, visit the extension\'s settings page, which is ' +
                   'accessible by clicking the extension\'s icon in the ' +
                   'toolbar.')
+              resolve()
             } else {
               for (let item of data.items) {
                 let video = getVideoObject(
