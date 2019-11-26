@@ -82,8 +82,10 @@ you set up a YouTube Data API key by following the instructions below.
      Note: If you need to access your API key in the future, it will be
      available here:
      https://console.cloud.google.com/apis/credentials
-
+     
 4. Set your API key on the extension's settings page.
+
+   <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2" width=400> 
  
    * Go to the extension's settings page, which is accessible by clicking the
      extension's icon in your browser's toolbar.
@@ -92,19 +94,23 @@ you set up a YouTube Data API key by following the instructions below.
    
    * Then click the "SAVE" button.
    
-   Now you should be good to go. Refresh any previously opened YouTube tabs to
-   see the changes.
-   
-   Note: To keep your API key private, the extension only stores your API key
-   locally on your computer using local storage. This can be confirmed by 
-   viewing the source code.
-   
-![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2)
+You should now be all set. Refresh any previously opened YouTube tabs to
+see the changes.
 
-The extension adds a rating bar to the bottom of every video's thumbnail.
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true" width=400> 
 
-![](https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true)
+YouTube will allow you to use your API key to make a certain number of API
+requests per day, this is called your quota. To view your daily quota usage,
+go here and select your project from the dropdown menu at the top of the 
+page:
+https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas
 
+To keep your API key private, this extension only stores your API key
+locally on your computer using local storage. This can be confirmed by 
+viewing the source code.
+
+Enjoy.
+ 
 ## Why
 Using YouTube usually involves browsing through many video previews. These video previews usually contain the following:
 * Thumbnail image
