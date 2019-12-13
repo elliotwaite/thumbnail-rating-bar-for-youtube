@@ -13,6 +13,10 @@
 		"default_title": "Settings",
 		"default_popup": "options-popup.html"
 	},
+	"options_ui": {
+		"page": "options-popup.html",
+		"browser_style": false
+    },
 	"background": {
     "scripts": ["background.js"],
     "persistent": false
