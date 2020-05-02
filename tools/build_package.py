@@ -1,4 +1,4 @@
-"""Build the package.zip file that will be uploaded to the Chrome Web Store."""
+"""Build the extension (create the package.zip file) for Chrome and Firefox."""
 
 import os
 import shutil
