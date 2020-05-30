@@ -160,7 +160,7 @@ ytrb-bar:hover ytrb-tooltip>div {
   opacity: 0.9;
 }
 
-/* To allow toggle displaying the tooltip. */
+/* Allows users to disable the tooltip. */
 ytrb-tooltip {
   display: none;
 }
