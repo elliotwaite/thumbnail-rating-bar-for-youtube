@@ -33,7 +33,9 @@ ytrb-bar.ytrb-bar-no-rating,
 }
 
 .ytrb-bar-separator ytrb-bar {
-  border-top: 1px solid #fff;
+  --ytrb-ytbgfallback: #fff;
+  --ytrb-ytbg: var(--yt-spec-general-background-a, var(--ytrb-ytbgfallback));
+  border-top: 1px solid var(--ytrb-ytbg);
 }
 
 ytrb-tooltip {
