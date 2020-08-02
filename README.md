@@ -130,3 +130,7 @@ When a user browses a page on YouTube, the extension/add-on script searches the 
 ## Design Details
 
 The current settings offer a blue-and-grey bar or a green-and-red bar (default: blue-and-grey). The thickness of the bar can be adjusted between 0px and 16px (default: 4px). The opacity of the bar can be adjusted between 0% and 100% (default: 100%). A white separation line can optionally be shown above the bar (default: not shown). A tooltip that displays the exact number of likes and dislikes can optionally be shown when a user hovers over the bar (default: enabled).
+
+## License
+
+[MIT](LICENSE)
