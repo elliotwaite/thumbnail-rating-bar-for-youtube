@@ -31,6 +31,8 @@ def build_chrome_package():
 
 
 def build_firefox_package():
+    # This separate build is required to customize the manifest.json
+    # file for Firefox.
     tmp_dir = 'tmp'
     shutil.copytree(EXTENSION_DIR, tmp_dir)
     manifest_path = os.path.join(tmp_dir, 'manifest.json')
