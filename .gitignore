@@ -1,6 +1,5 @@
 /.git/
 /.idea/
+/build/
 /extension/api-keys.js
-/tools/chrome-package.zip
-/tools/firefox-package.zip
 /zipped/thumbnail-rating-bar-for-youtube/

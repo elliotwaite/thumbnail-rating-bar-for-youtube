@@ -7,13 +7,19 @@ import os
 import shutil
 import zipfile
 
-EXTENSION_DIR = '../extension/'
+CUR_DIR = os.path.join(os.path.dirname(__file__))
+BUILD_DIR = os.path.abspath(os.path.join(CUR_DIR, '../build/'))
+CHROME_PACKAGE_PATH = os.path.join(BUILD_DIR, 'chrome-package.zip')
+FIREFOX_PACKAGE_PATH = os.path.join(BUILD_DIR, 'firefox-package.zip')
+EXTENSION_DIR = os.path.abspath(os.path.join(CUR_DIR, '../extension/'))
 
 
 def zip_dir(source_dir, output_path, excluded_filenames=None):
     if excluded_filenames is None:
         excluded_filenames = ['.DS_Store']
-    print(f'Zipping: {source_dir} --> {output_path}')
+    print(f'Zip source path: {source_dir}')
+    print(f'Zip output path: {output_path}')
+    print(f'Zipped files:')
     with zipfile.ZipFile(output_path, 'w') as z:
         for dir_path, dir_names, filenames in os.walk(source_dir):
             for filename in filenames:
@@ -21,13 +27,13 @@ def zip_dir(source_dir, output_path, excluded_filenames=None):
                     continue
                 path = os.path.join(dir_path, filename)
                 path_in_zip = path[len(source_dir) :]
-                print(path_in_zip)
+                print(f'  {path_in_zip}')
                 z.write(path, path_in_zip)
     print()
 
 
 def build_chrome_package():
-    zip_dir(EXTENSION_DIR, 'chrome-package.zip')
+    zip_dir(EXTENSION_DIR, CHROME_PACKAGE_PATH)
 
 
 def build_firefox_package():
@@ -64,13 +70,15 @@ def build_firefox_package():
 
     with open(manifest_path, 'w') as f:
         f.write(manifest_text)
-    zip_dir(tmp_dir, 'firefox-package.zip')
+    zip_dir(tmp_dir, FIREFOX_PACKAGE_PATH)
     shutil.rmtree(tmp_dir)
 
 
 def main():
+    os.makedirs(BUILD_DIR, exist_ok=True)
     build_chrome_package()
     build_firefox_package()
+    print(f'Generated package files:\n  {CHROME_PACKAGE_PATH}\n  {FIREFOX_PACKAGE_PATH}')
 
 
 if __name__ == '__main__':
