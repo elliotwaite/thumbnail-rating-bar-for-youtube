@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="libraries/material.min.css">
-  <script src="libraries/material.min.js"></script>
-  <script src="libraries/jquery-3.3.1.min.js"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="options-style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="libraries/material.min.css">
+    <script src="libraries/material.min.js"></script>
+    <script src="libraries/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="options-style.css">
 </head>
 <body>
 
-  <div class="left-options">
-
-    <!--<h5>Rating Bar Settings</h5>-->
+<div class="left-options">
 
     <div id="thumbnail-preview" class="thumbnail-preview  ytrb-bar-color-green-red">
-      <img src="options-thumbnail.jpg">
-      <ytrb-bar>
-        <ytrb-rating style="width:61.8%"></ytrb-rating>
-        <ytrb-tooltip><div>34&nbsp;/&nbsp;21 &nbsp;&nbsp; 61.8% &nbsp;&nbsp; 54&nbsp;total</div></ytrb-tooltip>
-      </ytrb-bar>
+        <img src="options-thumbnail.jpg">
+        <ytrb-bar>
+            <ytrb-rating style="width:61.8%"></ytrb-rating>
+            <ytrb-tooltip>
+                <div>34&nbsp;/&nbsp;21 &nbsp;&nbsp; 61.8% &nbsp;&nbsp; 54&nbsp;total</div>
+            </ytrb-tooltip>
+        </ytrb-bar>
     </div>
 
     <h6 class="h6">Color</h6>
 
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-blue-gray">
-      <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
-      <span class="mdl-radio__label">
+        <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
+        <span class="mdl-radio__label">
         <ytrb-bar>
           <ytrb-rating style="width:61.8%"></ytrb-rating>
         </ytrb-bar>
       </span>
     </label>
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-green-red">
-      <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
-      <span class="mdl-radio__label ytrb-bar-color-green-red">
+        <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
+        <span class="mdl-radio__label ytrb-bar-color-green-red">
         <ytrb-bar>
           <ytrb-rating style="width:61.8%"></ytrb-rating>
         </ytrb-bar>
@@ -44,62 +44,62 @@
     <h6>Thickness</h6>
 
     <label class="slider-label">
-      <span id="bar-thickness-text" class="slider-bubble">4 px</span>
-      <div class="slider-input-container">
-        <input id="bar-thickness" class="mdl-slider mdl-js-slider" type="range" min="0" max="16" value="4">
-      </div>
+        <span id="bar-thickness-text" class="slider-bubble">4 px</span>
+        <div class="slider-input-container">
+            <input id="bar-thickness" class="mdl-slider mdl-js-slider" type="range" min="0" max="16" value="4">
+        </div>
     </label>
 
     <h6>Opacity</h6>
 
     <label class="slider-label">
-      <span id="bar-opacity-text" class="slider-bubble">100%</span>
-      <div class="slider-input-container">
-        <input id="bar-opacity" class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="100">
-      </div>
+        <span id="bar-opacity-text" class="slider-bubble">100%</span>
+        <div class="slider-input-container">
+            <input id="bar-opacity" class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="100">
+        </div>
     </label>
 
-  </div>
-  <div class="right-options">
+</div>
+<div class="right-options">
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
-      <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
-      <span class="mdl-checkbox__label">Add a separation line above the rating bar.</span>
+        <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
+        <span class="mdl-checkbox__label">Add a separation line above the rating bar.</span>
     </label>
 
-    <br />
-    <br />
-    <br />
+    <br/>
+    <br/>
+    <br/>
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-tooltip">
-      <input type="checkbox" id="bar-tooltip" class="mdl-checkbox__input">
-      <span class="mdl-checkbox__label">Hover your mouse over the rating bar to reveal a tooltip of rating info.</span>
+        <input type="checkbox" id="bar-tooltip" class="mdl-checkbox__input">
+        <span class="mdl-checkbox__label">Hover your mouse over the rating bar to reveal a tooltip of rating info.</span>
     </label>
 
-    <br />
-    <br />
-    <br />
-    <br />
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 
     <div id="api-key-container" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-      <input id="api-key" class="mdl-textfield__input" type="text" required>
-      <label class="mdl-textfield__label" for="api-key">Your YouTube Data API Key</label>
-      <span class="mdl-textfield__error">An API Key is required.</span>
+        <input id="api-key" class="mdl-textfield__input" type="text" required>
+        <label class="mdl-textfield__label" for="api-key">Your YouTube Data API Key</label>
+        <span class="mdl-textfield__error">An API Key is required.</span>
     </div>
 
-    <br />
-    <br />
+    <br/>
+    <br/>
 
     <p>
-      This extension requires you to enter a personal YouTube Data API key. Instructions for obtaining a free API key, and an explanation for why it is required, can be found here:
-      <br />
-      <a href="https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube" target="_blank">https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube</a>
+        This extension requires you to enter a personal YouTube Data API key. Instructions for obtaining a free API key, and an explanation for why it is required, can be found here:
+        <br/>
+        <a href="https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube" target="_blank">https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube</a>
     </p>
 
 
     <!--<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="time-since-published">-->
-      <!--<input type="checkbox" id="time-since-published" class="mdl-checkbox__input">-->
-      <!--<span class="mdl-checkbox__label">Add the time since published (ex. 2 days ago) to the sidebar suggested videos and to the currently playing video's info section.</span>-->
+    <!--<input type="checkbox" id="time-since-published" class="mdl-checkbox__input">-->
+    <!--<span class="mdl-checkbox__label">Add the time since published (ex. 2 days ago) to the sidebar suggested videos and to the currently playing video's info section.</span>-->
     <!--</label>-->
 
     <!--<br />-->
@@ -108,25 +108,25 @@
     <!--<br />-->
     <!--<br />-->
 
-  </div>
-  <div class="buttons-container">
+</div>
+<div class="buttons-container">
 
     <button id="restore-defaults-btn" class="mdl-button mdl-js-button mdl-button--primary">
-      Restore Defaults
+        Restore Defaults
     </button>
 
     <button id="save-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
-      Save
+        Save
     </button>
 
-  </div>
+</div>
 
-  <div id="toast" class="mdl-js-snackbar mdl-snackbar">
+<div id="toast" class="mdl-js-snackbar mdl-snackbar">
     <div class="mdl-snackbar__text"></div>
     <button class="mdl-snackbar__action" type="button"></button>
-  </div>
+</div>
 
-  <script src="options-script.js"></script>
+<script src="options-script.js"></script>
 
 </body>
 </html>
