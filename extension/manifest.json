@@ -1,38 +1,46 @@
 {
-	"manifest_version": 2,
-	"name": "Thumbnail Rating Bar for YouTube™",
-	"version": "0.1.2",
-	"description": "Displays a rating bar (likes/dislikes) on the bottom of every YouTube™ video thumbnail.",
-    "author": "Elliot Waite",
-	"icons": {
-		"96": "icons/icon96.png",
-		"128": "icons/icon128.png"
-	},
-	"browser_action": {
-		"default_icon": "icons/icon96.png",
-		"default_title": "Settings",
-		"default_popup": "options-popup.html"
-	},
-	"options_ui": {
-		"page": "options-popup.html",
-		"browser_style": false
-    },
-	"background": {
-        "scripts": ["background.js"],
-        "persistent": false
-    },
-	"content_scripts": [{
-		"matches": ["*://*.youtube.com/*"],
-		"css": ["content-style.css"],
-		"js": [
-			"libraries/jquery-3.3.1.min.js",
-			"content-script.js"
-		],
-		"run_at": "document_end"
-	}],
-    "permissions": [
-		"*://*.youtube.com/*",
-        "https://www.googleapis.com/*",
-		"storage"
-	]
+  "manifest_version": 2,
+  "name": "Thumbnail Rating Bar for YouTube™",
+  "version": "0.1.2",
+  "description": "Displays a rating bar (likes/dislikes) on the bottom of every YouTube™ video thumbnail.",
+  "author": "Elliot Waite",
+  "icons": {
+    "96": "icons/icon96.png",
+    "128": "icons/icon128.png"
+  },
+  "browser_action": {
+    "default_icon": "icons/icon96.png",
+    "default_title": "Settings",
+    "default_popup": "options-popup.html"
+  },
+  "options_ui": {
+    "page": "options-popup.html",
+    "browser_style": false
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "css": [
+        "content-style.css"
+      ],
+      "js": [
+        "libraries/jquery-3.3.1.min.js",
+        "content-script.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "*://*.youtube.com/*",
+    "https://www.googleapis.com/*",
+    "storage"
+  ]
 }
