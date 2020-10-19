@@ -14,7 +14,7 @@ chrome.runtime.onMessage.addListener(
       let promises = []
       if (youtubeApiKey === 'invidious') {
         for (let videoId of message.videoIds) {
-          let promise = fetch(`https://invidio.us/api/v1/videos/${videoId}?fields=likeCount,dislikeCount`)
+          let promise = fetch(`https://invidious.site/api/v1/videos/${videoId}?fields=likeCount,dislikeCount`)
             .then(response => response.json())
             .then(data => {
               combined_data.items.push({
