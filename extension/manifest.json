@@ -42,5 +42,8 @@
     "*://*.youtube.com/*",
     "https://www.googleapis.com/*",
     "storage"
+  ],
+  "web_accessible_resources": [
+    "top-progress-bar.css"
   ]
 }

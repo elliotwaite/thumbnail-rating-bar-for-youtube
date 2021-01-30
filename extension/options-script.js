@@ -6,7 +6,7 @@ $('#bar-color-blue-gray, #bar-color-green-red').change(function(event) {
 
 // Watch thickness slider.
 $('#bar-thickness').on('input change', function(event) {
-  $('#bar-thickness-text').text($('#bar-thickness').val() + ' px')
+  $('#bar-thickness-text').text($('#bar-thickness').val() === '0' ? 'Hidden' : $('#bar-thickness').val() + ' px')
   $('#thumbnail-preview ytrb-bar, #thumbnail-preview ytrb-rating').height($('#bar-thickness').val() + 'px')
   // A ghetto implementation of making the slider bubble move with the handle.
   $('#bar-thickness-text').css('left', ($('#bar-thickness').val() / 16 * 210) + 'px')
