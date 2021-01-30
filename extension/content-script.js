@@ -120,7 +120,7 @@ const DEFAULT_USER_SETTINGS = {
   barSeparator: false,
   barTooltip: true,
   showPercentage: false,
-  timeSincePublished: true,
+  // timeSincePublished: true,
 }
 let userSettings = DEFAULT_USER_SETTINGS
 
@@ -176,7 +176,7 @@ function updateThumbnailRatingBars() {
   // Add the videowall thumbnails.
   thumbnails = $.merge(thumbnails, $(THUMBNAIL_SELECTOR_VIDEOWALL))
 
-  let thumbnails_and_ids = []
+  let thumbnailsAndIds = []
   $(thumbnails).each(function(_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
@@ -236,25 +236,26 @@ function updateThumbnailRatingBars() {
     let match = url.match(/.*[?&]v=([^&]+).*/)
     if (match) {
       let id = match[1]
-      thumbnails_and_ids.push([thumbnail, id])
-    } else {
-      if (debug) console.log('match not found', thumbnail, url)
+      thumbnailsAndIds.push([thumbnail, id])
+    } else if (debug) {
+      console.log('match not found', thumbnail, url)
     }
   })
 
-  if (thumbnails_and_ids.length) {
-    addRatingsToCache(thumbnails_and_ids).then(function() {
-      addRatingBars(thumbnails_and_ids)
-      addRatingPercentage(thumbnails_and_ids)
+  if (thumbnailsAndIds.length) {
+    addRatingsToCache(thumbnailsAndIds).then(function() {
+      addRatingBars(thumbnailsAndIds)
+      if (userSettings.showPercentage) {
+        addRatingPercentage(thumbnailsAndIds)
+      }
     })
   }
 }
 
-function addRatingsToCache(thumbnails_and_ids) {
+function addRatingsToCache(thumbnailsAndIds) {
   // Get the set of all IDs we haven't seen yet.
   let unseenIds = new Set()
-  for (let thumbnail_and_id of thumbnails_and_ids) {
-    let id = thumbnail_and_id[1]
+  for (let [thumbnail, id] of thumbnailsAndIds) {
     if (!(id in videoCache)) {
       unseenIds.add(id)
     }
@@ -306,42 +307,35 @@ function addRatingsToCache(thumbnails_and_ids) {
   return Promise.all(promises)
 }
 
-function addRatingBars(thumbnails_and_ids) {
+function addRatingBars(thumbnailsAndIds) {
   // Add a rating bar to each thumbnail.
-  for (let thumbnail_and_id of thumbnails_and_ids) {
-    let thumbnail = thumbnail_and_id[0]
-    let id = thumbnail_and_id[1]
+  for (let [thumbnail, id] of thumbnailsAndIds) {
     if (id in videoCache) {
       $(thumbnail).prepend(getRatingBarHtml(videoCache[id]))
-    } else {
-      if (debug) console.log('missing id', id, thumbnail)
+    } else if (debug) {
+      console.log('missing id', id, thumbnail)
     }
   }
 }
 
-function addRatingPercentage(thumbnails_and_ids) {
-  if (!userSettings.showPercentage) return
-  for (let thumbnail_and_id of thumbnails_and_ids) {
-    let thumbnail = thumbnail_and_id[0]
-    let id = thumbnail_and_id[1]
+function addRatingPercentage(thumbnailsAndIds) {
+  // Add the rating percentage below each thumbnail.
+  for (let [thumbnail, id] of thumbnailsAndIds) {
     if (id in videoCache) {
-      let dismissable = $(thumbnail).closest('#dismissable')
-      if (!dismissable) continue
-      let details = dismissable.children('#details')
-      if (!details) continue
-      let meta = $(details[0]).children('#meta')
-      if (!meta) continue
-      let byline = $(meta[0]).children('.byline')
-      if (!byline) continue
-      let ytd_meta = $(byline[0]).children('ytd-video-meta-block')
-      if (!ytd_meta) continue
-      let metadata = $(ytd_meta[0]).children('#metadata')
-      if (!metadata) continue
-      let metadata_line = $(metadata[0]).children('#metadata-line')
-      if (!metadata_line) continue
-      $(metadata_line[0]).append(getRatingPercentageHtml(videoCache[id]))
-    } else {
-      if (debug) console.log('missing id', id, thumbnail)
+      var metadataLine = $(thumbnail).closest('#dismissable').find('#metadata-line').last()
+      if (metadataLine) {
+        // Remove any previously added percentages.
+        for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
+          oldPercentage.remove()
+        }
+        let lastSpan = metadataLine.children('span').last()
+        let video = videoCache[id]
+        if (lastSpan && video.rating != null) {
+          lastSpan.after(getRatingPercentageHtml(video.rating))
+        }
+      }
+    } else if (debug) {
+      console.log('missing id', id, thumbnail)
     }
   }
 }
@@ -350,56 +344,54 @@ function getVideoObject(likes, dislikes) {
   likes = parseInt(likes)
   dislikes = parseInt(dislikes)
   let total = likes + dislikes
-  let ratingStyle = ''
-  let ratingText = ''
-  let roundedRating = ''
-  if (total) {
-    let rating = (likes / total * 100)
-    roundedRating = Math.round(rating);
-    ratingStyle = rating + '%'
-    if (likes !== total && rating >= 99.95) {
-      ratingText = '>99.9%'
-    } else {
-      ratingText = rating.toFixed(1) + '%'
-    }
-  }
+  let rating = total ? likes / total : null
   return {
     likes: likes.toLocaleString(),
     dislikes: dislikes.toLocaleString(),
     total: total.toLocaleString(),
-    ratingStyle: ratingStyle,
-    ratingText: ratingText,
-    roundedRating: roundedRating,
+    rating: rating,
   }
+}
+
+function ratingToPercentage(rating, decimalPlaces) {
+  if (decimalPlaces == 0) {
+    return Math.floor(rating * 100) + '%'
+  } else if (decimalPlaces == 1) {
+    return (Math.floor(rating * 1000) / 10) + '%'
+  }
+}
+
+function ratingToRgb(rating) {
+  let r = (1 - rating) * 1275
+  let g = rating * 637.5 - 255
+  return 'rgb(' + r + ',' + g + ',0)'
 }
 
 function getRatingBarHtml(video) {
   return '<ytrb-bar' +
       (userSettings.barOpacity !== 100
-              ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
-              : ''
+          ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
+          : ''
       ) +
-      (video.ratingStyle
-              ? '>' +
-              '<ytrb-rating style="width:' + video.ratingStyle +
-              '"></ytrb-rating>'
-              : ' class="ytrb-bar-no-rating">'
+      (video.rating == null
+          ? ' class="ytrb-bar-no-rating">'
+          : '><ytrb-rating style="width:' + (video.rating * 100) + '%"></ytrb-rating>'
       ) +
       (userSettings.barTooltip
-              ? '<ytrb-tooltip><div>' + getToolTipText(video) +
-              '</div></ytrb-tooltip>'
-              : ''
+          ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
+          : ''
       ) +
       '</ytrb-bar>'
 }
 
-function getRatingPercentageHtml(video) {
-  return '<span style="opacity:' + ((video.roundedRating*0.01)/2 + 0.5) + '">' + video.roundedRating + '%</span>'
+function getRatingPercentageHtml(rating) {
+  return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
+      ratingToRgb(rating) + '">' + ratingToPercentage(rating, 0) + '</span>'
 }
 
 function getToolTipText(video) {
   return video.likes + '&nbsp;/&nbsp;' + video.dislikes + ' &nbsp;&nbsp; '
-      + video.ratingText + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
+      + ratingToPercentage(video.rating, 1) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
 }
 
 function updateVideoRatingBarTooltips() {
@@ -436,12 +428,12 @@ function updateVideoRatingBarTooltips() {
             let likes = match[1].replace(/\D/g, '')
             let dislikes = match[2].replace(/\D/g, '')
             let video = getVideoObject(likes, dislikes)
-            if (video.ratingStyle) {
-              $(tooltip)
-                  .append('<span> &nbsp;&nbsp; ' + video.ratingText +
-                      ' &nbsp;&nbsp; ' + video.total + '&nbsp;total</span>')
-            } else {
+            if (video.rating == null) {
               $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
+            } else {
+              $(tooltip).append('<span> &nbsp;&nbsp; ' + 
+                  ratingToPercentage(video.rating, 1) + ' &nbsp;&nbsp; ' +
+                  video.total + '&nbsp;total</span>')
             }
           } else {
             if (debug) console.log('tooltip match not found', text, tooltip,
@@ -489,9 +481,9 @@ function updateVideoRatingBarTooltips() {
 //   }
 // }
 
-chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(stored_settings) {
-  if (stored_settings) {
-    userSettings = stored_settings
+chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
+  if (storedSettings) {
+    userSettings = storedSettings
   }
   if (userSettings.barColor !== 'blue-gray') {
     $('html').addClass('ytrb-bar-color-' + userSettings.barColor)

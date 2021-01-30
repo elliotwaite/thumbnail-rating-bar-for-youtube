@@ -93,6 +93,7 @@ a {
 
 .mdl-textfield--floating-label.is-invalid:not(.is-focused) .mdl-textfield__label {
   font-size: 16px;
+  color: #bdbdbd;
 }
 
 /* Copied from content.style.css. */

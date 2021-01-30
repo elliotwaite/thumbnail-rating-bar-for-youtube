@@ -97,7 +97,8 @@ function restoreOptions() {
     barOpacity: 100,
     barSeparator: false,
     barTooltip: true,
-    timeSincePublished: true,
+    showPercentage: false,
+    // timeSincePublished: true,
     apiKey: '',
   }, function(settings) {
     $('#bar-color-' + settings.barColor).click()
