@@ -52,6 +52,7 @@ $('#save-btn').click(function() {
     barOpacity: $('#bar-opacity').val(),
     barSeparator: $('#bar-separator').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
+    showPercentage: $('#show-percentage').prop('checked'),
     apiKey: $('#api-key').val(),
     // timeSincePublished: $('#time-since-published').prop('checked'),
   }, function() {
@@ -80,6 +81,9 @@ $('#restore-defaults-btn').click(function() {
   if (!$('#bar-tooltip').prop('checked')) {
     $('#bar-tooltip').click()
   }
+  if ($('#show-percentage').prop('checked')) {
+    $('#show-percentage').click()
+  }
   // if (!$('#time-since-published').prop('checked')) {
   //   $('#time-since-published').click()
   // }
@@ -106,6 +110,9 @@ function restoreOptions() {
     }
     if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
       $('#bar-tooltip').click()
+    }
+    if ($('#show-percentage').prop('checked') !== settings.showPercentage) {
+      $('#show-percentage').click()
     }
     if ($('#api-key').val() !== settings.apiKey) {
       $('#api-key').val(settings.apiKey)

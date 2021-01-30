@@ -119,6 +119,7 @@ const DEFAULT_USER_SETTINGS = {
   barOpacity: 100,
   barSeparator: false,
   barTooltip: true,
+  showPercentage: false,
   timeSincePublished: true,
 }
 let userSettings = DEFAULT_USER_SETTINGS
@@ -244,6 +245,7 @@ function updateThumbnailRatingBars() {
   if (thumbnails_and_ids.length) {
     addRatingsToCache(thumbnails_and_ids).then(function() {
       addRatingBars(thumbnails_and_ids)
+      addRatingPercentage(thumbnails_and_ids)
     })
   }
 }
@@ -317,14 +319,43 @@ function addRatingBars(thumbnails_and_ids) {
   }
 }
 
+function addRatingPercentage(thumbnails_and_ids) {
+  if (!userSettings.showPercentage) return
+  for (let thumbnail_and_id of thumbnails_and_ids) {
+    let thumbnail = thumbnail_and_id[0]
+    let id = thumbnail_and_id[1]
+    if (id in videoCache) {
+      let dismissable = $(thumbnail).closest('#dismissable')
+      if (!dismissable) continue
+      let details = dismissable.children('#details')
+      if (!details) continue
+      let meta = $(details[0]).children('#meta')
+      if (!meta) continue
+      let byline = $(meta[0]).children('.byline')
+      if (!byline) continue
+      let ytd_meta = $(byline[0]).children('ytd-video-meta-block')
+      if (!ytd_meta) continue
+      let metadata = $(ytd_meta[0]).children('#metadata')
+      if (!metadata) continue
+      let metadata_line = $(metadata[0]).children('#metadata-line')
+      if (!metadata_line) continue
+      $(metadata_line[0]).append(getRatingPercentageHtml(videoCache[id]))
+    } else {
+      if (debug) console.log('missing id', id, thumbnail)
+    }
+  }
+}
+
 function getVideoObject(likes, dislikes) {
   likes = parseInt(likes)
   dislikes = parseInt(dislikes)
   let total = likes + dislikes
   let ratingStyle = ''
   let ratingText = ''
+  let roundedRating = ''
   if (total) {
     let rating = (likes / total * 100)
+    roundedRating = Math.round(rating);
     ratingStyle = rating + '%'
     if (likes !== total && rating >= 99.95) {
       ratingText = '>99.9%'
@@ -338,6 +369,7 @@ function getVideoObject(likes, dislikes) {
     total: total.toLocaleString(),
     ratingStyle: ratingStyle,
     ratingText: ratingText,
+    roundedRating: roundedRating,
   }
 }
 
@@ -359,6 +391,10 @@ function getRatingBarHtml(video) {
               : ''
       ) +
       '</ytrb-bar>'
+}
+
+function getRatingPercentageHtml(video) {
+  return '<span style="opacity:' + ((video.roundedRating*0.01)/2 + 0.5) + '">' + video.roundedRating + '%</span>'
 }
 
 function getToolTipText(video) {
