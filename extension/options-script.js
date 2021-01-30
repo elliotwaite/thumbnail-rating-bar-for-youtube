@@ -48,8 +48,8 @@ $('#save-btn').click(function() {
     barColor: $('#bar-color-green-red').prop('checked')
       ? 'green-red'
       : 'blue-gray',
-    barThickness: $('#bar-thickness').val(),
-    barOpacity: $('#bar-opacity').val(),
+    barThickness: Number($('#bar-thickness').val()),
+    barOpacity: Number($('#bar-opacity').val()),
     barSeparator: $('#bar-separator').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
     showPercentage: $('#show-percentage').prop('checked'),
