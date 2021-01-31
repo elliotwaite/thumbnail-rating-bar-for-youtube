@@ -9,25 +9,25 @@ This extension adds a likes/dislikes rating bar to the bottom of every YouTube v
 
 ## Install
 
-For Chrome:  
+For Chrome:
 https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmihdmfhaacemlpgfbpoeb
 
-For Firefox:  
+For Firefox:
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
 This extension also requires you to set up a personal YouTube Data API key, as described below in the "Set Up a YouTube Data API Key" section.
 
 ## Set Up a YouTube Data API Key
 
-This extension now requires users to provide their own personal YouTube Data 
+This extension now requires users to provide their own personal YouTube Data
 API key through the extension's settings page. This is because the quota for
-the extension's shared API key is currently restricted (more details available 
+the extension's shared API key is currently restricted (more details available
 [here](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/17)).
 
 Note: Alternatively, if you don't want to set up a personal API key, there is
 now an alternative option, however this option is much less performant and you
 will notice a significant lag between when a page loads and when the rating
-bars are displayed. To try out this alternative, you can set the API key to 
+bars are displayed. To try out this alternative, you can set the API key to
 "invidious" on the extension's settings page. This will cause the extension
 to use the public
 [invidious API](https://github.com/omarroth/invidious/wiki/API), however this
@@ -39,74 +39,74 @@ you set up a YouTube Data API key by following the instructions below.
 1. Create a new project.
 
    * Go to: https://console.developers.google.com/projectcreate
-     
+
    * For "Project name" enter any name you want, for example
      "YouTube Data API Key".
-   
+
    * For "Location" leave it as "No organization".
-   
+
    * Then click the "CREATE" button.
-   
+
    * This will start creating a project and you'll see a progress wheel around
      the notification icon. Once the project has finished being created,
      continue to the next step.
 
 2. Enable the YouTube Data API v3.
-   
+
    * Go to: https://console.cloud.google.com/apis/library/youtube.googleapis.com
 
    * Then click the "ENABLE" button.
-   
-   * Note: This may end up navigating you to another page that displays a 
-     "CREATE CREDENTIALS" button. But if that happens, just ignore that button 
+
+   * Note: This may end up navigating you to another page that displays a
+     "CREATE CREDENTIALS" button. But if that happens, just ignore that button
      and follow the instructions in the next step.
 
 3. Create an API Key.
-   
+
    * Go to: https://console.cloud.google.com/apis/credentials
 
    * Click the "+ CREATE CREDENTIALS" dropdown button, then choose "API key".
 
-   * This will create your API key and display a dialog box. At the bottom 
+   * This will create your API key and display a dialog box. At the bottom
      right of that dialog box, click the "RESTRICT KEY" button.
 
-   * Then under the "API restrictions" section, click the "Restrict key" radio 
+   * Then under the "API restrictions" section, click the "Restrict key" radio
      button, and then below it, open the "Select APIs" dropdown menu and check
      the "YouTube Data API v3" checkbox.
 
    * Then click the "SAVE" button at the bottom of that page.
-   
-   * Then copy your listed API key to your clipboard (it should look something 
+
+   * Then copy your listed API key to your clipboard (it should look something
      like this: AIzaSyAylQ59uKlkZt2EgRPoygscGb_AHBQ5MEY).
-    
+
      Note: If you need to access your API key in the future, it will be
      available here:
      https://console.cloud.google.com/apis/credentials
-     
+
 4. Set your API key on the extension's settings page.
 
-   <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2" width=400> 
- 
+   <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-2.jpg?raw=true&v=2" width=400>
+
    * Go to the extension's settings page, which is accessible by clicking the
      extension's icon in your browser's toolbar.
-     
+
    * Paste your API key into the available text field.
-   
+
    * Then click the "SAVE" button.
-   
+
 You should now be all set. Refresh any previously opened YouTube tabs to
 see the changes.
 
-<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true" width=400> 
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/screenshot-1.jpg?raw=true" width=400>
 
 YouTube will allow you to use your API key to make a certain number of API
 requests per day, this is called your quota. To view your daily quota usage,
-go here and select your project from the dropdown menu at the top of the 
+go here and select your project from the dropdown menu at the top of the
 page:
 https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas
 
 To keep your API key private, this extension only stores your API key
-locally on your computer using local storage. This can be confirmed by 
+locally on your computer using local storage. This can be confirmed by
 viewing the source code.
 
 Enjoy.
@@ -129,7 +129,7 @@ When a user browses a page on YouTube, the extension/add-on script searches the 
 
 ## Design Details
 
-The current settings offer a blue-and-grey bar or a green-and-red bar (default: blue-and-grey). The thickness of the bar can be adjusted between 0px and 16px (default: 4px). The opacity of the bar can be adjusted between 0% and 100% (default: 100%). A white separation line can optionally be shown above the bar (default: not shown). A tooltip that displays the exact number of likes and dislikes can optionally be shown when a user hovers over the bar (default: enabled).
+The current settings offer a blue-and-grey bar or a green-and-red bar (default: blue-and-grey). The position of the bar can be toggled between top or bottom (default: bottom). The height of the bar can be adjusted between 0px (hidden) and 16px (default: 4px). The opacity of the bar can be adjusted between 0% and 100% (default: 100%). A white separation line can optionally be shown above the bar (default: not shown). A tooltip that displays the exact number of likes and dislikes can optionally be shown when a user hovers over the bar (default: enabled). A color-coded rating percentage can be added to the text section of each video listing.
 
 ## License
 

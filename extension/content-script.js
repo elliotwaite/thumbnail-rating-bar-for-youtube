@@ -114,8 +114,9 @@ const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
 // The default user settings. `userSettings` is replaced with the stored user's
 // settings once they are loaded.
 const DEFAULT_USER_SETTINGS = {
+  barPosition: 'bottom',
   barColor: 'blue-gray',
-  barThickness: 4,
+  barHeight: 4,
   barOpacity: 100,
   barSeparator: false,
   barTooltip: true,
@@ -135,11 +136,6 @@ function handleMutations() {
     // them later.
     hasUnseenMutations = true
   } else {
-    // Inject CSS for bars, only if it's shown
-    if (userSettings.barThickness !== 0 && !$('head').find('#ytrb-bar').length) {
-      $('head').append(getRatingBarCssLink())
-    }
-
     // Run the updates.
     updateThumbnailRatingBars()
     updateVideoRatingBarTooltips()
@@ -249,7 +245,7 @@ function updateThumbnailRatingBars() {
 
   if (thumbnailsAndIds.length) {
     addRatingsToCache(thumbnailsAndIds).then(function() {
-      if (userSettings.barThickness !== 0) {
+      if (userSettings.barHeight !== 0) {
         addRatingBars(thumbnailsAndIds)
       }
       if (userSettings.showPercentage) {
@@ -391,16 +387,6 @@ function getRatingBarHtml(video) {
       '</ytrb-bar>'
 }
 
-function getRatingBarCssLink() {
-  let path = chrome.runtime.getURL('top-progress-bar.css');
-  return $('<link/>', {
-    rel: 'stylesheet',
-    type: 'text/css',
-    id: 'ytrb-bar',
-    href: path
-  });
-}
-
 function getRatingPercentageHtml(rating) {
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
       ratingToRgb(rating) + '">' + ratingToPercentage(rating, 0) + '</span>'
@@ -448,7 +434,7 @@ function updateVideoRatingBarTooltips() {
             if (video.rating == null) {
               $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
             } else {
-              $(tooltip).append('<span> &nbsp;&nbsp; ' + 
+              $(tooltip).append('<span> &nbsp;&nbsp; ' +
                   ratingToPercentage(video.rating, 1) + ' &nbsp;&nbsp; ' +
                   video.total + '&nbsp;total</span>')
             }
@@ -498,19 +484,54 @@ function updateVideoRatingBarTooltips() {
 //   }
 // }
 
+function insertCss(url) {
+  chrome.runtime.sendMessage({
+    contentScriptQuery: 'insertCss',
+    url: url,
+  })
+}
+
 chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
   if (storedSettings) {
     userSettings = storedSettings
   }
-  if (userSettings.barColor !== 'blue-gray') {
-    $('html').addClass('ytrb-bar-color-' + userSettings.barColor)
+
+  if (userSettings.barHeight !== 0) {
+    insertCss('css/bar.css')
+
+    if (userSettings.barPosition === 'top') {
+      insertCss('css/bar-top.css')
+    } else {
+      insertCss('css/bar-bottom.css')
+    }
+
+    if (userSettings.barColor === 'blue-gray') {
+      insertCss('css/bar-blue-gray.css')
+    } else {
+      insertCss('css/bar-green-red.css')
+    }
+
+    if (userSettings.barSeparator) {
+      if (userSettings.barPosition === 'top') {
+        insertCss('css/bar-top-separator.css')
+      } else {
+        insertCss('css/bar-bottom-separator.css')
+      }
+    }
+
+    if (userSettings.barTooltip) {
+      insertCss('css/bar-tooltip.css')
+      if (userSettings.barPosition === 'top') {
+        insertCss('css/bar-top-tooltip.css')
+      } else {
+        insertCss('css/bar-bottom-tooltip.css')
+      }
+    }
   }
-  if (userSettings.barThickness !== 4) {
-    $('html').addClass('ytrb-bar-thickness-' + userSettings.barThickness)
-  }
-  if (userSettings.barSeparator) {
-    $('html').addClass('ytrb-bar-separator')
-  }
+
+  document.documentElement.style.setProperty('--ytrb-bar-height', userSettings.barHeight + 'px');
+  document.documentElement.style.setProperty('--ytrb-bar-opacity',  userSettings.barOpacity / 100);
+
   handleMutations()
   observer.observe(document.body, {childList: true, subtree: true})
 })

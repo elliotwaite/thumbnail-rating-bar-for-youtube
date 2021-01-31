@@ -39,5 +39,7 @@ chrome.runtime.onMessage.addListener(
       }
     } else if (message.contentScriptQuery === 'apiKey') {
       youtubeApiKey = message.apiKey
+    } else if (message.contentScriptQuery === 'insertCss') {
+      chrome.tabs.insertCSS(sender.tab.id, {file: message.url})
     }
   })

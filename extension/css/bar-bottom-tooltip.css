@@ -1,0 +1,3 @@
+ytrb-tooltip > div {
+  bottom: calc(var(--ytrb-bar-height) + 4px);
+}

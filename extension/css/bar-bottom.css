@@ -1,0 +1,59 @@
+ytrb-bar {
+  bottom: 0;
+}
+
+/* Reposition the thumbnail time (modern theme). */
+ytd-thumbnail-overlay-time-status-renderer {
+  bottom: var(--ytrb-bar-height) !important;
+}
+
+ytd-thumbnail-overlay-playback-status-renderer {
+  bottom: var(--ytrb-bar-height) !important;
+}
+
+/* Reposition the thumbnail time (classic theme). */
+.video-time {
+  margin-bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+.video-time-overlay {
+  margin-bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+.addto-button {
+  margin-bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+.addto-queue-button {
+  margin-bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+/* YouTube Gaming video time. */
+ytg-thumbnail-overlay-time-status-renderer {
+  bottom: calc(var(--ytrb-bar-height) + 4px) !important
+}
+
+.ytg-playlist-panel-video-renderer-0 ytg-text-badge-renderer.ytg-playlist-panel-video-renderer {
+  bottom: calc(var(--ytrb-bar-height) + 4px) !important
+}
+
+/* Moves the watch history progress bar to the top of the thumbnail. */
+ytd-thumbnail-overlay-resume-playback-renderer,  /* Modern */
+.resume-playback-background,  /* Classic */
+.resume-playback-progress-bar,  /* Classic */
+ytg-thumbnail-overlay-resume-playback-renderer  /* Gaming */
+{
+  top: 0 !important;
+}
+
+#bottom-thumbnail-overlay-badges  /* Gaming */
+{
+  height: calc(100% - var(--ytrb-bar-height) - 4px) !important;
+}
+
+ytg-thumbnail-overlay-time-status-renderer /* Gaming */
+{
+  position: absolute !important;
+  bottom: var(--ytrb-bar-height) !important;
+  height: 15px !important;
+}

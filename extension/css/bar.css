@@ -1,0 +1,34 @@
+:root {
+  --ytrb-bar-height: 4px;
+  --ytrb-bar-opacity: 1;
+}
+
+ytrb-bar {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: var(--ytrb-bar-height);
+  z-index: 999;
+  transition: opacity 0.2s ease-out 0.2s;
+  opacity: var(--ytrb-bar-opacity);
+}
+
+ytrb-rating {
+  display: block;
+  height: var(--ytrb-bar-height);
+  left: 0;
+}
+
+ytrb-bar.ytrb-bar-no-rating {
+  background-color: #888;
+}
+
+/* For YouTube Gaming. Keeps the rating bar contained in the thumbnail. */
+#thumbnail-container {
+  position: relative;
+}
+
+/* For YouTube Gaming. Prevents the rating bar from showing over the top menu bar. */
+ytg-thumbnail .ytrb-bar {
+  z-index: 1;
+}

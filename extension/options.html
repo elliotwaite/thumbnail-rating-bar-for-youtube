@@ -2,55 +2,66 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="libraries/material.min.css">
-    <script src="libraries/material.min.js"></script>
-    <script src="libraries/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="lib/material.min.css">
+    <script src="lib/material.min.js"></script>
+    <script src="lib/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="options-style.css">
+    <link rel="stylesheet" href="css/options.css">
 </head>
 <body>
 
 <div class="left-options">
 
     <div id="thumbnail-preview" class="thumbnail-preview  ytrb-bar-color-green-red">
-        <img src="options-thumbnail.jpg">
+        <img src="img/options-thumbnail.jpg">
         <ytrb-bar>
             <ytrb-rating style="width:61.8%"></ytrb-rating>
             <ytrb-tooltip>
-                <div>34&nbsp;/&nbsp;21 &nbsp;&nbsp; 61.8% &nbsp;&nbsp; 54&nbsp;total</div>
+                <div style="position:absolute; opacity:0">34&nbsp;/&nbsp;21 &nbsp;&nbsp; 61.8% &nbsp;&nbsp; 54&nbsp;total</div>
             </ytrb-tooltip>
         </ytrb-bar>
     </div>
 
-    <h6 class="h6">Color</h6>
+    <h6 class="h6" style="display: inline-block; padding-right: 16px">Position:</h6>
+
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-position-top" style="padding-right: 16px">
+        <input type="radio" id="bar-position-top" class="mdl-radio__button" name="bar-position" value="top">
+        <span class="mdl-radio__label">Top</span>
+    </label>
+    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-position-bottom">
+        <input type="radio" id="bar-position-bottom" class="mdl-radio__button" name="bar-position" value="bottom">
+        <span class="mdl-radio__label">Bottom</span>
+    </label>
+
+    <h6 class="h6" style="margin-top: 8px">Color:</h6>
 
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-blue-gray">
         <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
         <span class="mdl-radio__label">
-        <ytrb-bar>
-          <ytrb-rating style="width:61.8%"></ytrb-rating>
-        </ytrb-bar>
+        <ytrb-options-bar>
+          <ytrb-options-rating style="width:61.8%"></ytrb-options-rating>
+        </ytrb-options-bar>
       </span>
     </label>
     <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-green-red">
         <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
-        <span class="mdl-radio__label ytrb-bar-color-green-red">
-        <ytrb-bar>
-          <ytrb-rating style="width:61.8%"></ytrb-rating>
-        </ytrb-bar>
+        <span class="mdl-radio__label">
+        <ytrb-options-bar class="ytrb-options-bar-color-green-red">
+          <ytrb-options-rating style="width:61.8%"></ytrb-options-rating>
+        </ytrb-options-bar>
       </span>
     </label>
 
-    <h6>Thickness</h6>
+    <h6>Height:</h6>
 
     <label class="slider-label">
-        <span id="bar-thickness-text" class="slider-bubble">4 px</span>
+        <span id="bar-height-text" class="slider-bubble">4 px</span>
         <div class="slider-input-container">
-            <input id="bar-thickness" class="mdl-slider mdl-js-slider" type="range" min="0" max="16" value="4">
+            <input id="bar-height" class="mdl-slider mdl-js-slider" type="range" min="0" max="16" value="4">
         </div>
     </label>
 
-    <h6>Opacity</h6>
+    <h6>Opacity:</h6>
 
     <label class="slider-label">
         <span id="bar-opacity-text" class="slider-bubble">100%</span>
@@ -64,7 +75,7 @@
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
         <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
-        <span class="mdl-checkbox__label">Add a separation line above the rating bar.</span>
+        <span class="mdl-checkbox__label">Add a separation line to the rating bar.</span>
     </label>
 
     <br/>
@@ -83,9 +94,11 @@
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="show-percentage">
         <input type="checkbox" id="show-percentage" class="mdl-checkbox__input">
-        <span class="mdl-checkbox__label">Add a color-coded rating percentage to each listing.</span>
+        <span class="mdl-checkbox__label">Add a color-coded rating percentage to each video listing.</span>
     </label>
 
+    <br/>
+    <br/>
     <br/>
     <br/>
     <br/>
@@ -130,7 +143,7 @@
     <button class="mdl-snackbar__action" type="button"></button>
 </div>
 
-<script src="options-script.js"></script>
+<script src="options.js"></script>
 
 </body>
 </html>

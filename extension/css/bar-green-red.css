@@ -1,0 +1,21 @@
+ytrb-bar {
+  background-color: #c00;
+}
+
+ytrb-rating {
+  background-color: #060;
+  box-shadow: 1px 0 0 0 #fff;
+}
+
+/* The video's main page rating bar. */
+.ytrb-bar-color-green-red #container.ytd-sentiment-bar-renderer,
+.ytrb-bar-color-green-red .video-extras-sparkbar-dislikes /* For classic theme. */ {
+  background-color: #c00 !important;
+}
+
+.ytrb-bar-color-green-red #like-bar.ytd-sentiment-bar-renderer ,
+.ytrb-bar-color-green-red .video-extras-sparkbar-likes /* For classic theme. */ {
+  background-color: #060 !important;
+  box-shadow: 1px 0 #fff;
+  position: relative;
+}
