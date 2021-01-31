@@ -135,6 +135,11 @@ function handleMutations() {
     // them later.
     hasUnseenMutations = true
   } else {
+    // Inject CSS for bars, only if it's shown
+    if (userSettings.barThickness !== 0 && !$('head').find('#ytrb-bar').length) {
+      $('head').append(getRatingBarCssLink())
+    }
+
     // Run the updates.
     updateThumbnailRatingBars()
     updateVideoRatingBarTooltips()
@@ -244,7 +249,9 @@ function updateThumbnailRatingBars() {
 
   if (thumbnailsAndIds.length) {
     addRatingsToCache(thumbnailsAndIds).then(function() {
-      addRatingBars(thumbnailsAndIds)
+      if (userSettings.barThickness !== 0) {
+        addRatingBars(thumbnailsAndIds)
+      }
       if (userSettings.showPercentage) {
         addRatingPercentage(thumbnailsAndIds)
       }
@@ -382,6 +389,16 @@ function getRatingBarHtml(video) {
           : ''
       ) +
       '</ytrb-bar>'
+}
+
+function getRatingBarCssLink() {
+  let path = chrome.runtime.getURL('top-progress-bar.css');
+  return $('<link/>', {
+    rel: 'stylesheet',
+    type: 'text/css',
+    id: 'ytrb-bar',
+    href: path
+  });
 }
 
 function getRatingPercentageHtml(rating) {
