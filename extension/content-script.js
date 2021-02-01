@@ -492,6 +492,7 @@ function insertCss(url) {
 }
 
 chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
+  // In Firefox, `storedSettings` will be undeclared if not previously set.
   if (storedSettings) {
     userSettings = storedSettings
   }

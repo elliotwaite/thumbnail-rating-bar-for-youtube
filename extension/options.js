@@ -1,3 +1,15 @@
+const DEFAULT_USER_SETTINGS = {
+  barPosition: 'bottom',
+  barColor: 'blue-gray',
+  barHeight: 4,
+  barOpacity: 100,
+  barSeparator: false,
+  barTooltip: true,
+  showPercentage: false,
+  // timeSincePublished: true,
+  apiKey: '',
+}
+
 function getCssLink(url) {
   return $('<link/>', {
     rel: 'stylesheet',
@@ -122,17 +134,11 @@ $('#restore-defaults-btn').click(function() {
 
 // Load saved settings.
 function restoreOptions() {
-  chrome.storage.sync.get({
-    barPosition: 'bottom',
-    barColor: 'blue-gray',
-    barHeight: 4,
-    barOpacity: 100,
-    barSeparator: false,
-    barTooltip: true,
-    showPercentage: false,
-    // timeSincePublished: true,
-    apiKey: '',
-  }, function(settings) {
+  chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(settings) {
+    // In Firefox, `settings` will be undeclared if not previously set.
+    if (!settings) {
+      settings = DEFAULT_USER_SETTINGS
+    }
     $('#bar-position-' + settings.barPosition).click()
     $('#bar-color-' + settings.barColor).click()
     $('#bar-height')[0].MaterialSlider.change(settings.barHeight)
