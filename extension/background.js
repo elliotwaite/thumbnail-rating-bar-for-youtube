@@ -1,10 +1,10 @@
 let youtubeApiKey = ''
 
-chrome.storage.sync.get({
-    apiKey: '',
-  }, function(settings) {
+chrome.storage.sync.get({apiKey: ''}, function(settings) {
+  if (settings) {
     youtubeApiKey = settings.apiKey
-  })
+  }
+})
 
 // Do the ajax request from this background script to avoid CORB.
 chrome.runtime.onMessage.addListener(
@@ -42,4 +42,5 @@ chrome.runtime.onMessage.addListener(
     } else if (message.contentScriptQuery === 'insertCss') {
       chrome.tabs.insertCSS(sender.tab.id, {file: message.url})
     }
-  })
+  }
+)
