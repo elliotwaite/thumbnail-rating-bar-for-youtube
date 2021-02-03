@@ -120,6 +120,7 @@ const DEFAULT_USER_SETTINGS = {
   barOpacity: 100,
   barSeparator: false,
   barTooltip: true,
+  useOnVideoPage: false,
   showPercentage: false,
   // timeSincePublished: true,
 }
@@ -526,6 +527,14 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
         insertCss('css/bar-top-tooltip.css')
       } else {
         insertCss('css/bar-bottom-tooltip.css')
+      }
+    }
+    
+    if (userSettings.useOnVideoPage) {
+      if (userSettings.barColor === 'blue-gray') {
+        insertCss('css/bar-blue-gray-video-page.css')
+      } else {
+        insertCss('css/bar-green-red-video-page.css')
       }
     }
   }

@@ -26,6 +26,8 @@ a {
   float: right;
   width: 258px;
   padding: 14px 16px 22px;
+  margin-left: -1px;
+  border-left: 1px solid #ccc;
 }
 
 .buttons-container {

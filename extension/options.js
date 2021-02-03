@@ -5,6 +5,7 @@ const DEFAULT_USER_SETTINGS = {
   barOpacity: 100,
   barSeparator: false,
   barTooltip: true,
+  useOnVideoPage: false,
   showPercentage: false,
   // timeSincePublished: true,
   apiKey: '',
@@ -94,6 +95,7 @@ $('#save-btn').click(function() {
     barOpacity: Number($('#bar-opacity').val()),
     barSeparator: $('#bar-separator').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
+    useOnVideoPage: $('#use-on-video-page').prop('checked'),
     showPercentage: $('#show-percentage').prop('checked'),
     apiKey: $('#api-key').val(),
     // timeSincePublished: $('#time-since-published').prop('checked'),
@@ -124,6 +126,9 @@ $('#restore-defaults-btn').click(function() {
   if (!$('#bar-tooltip').prop('checked')) {
     $('#bar-tooltip').click()
   }
+  if ($('#use-on-video-page').prop('checked')) {
+    $('#use-on-video-page').click()
+  }
   if ($('#show-percentage').prop('checked')) {
     $('#show-percentage').click()
   }
@@ -150,6 +155,9 @@ function restoreOptions() {
     }
     if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
       $('#bar-tooltip').click()
+    }
+    if ($('#use-on-video-page').prop('checked') !== settings.useOnVideoPage) {
+      $('#use-on-video-page').click()
     }
     if ($('#show-percentage').prop('checked') !== settings.showPercentage) {
       $('#show-percentage').click()
