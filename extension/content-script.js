@@ -326,7 +326,11 @@ function addRatingPercentage(thumbnailsAndIds) {
   // Add the rating percentage below each thumbnail.
   for (let [thumbnail, id] of thumbnailsAndIds) {
     if (id in videoCache) {
-      var metadataLine = $(thumbnail).closest('#dismissable').find('#metadata-line').last()
+      let videoContainer = $(thumbnail).closest('#content.style-scope.ytd-rich-item-renderer')
+      if (videoContainer.length === 0) {
+        videoContainer = $(thumbnail).closest('ytd-compact-video-renderer')
+      }
+      let metadataLine = videoContainer?.find('#metadata-line').last()
       if (metadataLine) {
         // Remove any previously added percentages.
         for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
