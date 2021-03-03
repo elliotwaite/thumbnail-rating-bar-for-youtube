@@ -332,7 +332,7 @@ function addRatingPercentage(thumbnailsAndIds) {
         '.ytd-expanded-shelf-contents-renderer, ' +  // Subscriptions page.
         '.yt-horizontal-list-renderer, ' +  // Channel page.
         '.ytd-item-section-renderer, ' +  // History page.
-        '.ytd-horizontal-card-list-renderer' // Gaming page.
+        '.ytd-horizontal-card-list-renderer'  // Gaming page.
       ).find('#metadata-line').last()
       if (metadataLine) {
         // Remove any previously added percentages.
