@@ -19,6 +19,9 @@ const THEME_CLASSIC = 2  // The classic theme.
 const THEME_GAMING = 3  // The YouTube Gaming theme.
 const NUM_THEMES = 3
 
+// `isDarkTheme` will be true if the appearance setting is in dark theme mode.
+let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') == ' #181818'
+
 // We use these JQuery selectors to find new thumbnails on the page. We use
 // :not([data-ytrb-found]) to make sure these aren't thumbnails that we've
 // already added a rating bar to. We need to check all combinations of these
@@ -375,6 +378,9 @@ function ratingToPercentage(rating, decimalPlaces) {
 function ratingToRgb(rating) {
   let r = (1 - rating) * 1275
   let g = rating * 637.5 - 255
+  if (!isDarkTheme) {
+    g = Math.min(g, 255) * 0.85
+  }
   return 'rgb(' + r + ',' + g + ',0)'
 }
 
@@ -536,7 +542,7 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
         insertCss('css/bar-bottom-tooltip.css')
       }
     }
-    
+
     if (userSettings.useOnVideoPage) {
       if (userSettings.barColor === 'blue-gray') {
         insertCss('css/bar-blue-gray-video-page.css')
