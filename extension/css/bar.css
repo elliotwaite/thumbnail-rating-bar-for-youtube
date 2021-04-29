@@ -7,20 +7,28 @@ ytrb-bar {
   display: block;
   position: absolute;
   width: 100%;
-  height: var(--ytrb-bar-height);
   z-index: 999;
   transition: opacity 0.2s ease-out 0.2s;
   opacity: var(--ytrb-bar-opacity);
 }
 
 ytrb-rating {
-  display: block;
-  height: var(--ytrb-bar-height);
-  left: 0;
+  display: flex;
 }
 
-ytrb-bar.ytrb-bar-no-rating {
+ytrb-no-rating {
+  display: flex;
+  height: var(--ytrb-bar-height);
   background-color: #888;
+}
+
+ytrb-likes {
+  height: var(--ytrb-bar-height);
+}
+
+ytrb-dislikes {
+  flex-grow: 1;
+  height: var(--ytrb-bar-height);
 }
 
 /* For YouTube Gaming. Keeps the rating bar contained in the thumbnail. */

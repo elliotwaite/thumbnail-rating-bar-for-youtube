@@ -90,18 +90,20 @@ ytrb-options-bar {
   background-color: #cfcfcf;
 }
 
-ytrb-options-rating {
-  display: block;
-  height: 4px;
-  left: 0;
+ytrb-options-bar.ytrb-options-bar-blue-gray ytrb-likes {
   background-color: #3095e3;
 }
 
-ytrb-options-bar.ytrb-options-bar-color-green-red {
-  background-color: #c00;
+ytrb-options-bar.ytrb-options-bar-blue-gray ytrb-dislikes {
+  background-color: #cfcfcf;
+  box-shadow: none;
 }
 
-ytrb-options-bar.ytrb-options-bar-color-green-red ytrb-options-rating {
+ytrb-options-bar.ytrb-options-bar-green-red ytrb-likes {
   background-color: #060;
-  box-shadow: 1px 0 0 0 #fff;
+}
+
+ytrb-options-bar.ytrb-options-bar-green-red ytrb-dislikes {
+  background-color: #c00;
+  box-shadow: inset 1px 0 #fff;
 }

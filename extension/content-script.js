@@ -390,9 +390,13 @@ function getRatingBarHtml(video) {
           ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
           : ''
       ) +
+      '>' +
       (video.rating == null
-          ? ' class="ytrb-bar-no-rating">'
-          : '><ytrb-rating style="width:' + (video.rating * 100) + '%"></ytrb-rating>'
+          ? '<ytrb-no-rating></ytrb-no-rating>'
+          : '<ytrb-rating>' +
+              '<ytrb-likes style="width:' + (video.rating * 100) + '%"></ytrb-likes>' +
+              '<ytrb-dislikes></ytrb-dislikes>' +
+            '</ytrb-rating>'
       ) +
       (userSettings.barTooltip
           ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
