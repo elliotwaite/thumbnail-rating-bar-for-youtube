@@ -422,9 +422,9 @@ function updateVideoRatingBarTooltips() {
         .each(function(_, tooltip) {
           let text
           try {
-            text = $(tooltip).text().split('  ')[3]
+            text = $(tooltip).text().slice(3, -1)
             // If the tooltip is empty, continue.
-            if (text.length < 3) {
+            if (text.length < 5) {
               return true
             }
           } catch (e) {
@@ -434,9 +434,11 @@ function updateVideoRatingBarTooltips() {
           let previousText = $(tooltip).attr('data-ytrb-found')
           if (previousText) {
             if (previousText === text) {
-              // This tooltip has already been processed.
+              // This tooltip has already been processed correctly.
               return true
             }
+            // This tooltip has to be reprocessed, so remove previously
+            // added span.
             $(tooltip).children('span').remove()
           }
 
