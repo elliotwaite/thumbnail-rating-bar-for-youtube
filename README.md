@@ -72,7 +72,8 @@ you set up a YouTube Data API key by following the instructions below.
 
    * Then under the "API restrictions" section, click the "Restrict key" radio
      button, and then below it, open the "Select APIs" dropdown menu and check
-     the "YouTube Data API v3" checkbox.
+     the "YouTube Data API v3" checkbox (if you don't see this option, make
+     sure you successfully enabled the API in step 2 above).
 
    * Then click the "SAVE" button at the bottom of that page.
 
