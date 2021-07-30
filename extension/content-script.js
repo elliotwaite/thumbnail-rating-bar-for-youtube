@@ -367,12 +367,13 @@ function getVideoObject(likes, dislikes) {
   }
 }
 
-function ratingToPercentage(rating, decimalPlaces) {
-  if (decimalPlaces == 0) {
-    return Math.floor(rating * 100) + '%'
-  } else if (decimalPlaces == 1) {
-    return (Math.floor(rating * 1000) / 10) + '%'
+function ratingToPercentage(rating) {
+  if (rating == 1) {
+    return '100%'
   }
+  // Note: We use floor instead of round to ensure that anything lower than
+  // 100% does not display "100.0%".
+  return (Math.floor(rating * 1000) / 10).toFixed(1) + '%'
 }
 
 function ratingToRgb(rating) {
@@ -407,12 +408,12 @@ function getRatingBarHtml(video) {
 
 function getRatingPercentageHtml(rating) {
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      ratingToRgb(rating) + '">' + ratingToPercentage(rating, 0) + '</span>'
+      ratingToRgb(rating) + '">' + ratingToPercentage(rating) + '</span>'
 }
 
 function getToolTipText(video) {
   return video.likes + '&nbsp;/&nbsp;' + video.dislikes + ' &nbsp;&nbsp; '
-      + ratingToPercentage(video.rating, 1) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
+      + ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
 }
 
 function updateVideoRatingBarTooltips() {
@@ -455,7 +456,7 @@ function updateVideoRatingBarTooltips() {
               $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
             } else {
               $(tooltip).append('<span> &nbsp;&nbsp; ' +
-                  ratingToPercentage(video.rating, 1) + ' &nbsp;&nbsp; ' +
+                  ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
                   video.total + '&nbsp;total</span>')
             }
           } else {
