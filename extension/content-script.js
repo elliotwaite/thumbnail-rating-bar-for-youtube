@@ -54,7 +54,9 @@ let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-ge
 const THUMBNAIL_SELECTORS = []
 THUMBNAIL_SELECTORS[THEME_MODERN] = '' +
     // All types except the video wall. The URL is on the selected a link.
-    'a#thumbnail'
+    // The mini-player thumbnail will not have an href attribute, which is why
+    // we require that it exists.
+    'a#thumbnail[href]'
 
 THUMBNAIL_SELECTORS[THEME_CLASSIC] = '' +
     // Search results videos. (url on parent)
@@ -217,7 +219,7 @@ function updateThumbnailRatingBars() {
     }
 
     if (!url) {
-      if (debug) console.log('url not found', thumbnail, url)
+      if (debug) console.log('DEBUG: Url not found.', thumbnail, url)
       return true
     }
 
@@ -243,7 +245,7 @@ function updateThumbnailRatingBars() {
       let id = match[1]
       thumbnailsAndIds.push([thumbnail, id])
     } else if (debug) {
-      console.log('match not found', thumbnail, url)
+      console.log('DEBUG: Match not found.', thumbnail, url)
     }
   })
 
@@ -320,7 +322,7 @@ function addRatingBars(thumbnailsAndIds) {
     if (id in videoCache) {
       $(thumbnail).prepend(getRatingBarHtml(videoCache[id]))
     } else if (debug) {
-      console.log('missing id', id, thumbnail)
+      console.log('DEBUG: Missing ID.', id, thumbnail)
     }
   }
 }
@@ -349,7 +351,7 @@ function addRatingPercentage(thumbnailsAndIds) {
         }
       }
     } else if (debug) {
-      console.log('missing id', id, thumbnail)
+      console.log('DEBUG: Missing ID.', id, thumbnail)
     }
   }
 }
@@ -426,10 +428,11 @@ function updateVideoRatingBarTooltips() {
             text = $(tooltip).text().slice(3, -1)
             // If the tooltip is empty, continue.
             if (text.length < 5) {
+              if (debug) console.log('DEBUG: Empty tooltip.', tooltip)
               return true
             }
           } catch (e) {
-            if (debug) console.log('tooltip likes not found', tooltip)
+            if (debug) console.log('DEBUG: Tooltip likes not found.', tooltip)
             return true
           }
           let previousText = $(tooltip).attr('data-ytrb-found')
@@ -447,7 +450,7 @@ function updateVideoRatingBarTooltips() {
           $(tooltip).attr('data-ytrb-found', text)
 
           // Extract the likes and dislikes from the tooltip's text.
-          let match = text.match(/([0-9,]+) \/ ([0-9,]+)/)
+          let match = text.match(/(.+) \/ (.+)/)
           if (match) {
             let likes = match[1].replace(/\D/g, '')
             let dislikes = match[2].replace(/\D/g, '')
@@ -459,9 +462,8 @@ function updateVideoRatingBarTooltips() {
                   ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
                   video.total + '&nbsp;total</span>')
             }
-          } else {
-            if (debug) console.log('tooltip match not found', text, tooltip,
-                $(tooltip))
+          } else if (debug) {
+            console.log('DEBUG: Tooltip match not found.', text, tooltip, $(tooltip))
           }
         })
   }
