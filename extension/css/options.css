@@ -3,7 +3,8 @@ html {
 }
 
 body {
-  width: 581px;
+  /*width: 581px;*/
+  width: 625px;
   height: auto;
 }
 
@@ -17,14 +18,16 @@ a {
 
 .left-options {
   float: left;
-  width: 258px;
+  /*width: 258px;*/
+  width: 280px;
   padding: 14px 16px 22px;
   border-right: 1px solid #ccc;
 }
 
 .right-options {
   float: right;
-  width: 258px;
+  /*width: 258px;*/
+  width: 280px;
   padding: 14px 16px 22px;
   margin-left: -1px;
   border-left: 1px solid #ccc;
@@ -64,7 +67,7 @@ a {
 }
 
 .mdl-checkbox {
-  padding-right: 24px;
+  /*padding-right: 24px;*/
 }
 
 #save-btn {
@@ -106,4 +109,24 @@ ytrb-options-bar.ytrb-options-bar-green-red ytrb-likes {
 ytrb-options-bar.ytrb-options-bar-green-red ytrb-dislikes {
   background-color: #c00;
   box-shadow: inset 1px 0 #fff;
+}
+
+.getmdl-select {
+  padding: 0;
+}
+
+.getmdl-select.is-focused .mdl-icon-toggle__label {
+  color: rgb(33,150,243);
+}
+
+.flex-row {
+  display: flex;
+}
+
+.flex-row > div:first-child {
+  margin-right: 8px;
+}
+
+.flex-row h6 {
+  margin: 0;
 }

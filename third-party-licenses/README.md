@@ -1,0 +1,1 @@
+This directory includes the third-party licenses for the libraries located in `/extension/lib/`.

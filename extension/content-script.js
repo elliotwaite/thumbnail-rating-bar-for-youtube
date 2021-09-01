@@ -121,6 +121,9 @@ const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
 const DEFAULT_USER_SETTINGS = {
   barPosition: 'bottom',
   barColor: 'blue-gray',
+  barLikesColor: '#3095e3',
+  barDislikesColor: '#cfcfcf',
+  barColorsSeparator: false,
   barHeight: 4,
   barOpacity: 100,
   barSeparator: false,
@@ -529,12 +532,6 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
       insertCss('css/bar-bottom.css')
     }
 
-    if (userSettings.barColor === 'blue-gray') {
-      insertCss('css/bar-blue-gray.css')
-    } else {
-      insertCss('css/bar-green-red.css')
-    }
-
     if (userSettings.barSeparator) {
       if (userSettings.barPosition === 'top') {
         insertCss('css/bar-top-separator.css')
@@ -553,16 +550,35 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
     }
 
     if (userSettings.useOnVideoPage) {
-      if (userSettings.barColor === 'blue-gray') {
-        insertCss('css/bar-blue-gray-video-page.css')
-      } else {
-        insertCss('css/bar-green-red-video-page.css')
-      }
+      insertCss('css/bar-video-page.css')
     }
   }
 
-  document.documentElement.style.setProperty('--ytrb-bar-height', userSettings.barHeight + 'px');
-  document.documentElement.style.setProperty('--ytrb-bar-opacity',  userSettings.barOpacity / 100);
+  document.documentElement.style.setProperty('--ytrb-bar-height', userSettings.barHeight + 'px')
+  document.documentElement.style.setProperty('--ytrb-bar-opacity',  userSettings.barOpacity / 100)
+
+  if (userSettings.barColor === 'blue-gray') {
+    document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#3095e3')
+    document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#cfcfcf')
+    document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'none')
+  } else if (userSettings.barColor === 'green-red') {
+    document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#060')
+    document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#c00')
+    document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'inset 1px 0 #fff')
+  } else if (userSettings.barColor === 'custom-colors') {
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-likes-color',
+      userSettings.barLikesColor
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-color',
+      userSettings.barDislikesColor
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-shadow',
+      userSettings.barColorsSeparator ? 'inset 1px 0 #fff' : 'none'
+    )
+  }
 
   handleMutations()
   observer.observe(document.body, {childList: true, subtree: true})

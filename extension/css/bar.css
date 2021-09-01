@@ -1,6 +1,9 @@
 :root {
   --ytrb-bar-height: 4px;
   --ytrb-bar-opacity: 1;
+  --ytrb-bar-likes-color: #3095e3;
+  --ytrb-bar-dislikes-color: #cfcfcf;
+  --ytrb-bar-dislikes-shadow: none;
 }
 
 ytrb-bar {
@@ -24,11 +27,14 @@ ytrb-no-rating {
 
 ytrb-likes {
   height: var(--ytrb-bar-height);
+  background-color: var(--ytrb-bar-likes-color);
 }
 
 ytrb-dislikes {
   flex-grow: 1;
   height: var(--ytrb-bar-height);
+  background-color: var(--ytrb-bar-dislikes-color);
+  box-shadow: var(--ytrb-bar-dislikes-shadow);
 }
 
 /* For YouTube Gaming. Keeps the rating bar contained in the thumbnail. */

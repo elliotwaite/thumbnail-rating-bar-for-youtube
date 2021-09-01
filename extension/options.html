@@ -2,11 +2,15 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="lib/material.min.css">
-    <script src="lib/material.min.js"></script>
-    <script src="lib/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="lib/getmdl-select.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="css/options.css">
+
+    <script src="lib/material.min.js"></script>
+    <script src="lib/getmdl-select.min.js"></script>
+    <script src="lib/jquery-3.3.1.min.js"></script>
 </head>
 <body>
 
@@ -36,30 +40,41 @@
         <span class="mdl-radio__label">Bottom</span>
     </label>
 
-    <h6 class="h6" style="margin-top: 8px">Color:</h6>
+    <div class="flex-row" style="margin-top: 8px">
+        <div>
+            <h6 class="h6">Colors:</h6>
+        </div>
 
-    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-blue-gray">
-        <input type="radio" id="bar-color-blue-gray" class="mdl-radio__button" name="bar-color" value="blueGray">
-        <span class="mdl-radio__label">
-        <ytrb-options-bar class="ytrb-options-bar-blue-gray">
-          <ytrb-rating>
-              <ytrb-likes style="width:61.8%"></ytrb-likes>
-              <ytrb-dislikes></ytrb-dislikes>
-          </ytrb-rating>
-        </ytrb-options-bar>
-      </span>
-    </label>
-    <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="bar-color-green-red">
-        <input type="radio" id="bar-color-green-red" class="mdl-radio__button" name="bar-color" value="greenRed">
-        <span class="mdl-radio__label">
-        <ytrb-options-bar class="ytrb-options-bar-green-red">
-          <ytrb-rating>
-              <ytrb-likes style="width:61.8%"></ytrb-likes>
-              <ytrb-dislikes></ytrb-dislikes>
-          </ytrb-rating>
-        </ytrb-options-bar>
-      </span>
-    </label>
+        <div class="mdl-textfield mdl-js-textfield getmdl-select">
+            <input class="mdl-textfield__input" value="" id="bar-color" readonly/>
+            <input value="" type="hidden" name="bar-color"/>
+            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+            <label class="mdl-textfield__label" for="bar-color" style="display: none">Bar Colors</label>
+            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="bar-color">
+                <li class="mdl-menu__item" data-val="blue-gray" id="bar-color-blue-gray">Blue / Gray</li>
+                <li class="mdl-menu__item" data-val="green-red" id="bar-color-green-red">Green / Red</li>
+                <li class="mdl-menu__item" data-val="custom-colors" id="bar-color-custom-colors">Custom Colors</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="custom-colors-options">
+        <div class="flex-row">
+            <div id="bar-likes-color-container" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input id="bar-likes-color" class="mdl-textfield__input" type="text" required>
+                <label class="mdl-textfield__label" for="bar-likes-color">Likes CSS Color</label>
+            </div>
+            <div id="bar-dislikes-color-container" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input id="bar-dislikes-color" class="mdl-textfield__input" type="text" required>
+                <label class="mdl-textfield__label" for="bar-dislikes-color">Dislikes CSS Color</label>
+            </div>
+        </div>
+
+        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-colors-separator">
+            <input type="checkbox" id="bar-colors-separator" class="mdl-checkbox__input">
+            <span class="mdl-checkbox__label">Separate colors with a white line.</span>
+        </label>
+    </div>
 
     <h6>Height:</h6>
 
@@ -84,7 +99,7 @@
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
         <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
-        <span class="mdl-checkbox__label">Add a separation line to the rating bar.</span>
+        <span class="mdl-checkbox__label">Add a separation line <span id="bar-separator-position">above</span> the rating bar.</span>
     </label>
 
     <br/>
@@ -99,7 +114,6 @@
     <br/>
     <br/>
     <br/>
-    <br/>
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="use-on-video-page">
         <input type="checkbox" id="use-on-video-page" class="mdl-checkbox__input">
@@ -109,11 +123,10 @@
     <br/>
     <br/>
     <br/>
-    <br/>
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="show-percentage">
         <input type="checkbox" id="show-percentage" class="mdl-checkbox__input">
-        <span class="mdl-checkbox__label">Add a color-coded rating percentage to each video listing.</span>
+        <span class="mdl-checkbox__label">Add a color-coded text rating percentage to each video listing.</span>
     </label>
 
     <br/>
