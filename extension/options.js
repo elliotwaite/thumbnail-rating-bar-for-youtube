@@ -262,11 +262,19 @@ function restoreOptions() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // We restore option twice in case the first time is before the Material
+  // Design components are loaded. (This is a temporary workaround until a
+  // better method is figured out.)
+  restoreOptions()
+  setTimeout(function () {
+    updateCss()
+  })
+
   // We use the delay timeout to give the MDL components time to load.
   setTimeout(function () {
     restoreOptions()
     setTimeout(function () {
       updateCss()
     })
-  }, 100)
+  }, 250)
 })
