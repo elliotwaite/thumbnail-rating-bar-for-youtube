@@ -2,5 +2,5 @@ These minified files:
 getmdl-select.min.css
 getmdl-select.min.js
 
-... were download from the source code zip file here:
+... were downloaded from the source code zip file here:
 https://github.com/CreativeIT/getmdl-select/releases/tag/v2.0
