@@ -96,26 +96,6 @@ THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
 const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
     'a.ytp-videowall-still'
 
-// Set the current theme.
-// function setCurrentTheme() {
-//   console.log('debug')
-//   console.log($('head'))
-//   console.log($('head>meta'))
-//   console.log($('head>meta[property="og:site_name"]'))
-//   console.log($('head>meta[property="og:site_name"]').attr('content'))
-//   let siteName = $('head>meta[property="og:site_name"]').attr('content')
-//   if (siteName === 'YouTube') {
-//     curTheme = THEME_MODERN
-//   } else if (siteName === 'YouTube Gaming') {
-//     curTheme = THEME_GAMING
-//   } else {
-//     // siteName will be undefined.
-//     curTheme = THEME_CLASSIC
-//   }
-//   console.log('set theme', siteName, curTheme)
-//   curTheme = 1
-// }
-
 // The default user settings. `userSettings` is replaced with the stored user's
 // settings once they are loaded.
 const DEFAULT_USER_SETTINGS = {
@@ -179,6 +159,7 @@ function updateThumbnailRatingBars() {
       thumbnails = $(THUMBNAIL_SELECTORS[i])
       if (thumbnails.length) {
         curTheme = i
+        break
       }
     }
   }
