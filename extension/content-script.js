@@ -407,47 +407,58 @@ function updateVideoRatingBarTooltips() {
   if (curTheme === THEME_MODERN || !curTheme) {
     $('.ytd-sentiment-bar-renderer #tooltip')
         .each(function(_, tooltip) {
+          // Get the current tooltip's text.
           let text
           try {
-            text = $(tooltip).text().slice(3, -1)
-            // If the tooltip is empty, continue.
-            if (text.length < 5) {
-              if (debug) console.log('DEBUG: Empty tooltip.', tooltip)
-              return true
-            }
+            text = $(tooltip).text().trim()
           } catch (e) {
             if (debug) console.log('DEBUG: Tooltip likes not found.', tooltip)
             return true
           }
-          let previousText = $(tooltip).attr('data-ytrb-found')
-          if (previousText) {
-            if (previousText === text) {
+
+          // If the tooltip is empty, continue.
+          if (text.length < 5) {
+            if (debug) console.log('DEBUG: Empty tooltip.', tooltip)
+            return true
+          }
+
+          // Extract the likes and dislikes from the tooltip's text.
+          let likes = 0
+          let dislikes = 0
+          let match = text.match(/(.+) \/ (.+)/)
+          console.log('DEBUG match:', match)
+          if (match) {
+            likes = match[1].replace(/\D/g, '')
+            dislikes = match[2].replace(/\D/g, '')
+          } else if (debug) {
+            console.log('DEBUG: Tooltip match not found.', text, tooltip, $(tooltip))
+          }
+
+          // Create a hash string for this rating to mark it has already having
+          // been processed.
+          let hash = likes + '/' + dislikes
+          let prevHash = $(tooltip).attr('data-ytrb-hash')
+          if (prevHash) {
+            if (prevHash === hash) {
               // This tooltip has already been processed correctly.
               return true
             }
-            // This tooltip has to be reprocessed, so remove previously
+            // This tooltip needs to be reprocessed, so remove previously
             // added span.
             $(tooltip).children('span').remove()
           }
 
-          // Mark this tooltip as found, and remember the text it is for.
-          $(tooltip).attr('data-ytrb-found', text)
+          // Store the hash value on the element.
+          $(tooltip).attr('data-ytrb-hash', hash)
 
-          // Extract the likes and dislikes from the tooltip's text.
-          let match = text.match(/(.+) \/ (.+)/)
-          if (match) {
-            let likes = match[1].replace(/\D/g, '')
-            let dislikes = match[2].replace(/\D/g, '')
-            let video = getVideoObject(likes, dislikes)
-            if (video.rating == null) {
-              $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
-            } else {
-              $(tooltip).append('<span> &nbsp;&nbsp; ' +
-                  ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
-                  video.total + '&nbsp;total</span>')
-            }
-          } else if (debug) {
-            console.log('DEBUG: Tooltip match not found.', text, tooltip, $(tooltip))
+          // Update the tooltip by adding a span of additional rating info.
+          let video = getVideoObject(likes, dislikes)
+          if (video.rating == null) {
+            $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
+          } else {
+            $(tooltip).append('<span> &nbsp;&nbsp; ' +
+                ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
+                video.total + '&nbsp;total</span>')
           }
         })
   }
