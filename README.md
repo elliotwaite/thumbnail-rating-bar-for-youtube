@@ -137,9 +137,11 @@ half the width of the likes bar. E.g.:
 
 
 The equation for linear scaling:
+
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/linear-scaling-equation.png?raw=true" width=145>
 
 The equation for exponential scaling:
+
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/exponential-scaling-equation.png?raw=true" width=215>
 
 Note: This option only affects the width of the rating bar that is added to the
