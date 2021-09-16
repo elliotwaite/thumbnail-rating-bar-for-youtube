@@ -140,7 +140,7 @@ The equation for linear scaling:
 
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/linear-scaling-equation.png?raw=true" width=145>
 
-The equation for exponential scaling:
+The equation for exponential scaling (where the rating and width values are in the range of 0 to 1):
 
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/exponential-scaling-equation.png?raw=true" width=215>
 
