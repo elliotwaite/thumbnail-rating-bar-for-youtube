@@ -312,26 +312,38 @@ function addRatingBars(thumbnailsAndIds) {
 }
 
 function addRatingPercentage(thumbnailsAndIds) {
-  // Add the rating percentage below each thumbnail.
+  // Add the rating text percentage below or next to each thumbnail.
   for (let [thumbnail, id] of thumbnailsAndIds) {
     if (id in videoCache) {
       let metadataLine = $(thumbnail).closest(
         '.ytd-rich-item-renderer, ' +  // Home page.
-        '.ytd-grid-renderer, ' +  // Trending page.
-        '.ytd-expanded-shelf-contents-renderer, ' +  // Subscriptions page.
+        '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
+        '.ytd-expanded-shelf-contents-renderer, ' +  // Also subscriptions page.
         '.yt-horizontal-list-renderer, ' +  // Channel page.
         '.ytd-item-section-renderer, ' +  // History page.
-        '.ytd-horizontal-card-list-renderer'  // Gaming page.
+        '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
+        '.ytd-playlist-video-list-renderer' // Playlist page.
       ).find('#metadata-line').last()
+
       if (metadataLine) {
         // Remove any previously added percentages.
         for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
           oldPercentage.remove()
         }
-        let lastSpan = metadataLine.children('span').last()
+
+        // Add new percentage.
         let video = videoCache[id]
-        if (lastSpan && video.rating != null) {
-          lastSpan.after(getRatingPercentageHtml(video.rating))
+        if (video.rating != null) {
+          let ratingPercentageHtml = getRatingPercentageHtml(video.rating)
+          let lastSpan = metadataLine.children('span').last()
+          if (lastSpan.length) {
+            lastSpan.after(ratingPercentageHtml)
+          } else {
+            // This handles metadata lines that are initially empty, which
+            // occurs on playlist pages.
+            metadataLine.prepend(ratingPercentageHtml)
+            metadataLine.prepend('<span class="style-scope ytd-video-meta-block"></span>')
+          }
         }
       }
     } else if (debug) {
@@ -354,7 +366,7 @@ function getVideoObject(likes, dislikes) {
 }
 
 function ratingToPercentage(rating) {
-  if (rating == 1) {
+  if (rating === 1) {
     return '100%'
   }
   // Note: We use floor instead of round to ensure that anything lower than
