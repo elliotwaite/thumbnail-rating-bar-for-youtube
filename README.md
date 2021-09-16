@@ -125,7 +125,7 @@ Here you can see the difference between the default linear scaling and the expon
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/linear-vs-exponential-scaling.png?raw=true" width=367>
 
 With exponential scaling, each reduction in 10% of the rating from 100% will
-half the width of the likes bar. E.g.:
+half the width of the likes bar:
 
 | Rating | Width |
 |--------|-------|
