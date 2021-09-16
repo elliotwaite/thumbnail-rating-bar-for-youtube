@@ -340,7 +340,9 @@ function addRatingPercentage(thumbnailsAndIds) {
             lastSpan.after(ratingPercentageHtml)
           } else {
             // This handles metadata lines that are initially empty, which
-            // occurs on playlist pages.
+            // occurs on playlist pages, and additionally prepends an empty
+            // meta block element to add a separating dot before the rating
+            // percentage.
             metadataLine.prepend(ratingPercentageHtml)
             metadataLine.prepend('<span class="style-scope ytd-video-meta-block"></span>')
           }
