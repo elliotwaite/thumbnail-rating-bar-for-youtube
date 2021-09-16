@@ -144,8 +144,8 @@ The equation for exponential scaling:
 
 <img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/exponential-scaling-equation.png?raw=true" width=215>
 
-Note: This option only affects the width of the rating bar that is added to the
-thumbnails. It does not change the scaling of the rating bar shown on the video
+Note: This option only affects the scaling of the rating bar that is added to the
+thumbnails. It does not affect the scaling of the rating bar shown on the video
 page.
 
 Special thanks to [Qarthak](https://github.com/Qarthak) for
