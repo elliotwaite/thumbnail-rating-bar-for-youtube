@@ -112,6 +112,45 @@ viewing the source code.
 
 Enjoy.
 
+## Exponential Scaling Explained
+Most videos on YouTube have very high ratings making it hard distinguish which
+videos are higher rated than others just by looking at the rating bar. To help
+with this, an option has been added to allow users to exponentially scale the
+rating bar.
+
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/exponential-scaling-option.png?raw=true" width=276>
+
+Here you can see the difference between the default linear scaling and the exponential scaling:
+
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/linear-vs-exponential-scaling.png?raw=true" width=367>
+
+With exponential scaling, each reduction in 10% of the rating from 100% will
+half the width of the likes bar. E.g.:
+
+| Rating | Width |
+|--------|-------|
+|   100% |  100% |
+|    90% |   50% |
+|    80% |   25% |
+|    70% | 12.5% |
+|    ... |  etc. |
+
+
+The equation for linear scaling:
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/linear-scaling-equation.png?raw=true" width=145>
+
+The equation for exponential scaling:
+<img src="https://raw.githubusercontent.com/elliotwaite/thumbnail-rating-bar-for-youtube/master/images/exponential-scaling-equation.png?raw=true" width=215>
+
+Note: This option only affects the width of the rating bar that is added to the
+thumbnails. It does not change the scaling of the rating bar shown on the video
+page.
+
+Special thanks to [Qarthak](https://github.com/Qarthak) for
+[requensting this feature](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/49).
+
+
+
 ## Why Use This Extension
 Using YouTube usually involves browsing through many video previews. These video previews usually contain the following:
 * Thumbnail image
