@@ -149,7 +149,7 @@ thumbnails. It does not affect the scaling of the rating bar shown on the video
 page.
 
 Special thanks to [Qarthak](https://github.com/Qarthak) for
-[requensting this feature](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/49).
+[requesting this feature](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/49).
 
 
 
