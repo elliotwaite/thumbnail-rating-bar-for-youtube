@@ -112,7 +112,7 @@ viewing the source code.
 
 Enjoy.
 
-## Exponential Scaling Explained
+## Exponential Scaling Option Explained
 Most videos on YouTube have very high ratings making it hard distinguish which
 videos are higher rated than others just by looking at the rating bar. To help
 with this, an option has been added to allow users to exponentially scale the

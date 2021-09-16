@@ -107,6 +107,7 @@ const DEFAULT_USER_SETTINGS = {
   barHeight: 4,
   barOpacity: 100,
   barSeparator: false,
+  useExponentialScaling: false,
   barTooltip: true,
   useOnVideoPage: false,
   showPercentage: false,
@@ -386,6 +387,12 @@ function ratingToRgb(rating) {
 }
 
 function getRatingBarHtml(video) {
+  let likesWidthPercentage
+  if (userSettings.useExponentialScaling) {
+    likesWidthPercentage = 100 * Math.pow(2, 10 * (video.rating - 1))
+  } else {
+    likesWidthPercentage = 100 * video.rating
+  }
   return '<ytrb-bar' +
       (userSettings.barOpacity !== 100
           ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
@@ -395,7 +402,7 @@ function getRatingBarHtml(video) {
       (video.rating == null
           ? '<ytrb-no-rating></ytrb-no-rating>'
           : '<ytrb-rating>' +
-              '<ytrb-likes style="width:' + (video.rating * 100) + '%"></ytrb-likes>' +
+              '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
               '<ytrb-dislikes></ytrb-dislikes>' +
             '</ytrb-rating>'
       ) +

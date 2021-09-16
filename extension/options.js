@@ -7,6 +7,7 @@ const DEFAULT_USER_SETTINGS = {
   barHeight: 4,
   barOpacity: 100,
   barSeparator: false,
+  useExponentialScaling: false,
   barTooltip: true,
   useOnVideoPage: false,
   showPercentage: false,
@@ -156,6 +157,7 @@ $('#save-btn').click(function() {
     barHeight: Number($('#bar-height').val()),
     barOpacity: Number($('#bar-opacity').val()),
     barSeparator: $('#bar-separator').prop('checked'),
+    useExponentialScaling: $('#use-exponential-scaling').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
     useOnVideoPage: $('#use-on-video-page').prop('checked'),
     showPercentage: $('#show-percentage').prop('checked'),
@@ -189,6 +191,9 @@ $('#restore-defaults-btn').click(function() {
 
   if ($('#bar-separator').prop('checked') !== DEFAULT_USER_SETTINGS.barSeparator) {
     $('#bar-separator').click()
+  }
+  if ($('#use-exponential-scaling').prop('checked') !== DEFAULT_USER_SETTINGS.useExponentialScaling) {
+    $('#use-exponential-scaling').click()
   }
   if ($('#bar-tooltip').prop('checked') !== DEFAULT_USER_SETTINGS.barTooltip) {
     $('#bar-tooltip').click()
@@ -237,6 +242,9 @@ function restoreOptions() {
 
     if ($('#bar-separator').prop('checked') !== settings.barSeparator) {
       $('#bar-separator').click()
+    }
+    if ($('#use-exponential-scaling').prop('checked') !== settings.useExponentialScaling) {
+      $('#use-exponential-scaling').click()
     }
     if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
       $('#bar-tooltip').click()
