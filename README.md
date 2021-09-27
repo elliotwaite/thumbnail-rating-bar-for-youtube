@@ -15,7 +15,9 @@ https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmi
 Firefox Add-on:<br />
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
-This extension also requires you to set up a personal YouTube Data API key, as described below in the "Set Up a YouTube Data API Key" section.
+This extension also requires you to set up a personal YouTube Data API key, as
+described below in the [Set Up a YouTube Data API Key](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube#set-up-a-youtube-data-api-key)
+section.
 
 ## Set Up a YouTube Data API Key
 
