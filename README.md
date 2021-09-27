@@ -9,10 +9,10 @@ This extension adds a likes/dislikes rating bar to the bottom of every YouTube v
 
 ## Install
 
-For Chrome:
+Chrome Extension:<br />
 https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmihdmfhaacemlpgfbpoeb
 
-For Firefox:
+Firefox Add-on:<br />
 https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 
 This extension also requires you to set up a personal YouTube Data API key, as described below in the "Set Up a YouTube Data API Key" section.
