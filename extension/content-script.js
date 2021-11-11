@@ -106,6 +106,7 @@ const DEFAULT_USER_SETTINGS = {
   barColorsSeparator: false,
   barHeight: 4,
   barOpacity: 100,
+  ratingType: 'likes-to-dislikes',
   barSeparator: false,
   useExponentialScaling: false,
   barTooltip: true,
@@ -284,6 +285,7 @@ function addRatingsToCache(thumbnailsAndIds) {
             } else {
               for (let item of data.items) {
                 let video = getVideoObject(
+                    item.statistics.viewCount || 0,
                     item.statistics.likeCount || 0,
                     item.statistics.dislikeCount || 0)
                 videoCache[item.id] = video
@@ -335,7 +337,7 @@ function addRatingPercentage(thumbnailsAndIds) {
         // Add new percentage.
         let video = videoCache[id]
         if (video.rating != null) {
-          let ratingPercentageHtml = getRatingPercentageHtml(video.rating)
+          let ratingPercentageHtml = getRatingPercentageHtml(video)
           let lastSpan = metadataLine.children('span').last()
           if (lastSpan.length) {
             lastSpan.after(ratingPercentageHtml)
@@ -355,16 +357,20 @@ function addRatingPercentage(thumbnailsAndIds) {
   }
 }
 
-function getVideoObject(likes, dislikes) {
+function getVideoObject(views, likes, dislikes) {
+  views = parseInt(views)
   likes = parseInt(likes)
   dislikes = parseInt(dislikes)
   let total = likes + dislikes
   let rating = total ? likes / total : null
+  let viewsRating = total ? likes / views : null
   return {
+    views: views.toLocaleString(),
     likes: likes.toLocaleString(),
     dislikes: dislikes.toLocaleString(),
     total: total.toLocaleString(),
     rating: rating,
+    viewsRating: viewsRating,
   }
 }
 
@@ -393,19 +399,40 @@ function getRatingBarHtml(video) {
   } else {
     likesWidthPercentage = 100 * video.rating
   }
+
+  let viewsLikesWidthPercentage
+  if (userSettings.ratingType !== 'likes-to-dislikes') {
+    let a = 30
+    let b = .2
+    let score = 1 / (1 + Math.exp(-a * (Math.pow(video.viewsRating, b) - .5)))
+    viewsLikesWidthPercentage = 100 * score
+  }
+
+  let ratingElem = ''
+  if (video.rating == null) {
+    ratingElem = '<ytrb-no-rating></ytrb-no-rating>'
+  } else {
+    if (userSettings.ratingType === 'likes-to-dislikes' || userSettings.ratingType === 'both') {
+      ratingElem += '<ytrb-rating>' +
+                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
+                      '<ytrb-dislikes></ytrb-dislikes>' +
+                    '</ytrb-rating>'
+    }
+    if (userSettings.ratingType === 'likes-to-views' || userSettings.ratingType === 'both') {
+      ratingElem += '<ytrb-rating>' +
+                      '<ytrb-likes style="width:' + viewsLikesWidthPercentage + '%"></ytrb-likes>' +
+                      '<ytrb-dislikes></ytrb-dislikes>' +
+                    '</ytrb-rating>'
+    }
+  }
+
   return '<ytrb-bar' +
       (userSettings.barOpacity !== 100
           ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
           : ''
       ) +
       '>' +
-      (video.rating == null
-          ? '<ytrb-no-rating></ytrb-no-rating>'
-          : '<ytrb-rating>' +
-              '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
-              '<ytrb-dislikes></ytrb-dislikes>' +
-            '</ytrb-rating>'
-      ) +
+      ratingElem +
       (userSettings.barTooltip
           ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
           : ''
@@ -413,9 +440,9 @@ function getRatingBarHtml(video) {
       '</ytrb-bar>'
 }
 
-function getRatingPercentageHtml(rating) {
+function getRatingPercentageHtml(video) {
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      ratingToRgb(rating) + '">' + ratingToPercentage(rating) + '</span>'
+      ratingToRgb(video.rating) + '">' + ratingToPercentage(video.rating) + '</span>'
 }
 
 function getToolTipText(video) {

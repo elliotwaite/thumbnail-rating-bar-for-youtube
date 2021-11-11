@@ -6,6 +6,7 @@ const DEFAULT_USER_SETTINGS = {
   barColorsSeparator: false,
   barHeight: 4,
   barOpacity: 100,
+  ratingType: 'likes-to-dislikes',
   barSeparator: false,
   useExponentialScaling: false,
   barTooltip: true,
@@ -156,6 +157,7 @@ $('#save-btn').click(function() {
     barColorsSeparator: $('#bar-colors-separator').prop('checked'),
     barHeight: Number($('#bar-height').val()),
     barOpacity: Number($('#bar-opacity').val()),
+    ratingType: $('[name="rating-type"]').val(),
     barSeparator: $('#bar-separator').prop('checked'),
     useExponentialScaling: $('#use-exponential-scaling').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
@@ -186,8 +188,11 @@ $('#restore-defaults-btn').click(function() {
 
   $('#bar-height')[0].MaterialSlider.change(DEFAULT_USER_SETTINGS.barHeight)
   $('#bar-height').change()
+
   $('#bar-opacity')[0].MaterialSlider.change(DEFAULT_USER_SETTINGS.barOpacity)
   $('#bar-opacity').change()
+
+  $('#rating-type-' + DEFAULT_USER_SETTINGS.ratingType).click()
 
   if ($('#bar-separator').prop('checked') !== DEFAULT_USER_SETTINGS.barSeparator) {
     $('#bar-separator').click()
@@ -237,8 +242,11 @@ function restoreOptions() {
 
     $('#bar-height')[0].MaterialSlider.change(settings.barHeight)
     $('#bar-height').change()
+
     $('#bar-opacity')[0].MaterialSlider.change(settings.barOpacity)
     $('#bar-opacity').change()
+
+    $('#rating-type-' + settings.ratingType).click()
 
     if ($('#bar-separator').prop('checked') !== settings.barSeparator) {
       $('#bar-separator').click()
