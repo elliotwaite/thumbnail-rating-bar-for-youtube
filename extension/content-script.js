@@ -401,7 +401,12 @@ function ratingToRgb(rating) {
 function getRatingBarHtml(video) {
   let ratingElem = ''
 
-  if (userSettings.ratingType === 'likes-to-dislikes' || userSettings.ratingType === 'both' || userSettings.ratingType === 'ltd-ltc') {
+  if (
+    userSettings.ratingType === 'likes-to-dislikes' ||
+    userSettings.ratingType === 'both' ||
+    userSettings.ratingType === 'ltd-ltc' ||
+    userSettings.ratingType === 'ltd-ltv-ltc'
+  ) {
     if (video.rating == null) {
       ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
     } else {
@@ -418,7 +423,11 @@ function getRatingBarHtml(video) {
     }
   }
 
-  if (userSettings.ratingType === 'likes-to-views' || userSettings.ratingType === 'both') {
+  if (
+    userSettings.ratingType === 'likes-to-views' ||
+    userSettings.ratingType === 'both' ||
+    userSettings.ratingType === 'ltd-ltv-ltc'
+  ) {
     if (video.likesToViews == null) {
       ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
     } else {
@@ -433,7 +442,11 @@ function getRatingBarHtml(video) {
     }
   }
 
-  if (userSettings.ratingType === 'likes-to-comments' || userSettings.ratingType === 'ltd-ltc') {
+  if (
+    userSettings.ratingType === 'likes-to-comments' ||
+    userSettings.ratingType === 'ltd-ltc' ||
+    userSettings.ratingType === 'ltd-ltv-ltc'
+  ) {
     if (video.likesToComments == null) {
       ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
     } else {
