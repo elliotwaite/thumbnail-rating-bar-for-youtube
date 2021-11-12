@@ -285,9 +285,11 @@ function addRatingsToCache(thumbnailsAndIds) {
             } else {
               for (let item of data.items) {
                 let video = getVideoObject(
-                    item.statistics.viewCount || 0,
-                    item.statistics.likeCount || 0,
-                    item.statistics.dislikeCount || 0)
+                    item.statistics.likeCount || '0',
+                    item.statistics.dislikeCount || '0',
+                    item.statistics.viewCount || '0',
+                    item.statistics.commentCount || '0',
+                )
                 videoCache[item.id] = video
                 resolve()
               }
@@ -357,20 +359,24 @@ function addRatingPercentage(thumbnailsAndIds) {
   }
 }
 
-function getVideoObject(views, likes, dislikes) {
-  views = parseInt(views)
+function getVideoObject(likes, dislikes, views='0', comments='0') {
   likes = parseInt(likes)
   dislikes = parseInt(dislikes)
+  views = parseInt(views)
+  comments = parseInt(comments)
   let total = likes + dislikes
   let rating = total ? likes / total : null
-  let viewsRating = total ? likes / views : null
+  let likesToViews = views ? likes / views : null
+  let likesToComments = comments ? likes / comments : null
   return {
-    views: views.toLocaleString(),
     likes: likes.toLocaleString(),
     dislikes: dislikes.toLocaleString(),
     total: total.toLocaleString(),
     rating: rating,
-    viewsRating: viewsRating,
+    views: views.toLocaleString(),
+    likesToViews: likesToViews,
+    comments: comments.toLocaleString(),
+    likesToComments: likesToComments,
   }
 }
 
@@ -393,34 +399,49 @@ function ratingToRgb(rating) {
 }
 
 function getRatingBarHtml(video) {
-  let likesWidthPercentage
-  if (userSettings.useExponentialScaling) {
-    likesWidthPercentage = 100 * Math.pow(2, 10 * (video.rating - 1))
-  } else {
-    likesWidthPercentage = 100 * video.rating
-  }
-
-  let viewsLikesWidthPercentage
-  if (userSettings.ratingType !== 'likes-to-dislikes') {
-    let a = 30
-    let b = .2
-    let score = 1 / (1 + Math.exp(-a * (Math.pow(video.viewsRating, b) - .5)))
-    viewsLikesWidthPercentage = 100 * score
-  }
-
   let ratingElem = ''
-  if (video.rating == null) {
-    ratingElem = '<ytrb-no-rating></ytrb-no-rating>'
-  } else {
-    if (userSettings.ratingType === 'likes-to-dislikes' || userSettings.ratingType === 'both') {
+
+  if (userSettings.ratingType === 'likes-to-dislikes' || userSettings.ratingType === 'both' || userSettings.ratingType === 'ltd-ltc') {
+    if (video.rating == null) {
+      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
+    } else {
+      let likesWidthPercentage
+      if (userSettings.useExponentialScaling) {
+        likesWidthPercentage = 100 * Math.pow(2, 10 * (video.rating - 1))
+      } else {
+        likesWidthPercentage = 100 * video.rating
+      }
       ratingElem += '<ytrb-rating>' +
                       '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
                       '<ytrb-dislikes></ytrb-dislikes>' +
                     '</ytrb-rating>'
     }
-    if (userSettings.ratingType === 'likes-to-views' || userSettings.ratingType === 'both') {
+  }
+
+  if (userSettings.ratingType === 'likes-to-views' || userSettings.ratingType === 'both') {
+    if (video.likesToViews == null) {
+      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
+    } else {
+      let a = 30
+      let b = .2
+      let score = 1 / (1 + Math.exp(-a * (Math.pow(video.likesToViews, b) - .5)))
+      let likesWidthPercentage = 100 * score
       ratingElem += '<ytrb-rating>' +
-                      '<ytrb-likes style="width:' + viewsLikesWidthPercentage + '%"></ytrb-likes>' +
+                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
+                      '<ytrb-dislikes></ytrb-dislikes>' +
+                    '</ytrb-rating>'
+    }
+  }
+
+  if (userSettings.ratingType === 'likes-to-comments' || userSettings.ratingType === 'ltd-ltc') {
+    if (video.likesToComments == null) {
+      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
+    } else {
+      let a = .15
+      let score = 1 - Math.exp(-a * video.likesToComments)
+      let likesWidthPercentage = 100 * score
+      ratingElem += '<ytrb-rating>' +
+                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
                       '<ytrb-dislikes></ytrb-dislikes>' +
                     '</ytrb-rating>'
     }
