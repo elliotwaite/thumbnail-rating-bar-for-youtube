@@ -6,13 +6,10 @@ const THROTTLE_MS = 100
 let hasUnseenMutations = false
 let isThrottled = false
 
-// The YouTube API limit of the number of video IDs you can pass in per request.
-const MAX_IDS_PER_API_CALL = 50
-
 // A cache to store video ratings, to limit API calls and improve performance.
 let videoCache = {}
 
-// Enum values for which YouTube theme is currently begin viewed.
+// Enum values for which YouTube theme is currently being viewed.
 let curTheme = 0  // No theme set yet.
 const THEME_MODERN = 1  // The new Material Design theme.
 const THEME_CLASSIC = 2  // The classic theme.
@@ -20,10 +17,10 @@ const THEME_GAMING = 3  // The YouTube Gaming theme.
 const NUM_THEMES = 3
 
 // `isDarkTheme` will be true if the appearance setting is in dark theme mode.
-let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') == ' #181818'
+let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') === ' #181818'
 
 // We use these JQuery selectors to find new thumbnails on the page. We use
-// :not([data-ytrb-found]) to make sure these aren't thumbnails that we've
+// :not([data-ytrb-processed]) to make sure these aren't thumbnails that we've
 // already added a rating bar to. We need to check all combinations of these
 // modes and types:
 //   Modes:
@@ -96,6 +93,9 @@ THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
 const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
     'a.ytp-videowall-still'
 
+// A regex for cleaning the tooltip text on the video page before processing.
+const NON_DIGITS_OR_FORWARDSLASH_REGEX = /[^\d/]/g;
+
 // The default user settings. `userSettings` is replaced with the stored user's
 // settings once they are loaded.
 const DEFAULT_USER_SETTINGS = {
@@ -106,53 +106,74 @@ const DEFAULT_USER_SETTINGS = {
   barColorsSeparator: false,
   barHeight: 4,
   barOpacity: 100,
-  ratingType: 'likes-to-dislikes',
   barSeparator: false,
   useExponentialScaling: false,
   barTooltip: true,
   useOnVideoPage: false,
   showPercentage: false,
-  // timeSincePublished: true,
 }
 let userSettings = DEFAULT_USER_SETTINGS
 
-// An observer for watching changes to the body element.
-let observer = new MutationObserver(handleMutations)
-
-function handleMutations() {
-  // When the DOM is updated, we search for items that should be modified.
-  // However, we throttle these searches to not over tax the CPU.
-  if (isThrottled) {
-    // If updates are currently being throttled, we'll remember to handle
-    // them later.
-    hasUnseenMutations = true
-  } else {
-    // Run the updates.
-    updateThumbnailRatingBars()
-    updateVideoRatingBarTooltips()
-    // if (userSettings.timeSincePublished)
-    //   updateTimeSincePublishedElements()
-
-    hasUnseenMutations = false
-
-    // Turn on throttle.
-    isThrottled = true
-
-    setTimeout(function() {
-      // After `THROTTLE_MS` milliseconds, turn off the throttle.
-      isThrottled = false
-
-      // If any mutations occurred while being throttled, handle them now.
-      if (hasUnseenMutations) {
-        handleMutations()
-      }
-
-    }, THROTTLE_MS)
+function ratingToPercentage(rating) {
+  if (rating === 1) {
+    return '100%'
   }
+  // Note: We use floor instead of round to ensure that anything lower than
+  // 100% does not display "100.0%".
+  return (Math.floor(rating * 1000) / 10).toFixed(1) + '%'
 }
 
-function updateThumbnailRatingBars() {
-  // Get new thumbnails, and set the theme if it hasn't been set yet.
+function getToolTipText(video) {
+  return video.likes + '&nbsp;/&nbsp;' + video.dislikes + ' &nbsp;&nbsp; '
+      + ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
+}
+
+function getRatingBarHtml(videoData) {
+  let ratingElement
+  if (videoData.rating == null) {
+    ratingElement = '<ytrb-no-rating></ytrb-no-rating>'
+  } else {
+    let likesWidthPercentage
+    if (userSettings.useExponentialScaling) {
+      likesWidthPercentage = 100 * Math.pow(2, 10 * (videoData.rating - 1))
+    } else {
+      likesWidthPercentage = 100 * videoData.rating
+    }
+    ratingElement = '<ytrb-rating>' +
+                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
+                      '<ytrb-dislikes></ytrb-dislikes>' +
+                    '</ytrb-rating>'
+  }
+
+  return '<ytrb-bar' +
+      (userSettings.barOpacity !== 100
+          ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
+          : ''
+      ) +
+      '>' +
+      ratingElement +
+      (userSettings.barTooltip
+          ? '<ytrb-tooltip><div>' + getToolTipText(videoData) + '</div></ytrb-tooltip>'
+          : ''
+      ) +
+      '</ytrb-bar>'
+}
+
+function getRatingPercentageHtml(video) {
+  let r = (1 - video.rating) * 1275
+  let g = video.rating * 637.5 - 255
+  if (!isDarkTheme) {
+    g = Math.min(g, 255) * 0.85
+  }
+  let rgb = 'rgb(' + r + ',' + g + ',0)'
+
+  return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
+      rgb + '">' + ratingToPercentage(video.rating) + '</span>'
+}
+
+function getNewThumbnails() {
+  // Returns an array of thumbnails that have not been processed yet, and sets
+  // the theme if it hasn't been set yet.
   let thumbnails = []
   if (curTheme) {
     thumbnails = $(THUMBNAIL_SELECTORS[curTheme])
@@ -165,11 +186,14 @@ function updateThumbnailRatingBars() {
       }
     }
   }
-
-  // Add the videowall thumbnails.
   thumbnails = $.merge(thumbnails, $(THUMBNAIL_SELECTOR_VIDEOWALL))
+  return thumbnails
+}
 
-  let thumbnailsAndIds = []
+function getThumbnailsAndIds(thumbnails) {
+  // Finds the video ID associated with each thumbnail and returns an array of
+  // arrays of [thumbnail element, video ID string].
+  let thumbnailsAndVideoIds = []
   $(thumbnails).each(function(_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
@@ -200,7 +224,7 @@ function updateThumbnailRatingBars() {
       }
 
     } else {
-      // The theme may not be set if only videowall thumbnails were found.
+      // The theme may not be set if only video-wall thumbnails were found.
       url = $(thumbnail).attr('href')
     }
 
@@ -210,7 +234,7 @@ function updateThumbnailRatingBars() {
     }
 
     // Check if this thumbnail was previously found.
-    let previousUrl = $(thumbnail).attr('data-ytrb-found')
+    let previousUrl = $(thumbnail).attr('data-ytrb-processed')
     if (previousUrl) {
       // Check if this thumbnail is for the same URL as previously.
       if (previousUrl === url) {
@@ -223,370 +247,162 @@ function updateThumbnailRatingBars() {
     }
     // Add an attribute that marks this thumbnail as found, and give it the
     // value of the URL the thumbnail is for.
-    $(thumbnail).attr('data-ytrb-found', url)
+    $(thumbnail).attr('data-ytrb-processed', url)
 
     // Extract the video ID from the URL.
     let match = url.match(/.*[?&]v=([^&]+).*/)
     if (match) {
       let id = match[1]
-      thumbnailsAndIds.push([thumbnail, id])
+      thumbnailsAndVideoIds.push([thumbnail, id])
     } else if (debug) {
       console.log('DEBUG: Match not found.', thumbnail, url)
     }
   })
-
-  if (thumbnailsAndIds.length) {
-    addRatingsToCache(thumbnailsAndIds).then(function() {
-      if (userSettings.barHeight !== 0) {
-        addRatingBars(thumbnailsAndIds)
-      }
-      if (userSettings.showPercentage) {
-        addRatingPercentage(thumbnailsAndIds)
-      }
-    })
-  }
+  return thumbnailsAndVideoIds
 }
 
-function addRatingsToCache(thumbnailsAndIds) {
-  // Get the set of all IDs we haven't seen yet.
-  let unseenIds = new Set()
-  for (let [thumbnail, id] of thumbnailsAndIds) {
-    if (!(id in videoCache)) {
-      unseenIds.add(id)
-    }
-  }
-
-  // Go through the unseen IDs in batches of 50 and get their ratings.
-  let unseenIdsArray = Array.from(unseenIds)
-  let promises = []
-  for (let i = 0; i < unseenIdsArray.length; i += MAX_IDS_PER_API_CALL) {
-    let unseenIdsBatch = unseenIdsArray.slice(i, i + MAX_IDS_PER_API_CALL)
-
-    let promise = new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage(
-          {contentScriptQuery: 'videoStatistics', videoIds: unseenIdsBatch},
-          function(data) {
-            if (typeof data === 'undefined') {
-              console.error('[Missing Requirement] The "Thumbnail Rating ' +
-                  'Bar for YouTube™" extension is missing a required ' +
-                  'YouTube Data API key. To resolve this issue, visit the ' +
-                  'extension\'s settings page, which is accessible by ' +
-                  'clicking the extension\'s icon in the toolbar.')
-              resolve()
-            } else if (data && data.error) {
-              console.error('[YouTube Data API Error] The "Thumbnail Rating ' +
-                  'Bar for YouTube™" extension received an error when ' +
-                  'trying to request data from the YouTube Data API. This ' +
-                  'could be due to an invalid API key. To update the API ' +
-                  'key, visit the extension\'s settings page, which is ' +
-                  'accessible by clicking the extension\'s icon in the ' +
-                  'toolbar.')
-              resolve()
-            } else {
-              for (let item of data.items) {
-                let video = getVideoObject(
-                    item.statistics.likeCount || '0',
-                    item.statistics.dislikeCount || '0',
-                    item.statistics.viewCount || '0',
-                    item.statistics.commentCount || '0',
-                )
-                videoCache[item.id] = video
-                resolve()
-              }
-            }
-          })
-    })
-
-    promises.push(promise)
-  }
-
-  // Return a promise that resolves once all data has been retrieved and saved
-  // to the cache.
-  return Promise.all(promises)
-}
-
-function addRatingBars(thumbnailsAndIds) {
-  // Add a rating bar to each thumbnail.
-  for (let [thumbnail, id] of thumbnailsAndIds) {
-    if (id in videoCache) {
-      $(thumbnail).prepend(getRatingBarHtml(videoCache[id]))
-    } else if (debug) {
-      console.log('DEBUG: Missing ID.', id, thumbnail)
-    }
-  }
-}
-
-function addRatingPercentage(thumbnailsAndIds) {
-  // Add the rating text percentage below or next to each thumbnail.
-  for (let [thumbnail, id] of thumbnailsAndIds) {
-    if (id in videoCache) {
-      let metadataLine = $(thumbnail).closest(
-        '.ytd-rich-item-renderer, ' +  // Home page.
-        '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
-        '.ytd-expanded-shelf-contents-renderer, ' +  // Also subscriptions page.
-        '.yt-horizontal-list-renderer, ' +  // Channel page.
-        '.ytd-item-section-renderer, ' +  // History page.
-        '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
-        '.ytd-playlist-video-list-renderer' // Playlist page.
-      ).find('#metadata-line').last()
-
-      if (metadataLine) {
-        // Remove any previously added percentages.
-        for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
-          oldPercentage.remove()
-        }
-
-        // Add new percentage.
-        let video = videoCache[id]
-        if (video.rating != null) {
-          let ratingPercentageHtml = getRatingPercentageHtml(video)
-          let lastSpan = metadataLine.children('span').last()
-          if (lastSpan.length) {
-            lastSpan.after(ratingPercentageHtml)
-          } else {
-            // This handles metadata lines that are initially empty, which
-            // occurs on playlist pages, and additionally prepends an empty
-            // meta block element to add a separating dot before the rating
-            // percentage.
-            metadataLine.prepend(ratingPercentageHtml)
-            metadataLine.prepend('<span class="style-scope ytd-video-meta-block"></span>')
-          }
-        }
-      }
-    } else if (debug) {
-      console.log('DEBUG: Missing ID.', id, thumbnail)
-    }
-  }
-}
-
-function getVideoObject(likes, dislikes, views='0', comments='0') {
-  likes = parseInt(likes)
-  dislikes = parseInt(dislikes)
-  views = parseInt(views)
-  comments = parseInt(comments)
+function getVideoDataObject(likes, dislikes) {
   let total = likes + dislikes
   let rating = total ? likes / total : null
-  let likesToViews = views ? likes / views : null
-  let likesToComments = comments ? likes / comments : null
   return {
-    likes: likes.toLocaleString(),
-    dislikes: dislikes.toLocaleString(),
-    total: total.toLocaleString(),
+    likes: likes,
+    dislikes: dislikes,
+    total: total,
     rating: rating,
-    views: views.toLocaleString(),
-    likesToViews: likesToViews,
-    comments: comments.toLocaleString(),
-    likesToComments: likesToComments,
   }
 }
 
-function ratingToPercentage(rating) {
-  if (rating === 1) {
-    return '100%'
+async function getVideoData(videoId) {
+  if (videoId in videoCache) {
+    return videoCache[videoId]
   }
-  // Note: We use floor instead of round to ensure that anything lower than
-  // 100% does not display "100.0%".
-  return (Math.floor(rating * 1000) / 10).toFixed(1) + '%'
+
+  return new Promise(resolve => {
+    chrome.runtime.sendMessage(
+      {query: 'videoApiRequest', videoId: videoId},
+      data => {
+        let videoData = getVideoDataObject(data.likes, data.dislikes)
+        videoCache[videoId] = videoData
+        resolve(videoData)
+      },
+    )
+  })
 }
 
-function ratingToRgb(rating) {
-  let r = (1 - rating) * 1275
-  let g = rating * 637.5 - 255
-  if (!isDarkTheme) {
-    g = Math.min(g, 255) * 0.85
-  }
-  return 'rgb(' + r + ',' + g + ',0)'
+function addRatingBar(thumbnail, videoData) {
+  // Add a rating bar to each thumbnail.
+  $(thumbnail).prepend(getRatingBarHtml(videoData))
 }
 
-function getRatingBarHtml(video) {
-  let ratingElem = ''
+function addRatingPercentage(thumbnail, videoData) {
+  // Add the rating text percentage below or next to the thumbnail.
+  let metadataLine = $(thumbnail).closest(
+    '.ytd-rich-item-renderer, ' +  // Home page.
+    '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
+    '.ytd-expanded-shelf-contents-renderer, ' +  // Also subscriptions page.
+    '.yt-horizontal-list-renderer, ' +  // Channel page.
+    '.ytd-item-section-renderer, ' +  // History page.
+    '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
+    '.ytd-playlist-video-list-renderer' // Playlist page.
+  ).find('#metadata-line').last()
 
-  if (
-    userSettings.ratingType === 'likes-to-dislikes' ||
-    userSettings.ratingType === 'both' ||
-    userSettings.ratingType === 'ltd-ltc' ||
-    userSettings.ratingType === 'ltd-ltv-ltc'
-  ) {
-    if (video.rating == null) {
-      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
-    } else {
-      let likesWidthPercentage
-      if (userSettings.useExponentialScaling) {
-        likesWidthPercentage = 100 * Math.pow(2, 10 * (video.rating - 1))
+  if (metadataLine) {
+    // Remove any previously added percentages.
+    for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
+      oldPercentage.remove()
+    }
+
+    // Add new percentage.
+    if (videoData.rating != null) {
+      let ratingPercentageHtml = getRatingPercentageHtml(videoData)
+      let lastSpan = metadataLine.children('span').last()
+      if (lastSpan.length) {
+        lastSpan.after(ratingPercentageHtml)
       } else {
-        likesWidthPercentage = 100 * video.rating
+        // This handles metadata lines that are initially empty, which
+        // occurs on playlist pages. We prepend the rating percentage as well
+        // as an empty meta block element to add a separating dot before the
+        // rating percentage.
+        metadataLine.prepend(ratingPercentageHtml)
+        metadataLine.prepend('<span class="style-scope ytd-video-meta-block"></span>')
       }
-      ratingElem += '<ytrb-rating>' +
-                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
-                      '<ytrb-dislikes></ytrb-dislikes>' +
-                    '</ytrb-rating>'
     }
   }
-
-  if (
-    userSettings.ratingType === 'likes-to-views' ||
-    userSettings.ratingType === 'both' ||
-    userSettings.ratingType === 'ltd-ltv-ltc'
-  ) {
-    if (video.likesToViews == null) {
-      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
-    } else {
-      let a = 30
-      let b = .2
-      let score = 1 / (1 + Math.exp(-a * (Math.pow(video.likesToViews, b) - .5)))
-      let likesWidthPercentage = 100 * score
-      ratingElem += '<ytrb-rating>' +
-                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
-                      '<ytrb-dislikes></ytrb-dislikes>' +
-                    '</ytrb-rating>'
-    }
-  }
-
-  if (
-    userSettings.ratingType === 'likes-to-comments' ||
-    userSettings.ratingType === 'ltd-ltc' ||
-    userSettings.ratingType === 'ltd-ltv-ltc'
-  ) {
-    if (video.likesToComments == null) {
-      ratingElem += '<ytrb-no-rating></ytrb-no-rating>'
-    } else {
-      let a = .15
-      let score = 1 - Math.exp(-a * video.likesToComments)
-      let likesWidthPercentage = 100 * score
-      ratingElem += '<ytrb-rating>' +
-                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
-                      '<ytrb-dislikes></ytrb-dislikes>' +
-                    '</ytrb-rating>'
-    }
-  }
-
-  return '<ytrb-bar' +
-      (userSettings.barOpacity !== 100
-          ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
-          : ''
-      ) +
-      '>' +
-      ratingElem +
-      (userSettings.barTooltip
-          ? '<ytrb-tooltip><div>' + getToolTipText(video) + '</div></ytrb-tooltip>'
-          : ''
-      ) +
-      '</ytrb-bar>'
 }
 
-function getRatingPercentageHtml(video) {
-  return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      ratingToRgb(video.rating) + '">' + ratingToPercentage(video.rating) + '</span>'
-}
+function processNewThumbnails() {
+  let thumbnails = getNewThumbnails()
+  let thumbnailsAndVideoIds = getThumbnailsAndIds(thumbnails)
 
-function getToolTipText(video) {
-  return video.likes + '&nbsp;/&nbsp;' + video.dislikes + ' &nbsp;&nbsp; '
-      + ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
+  for (let [thumbnail, videoId] of thumbnailsAndVideoIds) {
+    getVideoData(videoId).then(videoData => {
+      if (videoData !== null) {
+        if (userSettings.barHeight !== 0) {
+          addRatingBar(thumbnail, videoData)
+        }
+        if (userSettings.showPercentage) {
+          addRatingPercentage(thumbnail, videoData)
+        }
+      }
+    })
+  }
 }
 
 function updateVideoRatingBarTooltips() {
-  // For modern theme.
-  if (curTheme === THEME_MODERN || !curTheme) {
-    $('.ytd-sentiment-bar-renderer #tooltip')
-        .each(function(_, tooltip) {
-          // Get the current tooltip's text.
-          let text
-          try {
-            text = $(tooltip).text().trim()
-          } catch (e) {
-            if (debug) console.log('DEBUG: Tooltip likes not found.', tooltip)
-            return true
-          }
+  $('.ryd-tooltip #tooltip')
+      .each(function(_, tooltip) {
+        let text = $(tooltip).text()
+        if (text !== $(tooltip).attr('data-ytrb-processed')) {
+          let cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
+          let [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
 
-          // If the tooltip is empty, continue.
-          if (text.length < 5) {
-            if (debug) console.log('DEBUG: Empty tooltip.', tooltip)
-            return true
-          }
+          let video = getVideoDataObject(likes, dislikes)
+          let newText = `${text} \u00A0\u00A0 ` +
+            `${video.rating == null ? '0%' : ratingToPercentage(video.rating)} \u00A0\u00A0 ` +
+            `${video.total.toLocaleString()} total`
 
-          // Extract the likes and dislikes from the tooltip's text.
-          let likes = 0
-          let dislikes = 0
-          let match = text.match(/(.+) \/ (.+)/)
-          console.log('DEBUG match:', match)
-          if (match) {
-            likes = match[1].replace(/\D/g, '')
-            dislikes = match[2].replace(/\D/g, '')
-          } else if (debug) {
-            console.log('DEBUG: Tooltip match not found.', text, tooltip, $(tooltip))
-          }
+          $(tooltip).text(newText)
+          $(tooltip).attr('data-ytrb-processed', newText)
+        }
+      })
+}
 
-          // Create a hash string for this rating to mark it has already having
-          // been processed.
-          let hash = likes + '/' + dislikes
-          let prevHash = $(tooltip).attr('data-ytrb-hash')
-          if (prevHash) {
-            if (prevHash === hash) {
-              // This tooltip has already been processed correctly.
-              return true
-            }
-            // This tooltip needs to be reprocessed, so remove previously
-            // added span.
-            $(tooltip).children('span').remove()
-          }
+function handleDomMutations() {
+  // When the DOM is updated, we search for items that should be modified.
+  // However, we throttle these searches to not over tax the CPU.
+  if (isThrottled) {
+    // If updates are currently being throttled, we'll remember to handle
+    // them later.
+    hasUnseenMutations = true
+  } else {
+    // Run the updates.
+    processNewThumbnails()
+    updateVideoRatingBarTooltips()
 
-          // Store the hash value on the element.
-          $(tooltip).attr('data-ytrb-hash', hash)
+    hasUnseenMutations = false
 
-          // Update the tooltip by adding a span of additional rating info.
-          let video = getVideoObject(likes, dislikes)
-          if (video.rating == null) {
-            $(tooltip).append('<span> &nbsp;&nbsp; No ratings yet.</span>')
-          } else {
-            $(tooltip).append('<span> &nbsp;&nbsp; ' +
-                ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
-                video.total + '&nbsp;total</span>')
-          }
-        })
-  }
+    // Turn on throttle.
+    isThrottled = true
 
-  // For classic theme.
-  if (curTheme === THEME_CLASSIC || !curTheme) {
-    $('#watch8-sentiment-actions:not([data-ytrb-found])')
-        .each(function(_, tooltip) {
-          $(tooltip).attr('data-ytrb-found', '')
-          let likes = $(tooltip)
-              .find('.like-button-renderer-like-button:first>span')
-              .text()
-              .replace(/\D/g, '')
-          let dislikes = $(tooltip)
-              .find('.like-button-renderer-dislike-button:first>span')
-              .text()
-              .replace(/\D/g, '')
-          let video = getVideoObject(likes, dislikes)
-          $(tooltip)
-              .find('.video-extras-sparkbars')
-              .append('<ytrb-classic-tooltip>' + getToolTipText(video) +
-                  '</ytrb-classic-tooltip>')
-        })
+    setTimeout(function() {
+      // After `THROTTLE_MS` milliseconds, turn off the throttle.
+      isThrottled = false
+
+      // If any mutations occurred while being throttled, handle them now.
+      if (hasUnseenMutations) {
+        handleDomMutations()
+      }
+
+    }, THROTTLE_MS)
   }
 }
 
-// function updateTimeSincePublishedElements() {
-//   // For modern theme.
-//   if (curTheme === THEME_MODERN || !curTheme) {
-//     $('#upload-info .date:not([data-ytrb-found])')
-//       .each(function (_, dateSpan) {
-//         let dateText = $(dateSpan).text().substring(13)
-//         // let prevDateText = $(dateSpan).attr('data-ytrb-found')
-//
-//         $(dateSpan).attr('data-ytrb-found', dateText)
-//
-//         let dateFromNow = moment(dateText).fromNow()
-//         console.log(dateText, dateFromNow, dateSpan)
-//         $(dateSpan).append('<span class="ytrb-time-since">' + dateFromNow + '</span>')
-//       })
-//   }
-// }
+// An observer for watching changes to the body element.
+let observer = new MutationObserver(handleDomMutations)
 
 function insertCss(url) {
   chrome.runtime.sendMessage({
-    contentScriptQuery: 'insertCss',
+    query: 'insertCss',
     url: url,
   })
 }
@@ -634,10 +450,12 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
   if (userSettings.barColor === 'blue-gray') {
     document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#3095e3')
     document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#cfcfcf')
+    document.documentElement.style.setProperty('--ytrb-bar-likes-shadow', 'none')
     document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'none')
   } else if (userSettings.barColor === 'green-red') {
     document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#060')
     document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#c00')
+    document.documentElement.style.setProperty('--ytrb-bar-likes-shadow', '1px 0 #fff')
     document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'inset 1px 0 #fff')
   } else if (userSettings.barColor === 'custom-colors') {
     document.documentElement.style.setProperty(
@@ -649,11 +467,15 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
       userSettings.barDislikesColor
     )
     document.documentElement.style.setProperty(
+      '--ytrb-bar-likes-shadow',
+      userSettings.barColorsSeparator ? '1px 0 #fff' : 'none'
+    )
+    document.documentElement.style.setProperty(
       '--ytrb-bar-dislikes-shadow',
       userSettings.barColorsSeparator ? 'inset 1px 0 #fff' : 'none'
     )
   }
 
-  handleMutations()
+  handleDomMutations()
   observer.observe(document.body, {childList: true, subtree: true})
 })

@@ -1,11 +1,8 @@
-#like-bar.ytd-sentiment-bar-renderer ,
-.video-extras-sparkbar-likes /* For classic theme. */ {
+#ryd-bar {
   background-color: var(--ytrb-bar-likes-color) !important;
-  position: relative;
+  box-shadow: var(--ytrb-bar-likes-shadow);
 }
 
-#container.ytd-sentiment-bar-renderer,
-.video-extras-sparkbar-dislikes /* For classic theme. */ {
+#ryd-bar-container {
   background-color: var(--ytrb-bar-dislikes-color) !important;
-  box-shadow: var(--ytrb-bar-dislikes-shadow);
 }

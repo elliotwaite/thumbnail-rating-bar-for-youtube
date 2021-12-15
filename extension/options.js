@@ -6,14 +6,11 @@ const DEFAULT_USER_SETTINGS = {
   barColorsSeparator: false,
   barHeight: 4,
   barOpacity: 100,
-  ratingType: 'likes-to-dislikes',
   barSeparator: false,
   useExponentialScaling: false,
   barTooltip: true,
   useOnVideoPage: false,
   showPercentage: false,
-  // timeSincePublished: true,
-  apiKey: '',
 }
 
 function sanitizeHexColor(str) {
@@ -157,24 +154,17 @@ $('#save-btn').click(function() {
     barColorsSeparator: $('#bar-colors-separator').prop('checked'),
     barHeight: Number($('#bar-height').val()),
     barOpacity: Number($('#bar-opacity').val()),
-    ratingType: $('[name="rating-type"]').val(),
     barSeparator: $('#bar-separator').prop('checked'),
     useExponentialScaling: $('#use-exponential-scaling').prop('checked'),
     barTooltip: $('#bar-tooltip').prop('checked'),
     useOnVideoPage: $('#use-on-video-page').prop('checked'),
     showPercentage: $('#show-percentage').prop('checked'),
-    apiKey: $('#api-key').val(),
-    // timeSincePublished: $('#time-since-published').prop('checked'),
   }, function() {
     // Show "Settings saved" message.
     document.querySelector('#toast').MaterialSnackbar.showSnackbar({
       message: 'Settings saved. Refresh the page.',
       timeout: 2000,
     })
-  })
-  chrome.runtime.sendMessage({
-    contentScriptQuery: 'apiKey',
-    apiKey: $('#api-key').val(),
   })
 })
 
@@ -192,8 +182,6 @@ $('#restore-defaults-btn').click(function() {
   $('#bar-opacity')[0].MaterialSlider.change(DEFAULT_USER_SETTINGS.barOpacity)
   $('#bar-opacity').change()
 
-  $('#rating-type-' + DEFAULT_USER_SETTINGS.ratingType).click()
-
   if ($('#bar-separator').prop('checked') !== DEFAULT_USER_SETTINGS.barSeparator) {
     $('#bar-separator').click()
   }
@@ -209,9 +197,6 @@ $('#restore-defaults-btn').click(function() {
   if ($('#show-percentage').prop('checked') !== DEFAULT_USER_SETTINGS.showPercentage) {
     $('#show-percentage').click()
   }
-  // if (!$('#time-since-published').prop('checked')) {
-  //   $('#time-since-published').click()
-  // }
 })
 
 // Load saved settings.
@@ -240,13 +225,17 @@ function restoreOptions() {
     // separator option above so that the update triggers get fired properly.
     $('#bar-color-' + settings.barColor).click()
 
-    $('#bar-height')[0].MaterialSlider.change(settings.barHeight)
+    let barHeightSlider = $('#bar-height')[0].MaterialSlider
+    if (barHeightSlider) {
+      barHeightSlider.change(settings.barHeight)
+    }
     $('#bar-height').change()
 
-    $('#bar-opacity')[0].MaterialSlider.change(settings.barOpacity)
+    let barOpacitySlider = $('#bar-opacity')[0].MaterialSlider
+    if (barOpacitySlider) {
+      barOpacitySlider.change(settings.barOpacity)
+    }
     $('#bar-opacity').change()
-
-    $('#rating-type-' + settings.ratingType).click()
 
     if ($('#bar-separator').prop('checked') !== settings.barSeparator) {
       $('#bar-separator').click()
@@ -263,17 +252,6 @@ function restoreOptions() {
     if ($('#show-percentage').prop('checked') !== settings.showPercentage) {
       $('#show-percentage').click()
     }
-
-    if ($('#api-key').val() !== settings.apiKey) {
-      $('#api-key').val(settings.apiKey)
-      if (settings.apiKey.length) {
-        $('#api-key-container').removeClass('is-invalid')
-        $('#api-key-container').addClass('is-dirty')
-      }
-    }
-    // if ($('#time-since-published').prop('checked') !== settings.timeSincePublished) {
-    //   $('#time-since-published').click()
-    // }
   })
 }
 

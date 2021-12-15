@@ -10,7 +10,7 @@
 
     <script src="lib/material.min.js"></script>
     <script src="lib/getmdl-select.min.js"></script>
-    <script src="lib/jquery-3.3.1.min.js"></script>
+    <script src="lib/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
@@ -96,27 +96,6 @@
 
 </div>
 <div class="right-options">
-    <div class="flex-row" style="margin-top: 8px">
-        <div>
-            <h6 class="h6">Type:</h6>
-        </div>
-        <div class="mdl-textfield mdl-js-textfield getmdl-select">
-            <input class="mdl-textfield__input" value="" id="rating-type" readonly/>
-            <input value="" type="hidden" name="rating-type"/>
-            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
-            <label class="mdl-textfield__label" for="rating-type" style="display: none">Bar Colors</label>
-            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="rating-type">
-                <li class="mdl-menu__item" data-val="likes-to-dislikes" id="rating-type-likes-to-dislikes">Likes-to-Dislikes</li>
-                <li class="mdl-menu__item" data-val="likes-to-views" id="rating-type-likes-to-views">Likes-to-Views</li>
-                <li class="mdl-menu__item" data-val="both" id="rating-type-both">A/B (L-t-D top, L-t-V bottom)</li>
-                <li class="mdl-menu__item" data-val="likes-to-comments" id="rating-type-likes-to-comments">Likes-to-Comments</li>
-                <li class="mdl-menu__item" data-val="ltd-ltc" id="rating-type-ltd-ltc">A/B (L-t-D top, L-t-C bottom)</li>
-                <li class="mdl-menu__item" data-val="ltd-ltv-ltc" id="rating-type-ltd-ltv-ltc">A/B/C (L-t-D, L-t-V, L-t-C)</li>
-            </ul>
-        </div>
-    </div>
-
-    <br/>
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
         <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
@@ -146,9 +125,11 @@
 
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="use-on-video-page">
         <input type="checkbox" id="use-on-video-page" class="mdl-checkbox__input">
-        <span class="mdl-checkbox__label">Use the rating bar colors for the rating bar on the video page.</span>
+        <span class="mdl-checkbox__label">Use the rating bar colors for the rating bar on the video page (when used with the <a href="https://returnyoutubedislike.com" target="_blank">Return YouTube Dislikes</a> extension).</span>
     </label>
 
+    <br/>
+    <br/>
     <br/>
     <br/>
     <br/>
@@ -157,32 +138,6 @@
         <input type="checkbox" id="show-percentage" class="mdl-checkbox__input">
         <span class="mdl-checkbox__label">Add a color-coded text rating percentage to each video listing.</span>
     </label>
-
-    <br/>
-    <br/>
-    <br/>
-
-    <div id="api-key-container" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input id="api-key" class="mdl-textfield__input" type="text" required>
-        <label class="mdl-textfield__label" for="api-key">Your YouTube Data API Key</label>
-        <span class="mdl-textfield__error">An API Key is required.</span>
-    </div>
-
-    <p style="font-size: 12px; padding-top: 5px; margin-bottom: 0;">
-        This extension requires a YouTube Data API key. Instructions for obtaining a free API key and an explanation of why it's required can be found <a href="https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube" target="_blank">here</a>.
-    </p>
-
-
-    <!--<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="time-since-published">-->
-    <!--<input type="checkbox" id="time-since-published" class="mdl-checkbox__input">-->
-    <!--<span class="mdl-checkbox__label">Add the time since published (ex. 2 days ago) to the sidebar suggested videos and to the currently playing video's info section.</span>-->
-    <!--</label>-->
-
-    <!--<br />-->
-    <!--<br />-->
-    <!--<br />-->
-    <!--<br />-->
-    <!--<br />-->
 
 </div>
 <div class="buttons-container">
