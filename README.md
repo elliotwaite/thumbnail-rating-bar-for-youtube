@@ -50,7 +50,7 @@ half the width of the likes bar:
 
 Note: This option only affects the scaling of the rating bar that is added to the
 thumbnails. It does not affect the scaling of the rating bar shown on the video
-page (if you have the [Return YouTube Dislike's extension](https://returnyoutubedislike.com/install)
+page (if you have the [Return YouTube Dislike extension](https://returnyoutubedislike.com/install)
 installed).
 
 Special thanks to [Qarthak](https://github.com/Qarthak) for
