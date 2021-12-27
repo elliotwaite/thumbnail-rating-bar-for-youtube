@@ -48,10 +48,10 @@ half the width of the likes bar:
 |    70% | 12.5% |
 |    ... |  etc. |
 
-Note: This option only affects the scaling of the rating bar that is added to the
-thumbnails. It does not affect the scaling of the rating bar shown on the video
-page (if you have the [Return YouTube Dislike extension](https://returnyoutubedislike.com/install)
-installed).
+Note: If you also have the [Return YouTube Dislike
+extension](https://returnyoutubedislike.com/install) installed, which adds a
+rating bar to the video page, this option will affect the scaling of that
+rating bar as well.
 
 Special thanks to [Qarthak](https://github.com/Qarthak) for
 [requesting this feature](https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/49).
