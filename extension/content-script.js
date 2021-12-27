@@ -128,6 +128,10 @@ function getToolTipText(video) {
       + ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' + video.total + '&nbsp;total'
 }
 
+function exponentialRatingWidthPercentage(rating) {
+  return 100 * Math.pow(2, 10 * (rating - 1))
+}
+
 function getRatingBarHtml(videoData) {
   let ratingElement
   if (videoData.rating == null) {
@@ -135,7 +139,7 @@ function getRatingBarHtml(videoData) {
   } else {
     let likesWidthPercentage
     if (userSettings.useExponentialScaling) {
-      likesWidthPercentage = 100 * Math.pow(2, 10 * (videoData.rating - 1))
+      likesWidthPercentage = exponentialRatingWidthPercentage(videoData.rating)
     } else {
       likesWidthPercentage = 100 * videoData.rating
     }
@@ -348,23 +352,35 @@ function processNewThumbnails() {
   }
 }
 
-function updateVideoRatingBarTooltips() {
-  $('.ryd-tooltip #tooltip')
-      .each(function(_, tooltip) {
-        let text = $(tooltip).text()
-        if (text !== $(tooltip).attr('data-ytrb-processed')) {
-          let cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
-          let [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
+function getVideoDataFromTooltipText(text) {
+  let cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
+  let [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
+  return getVideoDataObject(likes, dislikes)
+}
 
-          let video = getVideoDataObject(likes, dislikes)
-          let newText = `${text} \u00A0\u00A0 ` +
-            `${video.rating == null ? '0%' : ratingToPercentage(video.rating)} \u00A0\u00A0 ` +
-            `${video.total.toLocaleString()} total`
+function updateVideoRatingBar() {
+  $('.ryd-tooltip').each(function(_, rydTooltip) {
+    let tooltip = $(rydTooltip).find('#tooltip')
+    let curText = $(tooltip).text()
 
-          $(tooltip).text(newText)
-          $(tooltip).attr('data-ytrb-processed', newText)
-        }
-      })
+    // We add a zero width space to the end of any processed tooltip text to
+    // prevent it from being reprocessed.
+    if (!curText.endsWith('\u200b')) {
+      let videoData = getVideoDataFromTooltipText(curText)
+
+      if (userSettings.barTooltip) {
+        $(tooltip).text(`${curText} \u00A0\u00A0 ` +
+          `${videoData.rating == null ? '0%' : ratingToPercentage(videoData.rating)} \u00A0\u00A0 ` +
+          `${videoData.total.toLocaleString()} total\u200b`)
+      } else {
+        $(tooltip).text(`${curText}\u200b`)
+      }
+
+      if (userSettings.useExponentialScaling) {
+        $(rydTooltip).find('#ryd-bar')[0].style.width =  exponentialRatingWidthPercentage(videoData.rating) + '%'
+      }
+    }
+  })
 }
 
 function handleDomMutations() {
@@ -377,7 +393,10 @@ function handleDomMutations() {
   } else {
     // Run the updates.
     processNewThumbnails()
-    updateVideoRatingBarTooltips()
+
+    if (userSettings.barTooltip || userSettings.useExponentialScaling) {
+      updateVideoRatingBar()
+    }
 
     hasUnseenMutations = false
 
