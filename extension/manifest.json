@@ -30,6 +30,7 @@
       ],
       "js": [
         "lib/jquery-3.6.0.min.js",
+        "lib/jstat.min.js",
         "content-script.js"
       ],
       "run_at": "document_end"

@@ -132,6 +132,32 @@ function exponentialRatingWidthPercentage(rating) {
   return 100 * Math.pow(2, 10 * (rating - 1))
 }
 
+function getLikesToViewsPercentage(likes, views) {
+  if (likes <= 0) return 0
+  if (likes >= views) return 100
+
+  let ratio = likes / views
+  let r = (ratio ** 0.21032389998435974 - 0.4999999701976776) / 0.09012361615896225
+  let v = (Math.log(views) - 12.015865325927734) / 2.8472495079040527
+
+  let m0 = 0.040817804634571075
+  let m1 = -0.27621328830718994
+  let m2 = -0.05106991529464722
+  let m3 = -0.02893015556037426
+  let mean = m0 + m1 * v + m2 * v ** 2 + m3 * v ** 3
+
+  let s0 = -0.09283683449029922
+  let s1 = -0.13813409209251404
+  let s2 = 0.003354990854859352
+  let s3 = 0.004593323916196823
+  let log_std = s0 + s1 * v + s2 * v ** 2 + s3 * v ** 3
+  let std = Math.exp(log_std)
+
+  let cdf = jStat.normal.cdf(r, mean, std)
+  return cdf * 100
+}
+
+
 function getRatingBarHtml(videoData) {
   let ratingElement
   if (videoData.rating == null) {
