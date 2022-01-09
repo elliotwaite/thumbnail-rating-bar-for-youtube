@@ -97,6 +97,31 @@
 </div>
 <div class="right-options">
 
+    <div class="flex-row" style="margin-top: 8px">
+        <div style="flex: 0; white-space: nowrap;">
+            <h6 class="h6">Rating Cache Duration:</h6>
+        </div>
+
+        <div class="mdl-textfield mdl-js-textfield getmdl-select">
+            <input class="mdl-textfield__input" value="" id="cache-duration" readonly/>
+            <input value="" type="hidden" name="cache-duration"/>
+            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="cache-duration">
+                <li class="mdl-menu__item" data-val="0" id="cache-duration-0">None</li>
+                <li class="mdl-menu__item" data-val="60000" id="cache-duration-60000">1 min</li>
+                <li class="mdl-menu__item" data-val="300000" id="cache-duration-300000">5 min</li>
+                <li class="mdl-menu__item" data-val="600000" id="cache-duration-600000">10 min</li>
+                <li class="mdl-menu__item" data-val="1800000" id="cache-duration-1800000">30 min</li>
+                <li class="mdl-menu__item" data-val="3600000" id="cache-duration-3600000">1 hr</li>
+                <li class="mdl-menu__item" data-val="10800000" id="cache-duration-10800000">3 hr</li>
+                <li class="mdl-menu__item" data-val="21600000" id="cache-duration-21600000">6 hr</li>
+                <li class="mdl-menu__item" data-val="86400000" id="cache-duration-86400000">24 hr</li>
+            </ul>
+        </div>
+    </div>
+
+    <br/>
+
     <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="bar-separator">
         <input type="checkbox" id="bar-separator" class="mdl-checkbox__input">
         <span class="mdl-checkbox__label">Add a separation line <span id="bar-separator-position">above</span> the rating bar.</span>

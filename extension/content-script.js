@@ -6,9 +6,6 @@ const THROTTLE_MS = 100
 let hasUnseenMutations = false
 let isThrottled = false
 
-// A cache to store video ratings, to limit API calls and improve performance.
-let videoCache = {}
-
 // Enum values for which YouTube theme is currently being viewed.
 let curTheme = 0  // No theme set yet.
 const THEME_MODERN = 1  // The new Material Design theme.
@@ -304,17 +301,16 @@ function getVideoDataObject(likes, dislikes) {
 }
 
 async function getVideoData(videoId) {
-  if (videoId in videoCache) {
-    return videoCache[videoId]
-  }
-
   return new Promise(resolve => {
     chrome.runtime.sendMessage(
       {query: 'videoApiRequest', videoId: videoId},
-      data => {
-        let videoData = getVideoDataObject(data.likes, data.dislikes)
-        videoCache[videoId] = videoData
-        resolve(videoData)
+      likesData => {
+        if (likesData === null) {
+          resolve(null)
+        } else {
+          let videoData = getVideoDataObject(likesData.likes, likesData.dislikes)
+          resolve(videoData)
+        }
       },
     )
   })

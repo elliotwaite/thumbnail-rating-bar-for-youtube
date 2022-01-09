@@ -11,6 +11,7 @@ const DEFAULT_USER_SETTINGS = {
   barTooltip: true,
   useOnVideoPage: false,
   showPercentage: false,
+  cacheDuration: 600000,
 }
 
 function sanitizeHexColor(str) {
@@ -146,6 +147,7 @@ $('#bar-opacity').on('input change', function(event) {
 
 // Save settings.
 $('#save-btn').click(function() {
+  let cacheDuration = parseInt($('[name="cache-duration"]').val())
   chrome.storage.sync.set({
     barPosition: $('#bar-position-top').prop('checked') ? 'top' : 'bottom',
     barColor: $('[name="bar-color"]').val(),
@@ -159,6 +161,7 @@ $('#save-btn').click(function() {
     barTooltip: $('#bar-tooltip').prop('checked'),
     useOnVideoPage: $('#use-on-video-page').prop('checked'),
     showPercentage: $('#show-percentage').prop('checked'),
+    cacheDuration: cacheDuration,
   }, function() {
     // Show "Settings saved" message.
     document.querySelector('#toast').MaterialSnackbar.showSnackbar({
@@ -166,37 +169,73 @@ $('#save-btn').click(function() {
       timeout: 2000,
     })
   })
+  chrome.runtime.sendMessage({
+    query: 'updateSettings',
+    cacheDuration: cacheDuration,
+  })
 })
 
-// Restore defaults.
-$('#restore-defaults-btn').click(function() {
-  $('#bar-position-' + DEFAULT_USER_SETTINGS.barPosition).click()
+function applySettings(settings, applyColors=true) {
+  $('#bar-position-' + settings.barPosition).click()
 
   // Note: We don't restore the custom colors and colors separator settings so
   // that users can easily restore to their custom colors if they want to.
-  $('#bar-color-' + DEFAULT_USER_SETTINGS.barColor).click()
+  if (applyColors) {
+    $('#bar-likes-color').val(settings.barLikesColor)
+    if (settings.barLikesColor.length) {
+      $('#bar-likes-color-container').removeClass('is-invalid').addClass('is-dirty')
+    }
+    $('#bar-dislikes-color').val(settings.barDislikesColor)
+    if (settings.barDislikesColor.length) {
+      $('#bar-dislikes-color-container').removeClass('is-invalid').addClass('is-dirty')
+    }
+    let barColorsSeparator = $('#bar-colors-separator')
+    if (barColorsSeparator.prop('checked') !== settings.barColorsSeparator) {
+      barColorsSeparator.click()
+    }
+  }
 
-  $('#bar-height')[0].MaterialSlider.change(DEFAULT_USER_SETTINGS.barHeight)
+  // We set the bar color after setting the custom colors and colors
+  // separator option above so that the update triggers get fired properly.
+  $('#bar-color-' + settings.barColor).click()
+
+  let barHeightSlider = $('#bar-height')[0].MaterialSlider
+  if (barHeightSlider) {
+    barHeightSlider.change(settings.barHeight)
+  }
   $('#bar-height').change()
 
-  $('#bar-opacity')[0].MaterialSlider.change(DEFAULT_USER_SETTINGS.barOpacity)
+  let barOpacitySlider = $('#bar-opacity')[0].MaterialSlider
+  if (barOpacitySlider) {
+    barOpacitySlider.change(settings.barOpacity)
+  }
   $('#bar-opacity').change()
 
-  if ($('#bar-separator').prop('checked') !== DEFAULT_USER_SETTINGS.barSeparator) {
+  if ($('#bar-separator').prop('checked') !== settings.barSeparator) {
     $('#bar-separator').click()
   }
-  if ($('#use-exponential-scaling').prop('checked') !== DEFAULT_USER_SETTINGS.useExponentialScaling) {
+  if ($('#use-exponential-scaling').prop('checked') !== settings.useExponentialScaling) {
     $('#use-exponential-scaling').click()
   }
-  if ($('#bar-tooltip').prop('checked') !== DEFAULT_USER_SETTINGS.barTooltip) {
+  if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
     $('#bar-tooltip').click()
   }
-  if ($('#use-on-video-page').prop('checked') !== DEFAULT_USER_SETTINGS.useOnVideoPage) {
+  if ($('#use-on-video-page').prop('checked') !== settings.useOnVideoPage) {
     $('#use-on-video-page').click()
   }
-  if ($('#show-percentage').prop('checked') !== DEFAULT_USER_SETTINGS.showPercentage) {
+  if ($('#show-percentage').prop('checked') !== settings.showPercentage) {
     $('#show-percentage').click()
   }
+  if (parseInt($('[name="cache-duration"]').val()) !== settings.cacheDuration) {
+    $('#cache-duration-' + settings.cacheDuration.toString()).click()
+  }
+}
+
+// Restore defaults.
+$('#restore-defaults-btn').click(function() {
+  // Note: We don't restore the custom colors and colors separator settings so
+  // that users can easily restore to their custom colors if they want to.
+  applySettings(DEFAULT_USER_SETTINGS, false)
 })
 
 // Load saved settings.
@@ -206,52 +245,7 @@ function restoreOptions() {
     if (!settings) {
       settings = DEFAULT_USER_SETTINGS
     }
-    $('#bar-position-' + settings.barPosition).click()
-
-    $('#bar-likes-color').val(settings.barLikesColor)
-    if (settings.barLikesColor.length) {
-      $('#bar-likes-color-container').removeClass('is-invalid')
-      $('#bar-likes-color-container').addClass('is-dirty')
-    }
-    $('#bar-dislikes-color').val(settings.barDislikesColor)
-    if (settings.barDislikesColor.length) {
-      $('#bar-dislikes-color-container').removeClass('is-invalid')
-      $('#bar-dislikes-color-container').addClass('is-dirty')
-    }
-    if ($('#bar-colors-separator').prop('checked') !== settings.barColorsSeparator) {
-      $('#bar-colors-separator').click()
-    }
-    // We set the bar color after setting the custom colors and colors
-    // separator option above so that the update triggers get fired properly.
-    $('#bar-color-' + settings.barColor).click()
-
-    let barHeightSlider = $('#bar-height')[0].MaterialSlider
-    if (barHeightSlider) {
-      barHeightSlider.change(settings.barHeight)
-    }
-    $('#bar-height').change()
-
-    let barOpacitySlider = $('#bar-opacity')[0].MaterialSlider
-    if (barOpacitySlider) {
-      barOpacitySlider.change(settings.barOpacity)
-    }
-    $('#bar-opacity').change()
-
-    if ($('#bar-separator').prop('checked') !== settings.barSeparator) {
-      $('#bar-separator').click()
-    }
-    if ($('#use-exponential-scaling').prop('checked') !== settings.useExponentialScaling) {
-      $('#use-exponential-scaling').click()
-    }
-    if ($('#bar-tooltip').prop('checked') !== settings.barTooltip) {
-      $('#bar-tooltip').click()
-    }
-    if ($('#use-on-video-page').prop('checked') !== settings.useOnVideoPage) {
-      $('#use-on-video-page').click()
-    }
-    if ($('#show-percentage').prop('checked') !== settings.showPercentage) {
-      $('#show-percentage').click()
-    }
+    applySettings(settings)
   })
 }
 
