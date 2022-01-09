@@ -196,7 +196,7 @@ function getRatingPercentageHtml(video) {
   let rgb = 'rgb(' + r + ',' + g + ',0)'
 
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      rgb + '">' + ratingToPercentage(video.rating) + '</span>'
+      rgb + ' !important">' + ratingToPercentage(video.rating) + '</span>'
 }
 
 function getNewThumbnails() {
