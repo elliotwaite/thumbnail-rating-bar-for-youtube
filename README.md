@@ -18,15 +18,31 @@ https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
 Edge Add-on:<br />
 https://microsoftedge.microsoft.com/addons/detail/thumbnail-rating-bar-for-/mglepphnjnfcljjafdgafoipiakakbin
 
-## API and Rate Limiting
-
+## The API
 This extension uses the [Return YouTube
-Dislike](https://returnyoutubedislike.com) API for likes/dislikes data. Their
-API is rate limited by IP address, so if you notice that some thumbnails aren't
-receiving rating bars, you may be getting temporarily rate limited.
+Dislike](https://returnyoutubedislike.com) API for likes/dislikes data.
 
-You can also install [their extension](https://returnyoutubedislike.com/install)
-to see the likes/dislikes and rating bar on the video page.
+If you would also like to see the likes/dislikes rating bar that used to be
+available on each video page, you can also install [their
+extension](https://returnyoutubedislike.com/install).
+
+## Rate Limiting and the Cache Duration Setting 
+
+The Return YouTube Dislike API is rate limited by IP address, so if you notice
+that some thumbnails aren't receiving rating bars, you may be getting
+temporarily rate limited. If this happens, you will usually only be rate
+limited for about ~15 seconds before you can start retrieving new rating data,
+but you may need to refresh the page if you want to retry loading the rating
+bars for the thumbnails that got rate limited.
+
+To help prevent rate limiting, this extension uses a cache, meaning that
+whenever it fetches data from the API, it will save that data and reuse it
+if needed for however long the cache duration is (the default setting is 10
+minutes, but this is adjustable). This helps reduce the number or API requests
+that are made.
+
+Also, the same global cache is shared across all of your browser's tabs and
+windows.
 
 ## Exponential Scaling Option Explained
 
