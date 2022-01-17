@@ -120,11 +120,11 @@ function ratingToPercentage(rating) {
   return (Math.floor(rating * 1000) / 10).toFixed(1) + '%'
 }
 
-function getToolTipText(video) {
-  return video.likes.toLocaleString() + '&nbsp;/&nbsp;' +
-    video.dislikes.toLocaleString() + ' &nbsp;&nbsp; ' +
-    ratingToPercentage(video.rating) + ' &nbsp;&nbsp; ' +
-    video.total.toLocaleString() + '&nbsp;total'
+function getToolTipText(videoData) {
+  return videoData.likes.toLocaleString() + '&nbsp;/&nbsp;' +
+    videoData.dislikes.toLocaleString() + ' &nbsp;&nbsp; ' +
+    ratingToPercentage(videoData.rating) + ' &nbsp;&nbsp; ' +
+    videoData.total.toLocaleString() + '&nbsp;total'
 }
 
 function exponentialRatingWidthPercentage(rating) {
@@ -187,16 +187,16 @@ function getRatingBarHtml(videoData) {
       '</ytrb-bar>'
 }
 
-function getRatingPercentageHtml(video) {
-  let r = (1 - video.rating) * 1275
-  let g = video.rating * 637.5 - 255
+function getRatingPercentageHtml(videoData) {
+  let r = (1 - videoData.rating) * 1275
+  let g = videoData.rating * 637.5 - 255
   if (!isDarkTheme) {
     g = Math.min(g, 255) * 0.85
   }
   let rgb = 'rgb(' + r + ',' + g + ',0)'
 
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      rgb + ' !important">' + ratingToPercentage(video.rating) + '</span>'
+      rgb + ' !important">' + ratingToPercentage(videoData.rating) + '</span>'
 }
 
 function getNewThumbnails() {
