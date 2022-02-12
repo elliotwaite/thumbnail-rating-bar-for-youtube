@@ -86,7 +86,8 @@ THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
 
 THUMBNAIL_SELECTORS[THEME_MOBILE] = '' +
     'a.media-item-thumbnail-container, ' +
-    'a.compact-media-item-image'
+    'a.compact-media-item-image, ' +
+    'a.video-card-image'
 
 // All themes use this selector for video wall videos.
 const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
@@ -227,7 +228,7 @@ function getThumbnailsAndIds(thumbnails) {
   $(thumbnails).each(function(_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
-    if (curTheme === THEME_MODERN || curTheme === THEME_MOBILE) {
+    if (curTheme === THEME_MODERN) {
       // The URL should be on the current element.
       url = $(thumbnail).attr('href')
 
@@ -251,6 +252,17 @@ function getThumbnailsAndIds(thumbnails) {
       // preview video that plays when you hover over the thumbnail.
       if (!$(thumbnail).is('a')) {
         thumbnail = $(thumbnail).parent()
+      }
+
+    } else if (curTheme === THEME_MOBILE) {
+      // The URL should be on the current element.
+      url = $(thumbnail).attr('href')
+
+      // On mobile gaming (m.youtube.com/gaming), the thumbnail should be
+      // reassigned to the child container.
+      const firstChild = $(thumbnail).children(':first')[0]
+      if ($(firstChild).is('.video-thumbnail-container-compact')) {
+        thumbnail = firstChild
       }
 
     } else {
