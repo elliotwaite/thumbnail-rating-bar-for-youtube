@@ -47,3 +47,20 @@ ytrb-dislikes {
 ytg-thumbnail .ytrb-bar {
   z-index: 1;
 }
+
+/* For YouTube mobile. Keeps the rating bar contained in the thumbnail. */
+ytm-app a.media-item-thumbnail-container, ytm-app a.compact-media-item-image {
+  position: relative;
+}
+
+/* For YouTube mobile. Keeps the rating bar below the header. */
+ytm-app a.media-item-thumbnail-container ytrb-bar, ytm-app a.compact-media-item-image ytrb-bar {
+  z-index: auto;
+}
+
+/* On mobile, make the bar full width. */
+ytm-media-item ytrb-bar {
+  margin-left: -12px;
+  margin-right: -12px;
+  width: calc(100% + 24px);
+}

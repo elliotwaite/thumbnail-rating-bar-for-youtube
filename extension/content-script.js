@@ -1,6 +1,3 @@
-// Setting debug to true will turn on console.log messages used for debugging.
-let debug = false
-
 // Variables for handling throttling DOM searches.
 const THROTTLE_MS = 100
 let hasUnseenMutations = false
@@ -11,7 +8,8 @@ let curTheme = 0  // No theme set yet.
 const THEME_MODERN = 1  // The new Material Design theme.
 const THEME_CLASSIC = 2  // The classic theme.
 const THEME_GAMING = 3  // The YouTube Gaming theme.
-const NUM_THEMES = 3
+const THEME_MOBILE = 4  // The YouTube mobile theme (m.youtube.com).
+const NUM_THEMES = 4
 
 // `isDarkTheme` will be true if the appearance setting is in dark theme mode.
 let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') === ' #181818'
@@ -76,7 +74,7 @@ THUMBNAIL_SELECTORS[THEME_CLASSIC] = '' +
     '.pl-header-thumb'
 
 THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
-    // Gaming all types except video wall. URL is on the great grandparent,
+    // Gaming all types except video wall. URL is on the great-grandparent,
     // except for search result playlists it is on the grandparent.
     'ytg-thumbnail' +
     ':not([avatar])' +
@@ -85,6 +83,10 @@ THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
     ':not(.ytg-box-art)' +
     ':not(.ytg-compact-gaming-event-renderer)' +
     ':not(.ytg-playlist-header-renderer)'
+
+THUMBNAIL_SELECTORS[THEME_MOBILE] = '' +
+    'a.media-item-thumbnail-container, ' +
+    'a.compact-media-item-image'
 
 // All themes use this selector for video wall videos.
 const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
@@ -225,7 +227,7 @@ function getThumbnailsAndIds(thumbnails) {
   $(thumbnails).each(function(_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
-    if (curTheme === THEME_MODERN) {
+    if (curTheme === THEME_MODERN || curTheme === THEME_MOBILE) {
       // The URL should be on the current element.
       url = $(thumbnail).attr('href')
 
@@ -257,7 +259,6 @@ function getThumbnailsAndIds(thumbnails) {
     }
 
     if (!url) {
-      if (debug) console.log('DEBUG: Url not found.', thumbnail, url)
       return true
     }
 
@@ -266,8 +267,18 @@ function getThumbnailsAndIds(thumbnails) {
     if (previousUrl) {
       // Check if this thumbnail is for the same URL as previously.
       if (previousUrl === url) {
-        // If so, continue the next thumbnail.
-        return true
+        // If it is for the same URL, continue the next thumbnail, except on
+        // mobile where we have to make on additional check.
+        if (curTheme === THEME_MOBILE) {
+          // On mobile, we have to check to make sure the bar is still present,
+          // because thumbnails can sometimes be recreated (such as when they
+          // are scrolled out of view) which causes the bar to be removed.
+          if ($(thumbnail).children().last().is('ytrb-bar')) {
+            return true
+          }
+        } else {
+          return true
+        }
       } else {
         // If not, remove the old rating bar.
         $(thumbnail).children('ytrb-bar').remove()
@@ -282,8 +293,6 @@ function getThumbnailsAndIds(thumbnails) {
     if (match) {
       let id = match[1]
       thumbnailsAndVideoIds.push([thumbnail, id])
-    } else if (debug) {
-      console.log('DEBUG: Match not found.', thumbnail, url)
     }
   })
   return thumbnailsAndVideoIds
@@ -318,25 +327,35 @@ async function getVideoData(videoId) {
 
 function addRatingBar(thumbnail, videoData) {
   // Add a rating bar to each thumbnail.
-  $(thumbnail).prepend(getRatingBarHtml(videoData))
+  $(thumbnail).append(getRatingBarHtml(videoData))
 }
 
 function addRatingPercentage(thumbnail, videoData) {
   // Add the rating text percentage below or next to the thumbnail.
-  let metadataLine = $(thumbnail).closest(
-    '.ytd-rich-item-renderer, ' +  // Home page.
-    '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
-    '.ytd-expanded-shelf-contents-renderer, ' +  // Also subscriptions page.
-    '.yt-horizontal-list-renderer, ' +  // Channel page.
-    '.ytd-item-section-renderer, ' +  // History page.
-    '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
-    '.ytd-playlist-video-list-renderer' // Playlist page.
-  ).find('#metadata-line').last()
+  let metadataLine
+  if (curTheme === THEME_MOBILE) {
+    metadataLine = $(thumbnail).closest('ytm-media-item').find('ytm-badge-and-byline-renderer').last()
+  } else {
+    metadataLine = $(thumbnail).closest(
+      '.ytd-rich-item-renderer, ' +  // Home page.
+      '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
+      '.ytd-expanded-shelf-contents-renderer, ' +  // Subscriptions page.
+      '.yt-horizontal-list-renderer, ' +  // Channel page.
+      '.ytd-item-section-renderer, ' +  // History page.
+      '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
+      '.ytd-playlist-video-list-renderer' // Playlist page.
+    ).find('#metadata-line').last()
+  }
 
   if (metadataLine) {
     // Remove any previously added percentages.
     for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
       oldPercentage.remove()
+    }
+    if (curTheme === THEME_MOBILE) {
+      for (let oldPercentage of metadataLine.children('.ytrb-percentage-separator')) {
+        oldPercentage.remove()
+      }
     }
 
     // Add new percentage.
@@ -345,6 +364,10 @@ function addRatingPercentage(thumbnail, videoData) {
       let lastSpan = metadataLine.children('span').last()
       if (lastSpan.length) {
         lastSpan.after(ratingPercentageHtml)
+        if (curTheme === THEME_MOBILE) {
+          // On mobile, we have to add the separator dot manually.
+          lastSpan.after('<span class="ytm-badge-and-byline-separator ytrb-percentage-separator" aria-hidden="true">•</span>')
+        }
       } else {
         // This handles metadata lines that are initially empty, which
         // occurs on playlist pages. We prepend the rating percentage as well

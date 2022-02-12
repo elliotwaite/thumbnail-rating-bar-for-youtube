@@ -57,3 +57,25 @@ ytg-thumbnail-overlay-time-status-renderer /* Gaming */
   bottom: var(--ytrb-bar-height) !important;
   height: 15px !important;
 }
+
+/* Reposition the thumbnail time (mobile theme). */
+ytm-thumbnail-overlay-time-status-renderer {
+  position: absolute;
+  bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+/* Reposition the thumbnail playback status (mobile theme). */
+ytm-thumbnail-overlay-playback-status-renderer {
+  position: absolute;
+  bottom: calc(var(--ytrb-bar-height) + 1px) !important
+}
+
+/* Reposition the thumbnail watched bar (mobile theme). */
+ytm-app .video-thumbnail-overlay-bottom-group {
+  top: 0;
+}
+
+ytm-thumbnail-overlay-resume-playback-renderer {
+  position: absolute;
+  top: 0 !important;
+}
