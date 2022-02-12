@@ -2,10 +2,10 @@
 
 let cache = {}
 let cacheTimes = []
-let cacheDuration = 600000
+let cacheDuration = 600000  // Default is 10 mins.
 
 chrome.storage.sync.get({cacheDuration: 600000}, function(settings) {
-  if (settings) {
+  if (settings && settings.cacheDuration !== undefined) {
     cacheDuration = settings.cacheDuration
   }
 })

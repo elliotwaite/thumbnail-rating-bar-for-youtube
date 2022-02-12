@@ -245,6 +245,16 @@ function restoreOptions() {
     if (!settings) {
       settings = DEFAULT_USER_SETTINGS
     }
+
+    // Set any missing settings to their default values. Some settings may be
+    // missing if loading in settings that were saved using an older version of
+    // this extension.
+    for (const [key, value] of Object.entries(DEFAULT_USER_SETTINGS)) {
+      if (!(key in settings)) {
+        settings[key] = value
+      }
+    }
+
     applySettings(settings)
   })
 }
