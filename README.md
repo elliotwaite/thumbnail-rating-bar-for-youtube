@@ -19,12 +19,18 @@ Edge Add-on:<br />
 https://microsoftedge.microsoft.com/addons/detail/thumbnail-rating-bar-for-/mglepphnjnfcljjafdgafoipiakakbin
 
 ## The API
+
 This extension uses the [Return YouTube
 Dislike](https://returnyoutubedislike.com) API for likes/dislikes data.
 
 If you would also like to see the likes/dislikes rating bar that used to be
 available on each video page, you can also install [their
 extension](https://returnyoutubedislike.com/install).
+
+## Mobile Support
+
+This extension also works on mobile browsers that support Chrome extensions,
+such as [Kiwi Browser](https://kiwibrowser.com) for Android.  
 
 ## Rate Limiting and the Cache Duration Setting 
 
