@@ -1,11 +1,11 @@
-// Variables for throttling DOM searches.
+// Variables for throttling handling DOM mutations.
 const HANDLE_DOM_MUTATIONS_THROTTLE_MS = 100
-let hasUnseenMutations = false
-let isThrottled = false
+let domMutationsAreThrottled = false
+let hasUnseenDomMutations = false
 
-// Variables for throttling API retry requests.
-const MAX_API_REQUEST_ATTEMPTS = 7
-const API_REQUEST_RETRY_SLEEP_TIME_MS = 5000
+// Variables for handling what to do when an API request fails.
+const API_RETRY_DELAY = 5000
+let isPendingApiRetry = false
 
 // Enum values for which YouTube theme is currently being viewed.
 let curTheme = 0  // No theme set yet.
@@ -325,31 +325,33 @@ function getVideoDataObject(likes, dislikes) {
   }
 }
 
-function requestLikesData(videoId) {
+function retryApiInTheFuture() {
+  if (!isPendingApiRetry) {
+    isPendingApiRetry = true
+    setTimeout(() => {
+      isPendingApiRetry = false
+      hasUnseenDomMutations = true
+      handleDomMutations()
+    }, API_RETRY_DELAY)
+  }
+}
+
+function getVideoData(thumbnail, videoId) {
   return new Promise(resolve => {
     chrome.runtime.sendMessage(
       {query: 'videoApiRequest', videoId: videoId},
-      resolve
+      (likesData) => {
+        if (likesData === null) {
+          // The API request failed (usually due to rate limiting).
+          $(thumbnail).removeAttr('data-ytrb-processed')
+          retryApiInTheFuture()
+          resolve(null)
+        } else {
+          resolve(getVideoDataObject(likesData.likes, likesData.dislikes))
+        }
+      }
     )
   })
-}
-
-function sleep(milliseconds) {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
-async function getVideoData(videoId) {
-  let likesData = null
-  for (let i = 0; i < MAX_API_REQUEST_ATTEMPTS; i++) {
-    likesData = await requestLikesData(videoId)
-    if (likesData !== null) {
-      break
-    }
-    await sleep(API_REQUEST_RETRY_SLEEP_TIME_MS)
-  }
-  return likesData === null
-    ? null
-    : getVideoDataObject(likesData.likes, likesData.dislikes)
 }
 
 function addRatingBar(thumbnail, videoData) {
@@ -412,7 +414,7 @@ function processNewThumbnails() {
   const thumbnailsAndVideoIds = getThumbnailsAndIds(thumbnails)
 
   for (const [thumbnail, videoId] of thumbnailsAndVideoIds) {
-    getVideoData(videoId).then(videoData => {
+    getVideoData(thumbnail, videoId).then(videoData => {
       if (videoData !== null) {
         if (userSettings.barHeight !== 0) {
           addRatingBar(thumbnail, videoData)
@@ -459,11 +461,14 @@ function updateVideoRatingBar() {
 function handleDomMutations() {
   // When the DOM is updated, we search for items that should be modified.
   // However, we throttle these searches to not over tax the CPU.
-  if (isThrottled) {
+  if (domMutationsAreThrottled) {
     // If updates are currently being throttled, we'll remember to handle
     // them later.
-    hasUnseenMutations = true
+    hasUnseenDomMutations = true
   } else {
+    // Turn on throttling.
+    domMutationsAreThrottled = true
+
     // Run the updates.
     if (userSettings.barHeight !== 0 || userSettings.showPercentage) {
       processNewThumbnails()
@@ -472,17 +477,14 @@ function handleDomMutations() {
       updateVideoRatingBar()
     }
 
-    hasUnseenMutations = false
-
-    // Turn on throttling.
-    isThrottled = true
+    hasUnseenDomMutations = false
 
     setTimeout(function() {
-      // After the timeout, disable throttling.
-      isThrottled = false
+      // After the timeout, turn off throttling.
+      domMutationsAreThrottled = false
 
       // If any mutations occurred while being throttled, handle them now.
-      if (hasUnseenMutations) {
+      if (hasUnseenDomMutations) {
         handleDomMutations()
       }
 
@@ -491,7 +493,7 @@ function handleDomMutations() {
 }
 
 // An observer for watching changes to the body element.
-const observer = new MutationObserver(handleDomMutations)
+const mutationObserver = new MutationObserver(handleDomMutations)
 
 function insertCss(url) {
   chrome.runtime.sendMessage({
@@ -570,5 +572,5 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
   }
 
   handleDomMutations()
-  observer.observe(document.body, {childList: true, subtree: true})
+  mutationObserver.observe(document.body, {childList: true, subtree: true})
 })
