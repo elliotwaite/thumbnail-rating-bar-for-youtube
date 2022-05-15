@@ -1,7 +1,11 @@
-// Variables for handling throttling DOM searches.
-const THROTTLE_MS = 100
+// Variables for throttling DOM searches.
+const HANDLE_DOM_MUTATIONS_THROTTLE_MS = 100
 let hasUnseenMutations = false
 let isThrottled = false
+
+// Variables for throttling API retry requests.
+const MAX_API_REQUEST_ATTEMPTS = 7
+const API_REQUEST_RETRY_SLEEP_TIME_MS = 5000
 
 // Enum values for which YouTube theme is currently being viewed.
 let curTheme = 0  // No theme set yet.
@@ -12,7 +16,7 @@ const THEME_MOBILE = 4  // The YouTube mobile theme (m.youtube.com).
 const NUM_THEMES = 4
 
 // `isDarkTheme` will be true if the appearance setting is in dark theme mode.
-let isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') === ' #181818'
+const isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') === ' #181818'
 
 // We use these JQuery selectors to find new thumbnails on the page. We use
 // :not([data-ytrb-processed]) to make sure these aren't thumbnails that we've
@@ -191,12 +195,12 @@ function getRatingBarHtml(videoData) {
 }
 
 function getRatingPercentageHtml(videoData) {
-  let r = (1 - videoData.rating) * 1275
+  const r = (1 - videoData.rating) * 1275
   let g = videoData.rating * 637.5 - 255
   if (!isDarkTheme) {
     g = Math.min(g, 255) * 0.85
   }
-  let rgb = 'rgb(' + r + ',' + g + ',0)'
+  const rgb = 'rgb(' + r + ',' + g + ',0)'
 
   return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
       rgb + ' !important">' + ratingToPercentage(videoData.rating) + '</span>'
@@ -224,7 +228,7 @@ function getNewThumbnails() {
 function getThumbnailsAndIds(thumbnails) {
   // Finds the video ID associated with each thumbnail and returns an array of
   // arrays of [thumbnail element, video ID string].
-  let thumbnailsAndVideoIds = []
+  const thumbnailsAndVideoIds = []
   $(thumbnails).each(function(_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
@@ -275,7 +279,7 @@ function getThumbnailsAndIds(thumbnails) {
     }
 
     // Check if this thumbnail was previously found.
-    let previousUrl = $(thumbnail).attr('data-ytrb-processed')
+    const previousUrl = $(thumbnail).attr('data-ytrb-processed')
     if (previousUrl) {
       // Check if this thumbnail is for the same URL as previously.
       if (previousUrl === url) {
@@ -301,9 +305,9 @@ function getThumbnailsAndIds(thumbnails) {
     $(thumbnail).attr('data-ytrb-processed', url)
 
     // Extract the video ID from the URL.
-    let match = url.match(/.*[?&]v=([^&]+).*/)
+    const match = url.match(/.*[?&]v=([^&]+).*/)
     if (match) {
-      let id = match[1]
+      const id = match[1]
       thumbnailsAndVideoIds.push([thumbnail, id])
     }
   })
@@ -311,8 +315,8 @@ function getThumbnailsAndIds(thumbnails) {
 }
 
 function getVideoDataObject(likes, dislikes) {
-  let total = likes + dislikes
-  let rating = total ? likes / total : null
+  const total = likes + dislikes
+  const rating = total ? likes / total : null
   return {
     likes: likes,
     dislikes: dislikes,
@@ -321,20 +325,31 @@ function getVideoDataObject(likes, dislikes) {
   }
 }
 
-async function getVideoData(videoId) {
+function requestLikesData(videoId) {
   return new Promise(resolve => {
     chrome.runtime.sendMessage(
       {query: 'videoApiRequest', videoId: videoId},
-      likesData => {
-        if (likesData === null) {
-          resolve(null)
-        } else {
-          let videoData = getVideoDataObject(likesData.likes, likesData.dislikes)
-          resolve(videoData)
-        }
-      },
+      resolve
     )
   })
+}
+
+function sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+async function getVideoData(videoId) {
+  let likesData = null
+  for (let i = 0; i < MAX_API_REQUEST_ATTEMPTS; i++) {
+    likesData = await requestLikesData(videoId)
+    if (likesData !== null) {
+      break
+    }
+    await sleep(API_REQUEST_RETRY_SLEEP_TIME_MS)
+  }
+  return likesData === null
+    ? null
+    : getVideoDataObject(likesData.likes, likesData.dislikes)
 }
 
 function addRatingBar(thumbnail, videoData) {
@@ -361,19 +376,19 @@ function addRatingPercentage(thumbnail, videoData) {
 
   if (metadataLine) {
     // Remove any previously added percentages.
-    for (let oldPercentage of metadataLine.children('.ytrb-percentage')) {
+    for (const oldPercentage of metadataLine.children('.ytrb-percentage')) {
       oldPercentage.remove()
     }
     if (curTheme === THEME_MOBILE) {
-      for (let oldPercentage of metadataLine.children('.ytrb-percentage-separator')) {
+      for (const oldPercentage of metadataLine.children('.ytrb-percentage-separator')) {
         oldPercentage.remove()
       }
     }
 
     // Add new percentage.
     if (videoData.rating != null) {
-      let ratingPercentageHtml = getRatingPercentageHtml(videoData)
-      let lastSpan = metadataLine.children('span').last()
+      const ratingPercentageHtml = getRatingPercentageHtml(videoData)
+      const lastSpan = metadataLine.children('span').last()
       if (lastSpan.length) {
         lastSpan.after(ratingPercentageHtml)
         if (curTheme === THEME_MOBILE) {
@@ -393,10 +408,10 @@ function addRatingPercentage(thumbnail, videoData) {
 }
 
 function processNewThumbnails() {
-  let thumbnails = getNewThumbnails()
-  let thumbnailsAndVideoIds = getThumbnailsAndIds(thumbnails)
+  const thumbnails = getNewThumbnails()
+  const thumbnailsAndVideoIds = getThumbnailsAndIds(thumbnails)
 
-  for (let [thumbnail, videoId] of thumbnailsAndVideoIds) {
+  for (const [thumbnail, videoId] of thumbnailsAndVideoIds) {
     getVideoData(videoId).then(videoData => {
       if (videoData !== null) {
         if (userSettings.barHeight !== 0) {
@@ -411,20 +426,20 @@ function processNewThumbnails() {
 }
 
 function getVideoDataFromTooltipText(text) {
-  let cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
-  let [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
+  const cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
+  const [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
   return getVideoDataObject(likes, dislikes)
 }
 
 function updateVideoRatingBar() {
   $('.ryd-tooltip').each(function(_, rydTooltip) {
-    let tooltip = $(rydTooltip).find('#tooltip')
-    let curText = $(tooltip).text()
+    const tooltip = $(rydTooltip).find('#tooltip')
+    const curText = $(tooltip).text()
 
     // We add a zero width space to the end of any processed tooltip text to
     // prevent it from being reprocessed.
     if (!curText.endsWith('\u200b')) {
-      let videoData = getVideoDataFromTooltipText(curText)
+      const videoData = getVideoDataFromTooltipText(curText)
 
       if (userSettings.barTooltip) {
         $(tooltip).text(`${curText} \u00A0\u00A0 ` +
@@ -450,19 +465,20 @@ function handleDomMutations() {
     hasUnseenMutations = true
   } else {
     // Run the updates.
-    processNewThumbnails()
-
+    if (userSettings.barHeight !== 0 || userSettings.showPercentage) {
+      processNewThumbnails()
+    }
     if (userSettings.barTooltip || userSettings.useExponentialScaling) {
       updateVideoRatingBar()
     }
 
     hasUnseenMutations = false
 
-    // Turn on throttle.
+    // Turn on throttling.
     isThrottled = true
 
     setTimeout(function() {
-      // After `THROTTLE_MS` milliseconds, turn off the throttle.
+      // After the timeout, disable throttling.
       isThrottled = false
 
       // If any mutations occurred while being throttled, handle them now.
@@ -470,12 +486,12 @@ function handleDomMutations() {
         handleDomMutations()
       }
 
-    }, THROTTLE_MS)
+    }, HANDLE_DOM_MUTATIONS_THROTTLE_MS)
   }
 }
 
 // An observer for watching changes to the body element.
-let observer = new MutationObserver(handleDomMutations)
+const observer = new MutationObserver(handleDomMutations)
 
 function insertCss(url) {
   chrome.runtime.sendMessage({

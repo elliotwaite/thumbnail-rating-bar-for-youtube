@@ -15,12 +15,12 @@ chrome.runtime.onMessage.addListener(
     if (message.query === 'videoApiRequest') {
 
       // Remove expired cache data.
-      let now = new Date().getTime()
+      const now = new Date().getTime()
       let numRemoved = 0
-      for (const [videoId, fetchTime] of cacheTimes) {
+      for (const [fetchTime, videoId] of cacheTimes) {
         if (now - fetchTime > cacheDuration) {
           delete cache[videoId]
-          numRemoved++;
+          numRemoved++
         } else {
           break
         }
@@ -41,13 +41,13 @@ chrome.runtime.onMessage.addListener(
               sendResponse(null)
             } else {
               response.json().then(data => {
-                let likesData = {
+                const likesData = {
                   'likes': data.likes,
                   'dislikes': data.dislikes,
                 }
                 if (!(message.videoId in cache)) {
                   cache[message.videoId] = likesData
-                  cacheTimes.push([message.videoId, new Date().getTime()])
+                  cacheTimes.push([new Date().getTime(), message.videoId])
                 }
                 sendResponse(likesData)
               })
