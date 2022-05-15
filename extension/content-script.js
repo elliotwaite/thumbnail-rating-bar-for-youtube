@@ -5,7 +5,9 @@ let hasUnseenDomMutations = false
 
 // Variables for handling what to do when an API request fails.
 const API_RETRY_DELAY = 5000
+const MAX_RETRIES_PER_THUMBNAIL = 10
 let isPendingApiRetry = false
+let thumbnailsToRetry = []
 
 // Enum values for which YouTube theme is currently being viewed.
 let curTheme = 0  // No theme set yet.
@@ -296,8 +298,9 @@ function getThumbnailsAndIds(thumbnails) {
           return true
         }
       } else {
-        // If not, remove the old rating bar.
+        // If not, remove the old rating bar and retries count.
         $(thumbnail).children('ytrb-bar').remove()
+        $(thumbnail).removeAttr('data-ytrb-retries')
       }
     }
     // Add an attribute that marks this thumbnail as found, and give it the
@@ -325,12 +328,26 @@ function getVideoDataObject(likes, dislikes) {
   }
 }
 
-function retryApiInTheFuture() {
+function retryProcessingThumbnailInTheFuture(thumbnail) {
+  thumbnailsToRetry.push(thumbnail)
   if (!isPendingApiRetry) {
     isPendingApiRetry = true
     setTimeout(() => {
       isPendingApiRetry = false
-      hasUnseenDomMutations = true
+      thumbnailsToRetry.forEach(thumbnail => {
+        const retriesAttr = $(thumbnail).attr('data-ytrb-retries')
+        const retriesNum = retriesAttr ? Number.parseInt(retriesAttr, 10) : 0
+        if (retriesNum < MAX_RETRIES_PER_THUMBNAIL) {
+          $(thumbnail).attr('data-ytrb-retries', retriesNum + 1)
+          $(thumbnail).removeAttr('data-ytrb-processed')
+          hasUnseenDomMutations = true
+        }
+      })
+      thumbnailsToRetry = []
+
+      // Note: `handleDomMutations()` must be called after updating
+      // `isPendingApiRetry` and `thumbnailsToRetry` above to allow for
+      // additional retries if needed.
       handleDomMutations()
     }, API_RETRY_DELAY)
   }
@@ -342,9 +359,9 @@ function getVideoData(thumbnail, videoId) {
       {query: 'videoApiRequest', videoId: videoId},
       (likesData) => {
         if (likesData === null) {
-          // The API request failed (usually due to rate limiting).
-          $(thumbnail).removeAttr('data-ytrb-processed')
-          retryApiInTheFuture()
+          // The API request failed, which is usually due to rate limiting, so
+          // we will retry processing the thumbnail in the future.
+          retryProcessingThumbnailInTheFuture(thumbnail)
           resolve(null)
         } else {
           resolve(getVideoDataObject(likesData.likes, likesData.dislikes))
