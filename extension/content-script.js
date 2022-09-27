@@ -99,9 +99,6 @@ THUMBNAIL_SELECTORS[THEME_MOBILE] = '' +
 const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
     'a.ytp-videowall-still'
 
-// A regex for cleaning the tooltip text on the video page before processing.
-const NON_DIGITS_OR_FORWARDSLASH_REGEX = /[^\d/]/g;
-
 // The default user settings. `userSettings` is replaced with the stored user's
 // settings once they are loaded.
 const DEFAULT_USER_SETTINGS = {
@@ -445,8 +442,13 @@ function processNewThumbnails() {
 }
 
 function getVideoDataFromTooltipText(text) {
-  const cleanedText = text.replaceAll(NON_DIGITS_OR_FORWARDSLASH_REGEX, '')
-  const [likes, dislikes] = cleanedText.split('/').map(x => parseInt(x))
+  let likes = 0
+  let dislikes = 0
+  let match = text.match(/\s*([0-9,.]+)([^0-9,.]+)([0-9,.]+)/)
+  if (match && match.length >= 4) {
+    likes = parseInt(match[1].replaceAll(/[^0-9]/g, ''), 10)
+    dislikes = parseInt(match[3].replaceAll(/[^0-9]/g, ''), 10)
+  }
   return getVideoDataObject(likes, dislikes)
 }
 
@@ -468,7 +470,7 @@ function updateVideoRatingBar() {
         $(tooltip).text(`${curText}\u200b`)
       }
 
-      if (userSettings.useExponentialScaling) {
+      if (userSettings.useExponentialScaling && videoData.rating) {
         $(rydTooltip).find('#ryd-bar')[0].style.width =  exponentialRatingWidthPercentage(videoData.rating) + '%'
       }
     }
