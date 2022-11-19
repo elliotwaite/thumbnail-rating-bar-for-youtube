@@ -5,12 +5,10 @@ let cache = {}
 let cacheTimes = []
 let cacheDuration = 600000  // Default is 10 mins.
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get({cacheDuration: 600000}, function(settings) {
-    if (settings && settings.cacheDuration !== undefined) {
-      cacheDuration = settings.cacheDuration
-    }
-  })
+chrome.storage.local.get({cacheDuration: 600000}, function(settings) {
+  if (settings && settings.cacheDuration !== undefined) {
+    cacheDuration = settings.cacheDuration
+  }
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -62,12 +60,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true
 
     case 'insertCss':
-      chrome.scripting.insertCSS({
-        target: {
-          tabId: sender.tab.id,
-        },
-        files: message.files,
-      })
+      for (const file of message.files) {
+        chrome.tabs.insertCSS(sender.tab.id, { file })
+      }
       break
 
     case 'updateSettings':

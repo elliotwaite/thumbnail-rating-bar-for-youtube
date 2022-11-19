@@ -3,8 +3,3 @@ These minified files:
   * getmdl-select.min.js
 were downloaded from the source code zip file here:
 https://github.com/CreativeIT/getmdl-select/releases/tag/v2.0
-
-This minified files:
-  * jstat.min.js
-was downloaded from the source code zip file here:
-https://github.com/jstat/jstat/releases/tag/1.9.5

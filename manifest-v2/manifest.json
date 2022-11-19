@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Thumbnail Rating Bar for YouTube™",
   "version": "1.8.7",
   "description": "Displays a rating bar (likes/dislikes) on the bottom of every YouTube™ video thumbnail.",
@@ -8,17 +8,20 @@
     "96": "icons/icon96.png",
     "128": "icons/icon128.png"
   },
-  "action": {
+  "browser_action": {
     "default_icon": "icons/icon96.png",
     "default_title": "Settings",
     "default_popup": "options.html"
   },
   "options_ui": {
     "page": "options.html",
-    "browser_style": false
+    "chrome_style": false
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
   },
   "content_scripts": [
     {
@@ -33,29 +36,22 @@
     }
   ],
   "permissions": [
-    "scripting",
+    "*://*.youtube.com/*",
+    "*://*.returnyoutubedislikeapi.com/*",
     "storage"
   ],
-  "host_permissions": [
-    "*://*.youtube.com/*",
-    "*://*.returnyoutubedislikeapi.com/*"
-  ],
-  "web_accessible_resources": [{
-    "resources": [
-      "css/bar-blue-gray.css",
-      "css/bar-blue-gray-video-page.css",
-      "css/bar-bottom-separator.css",
-      "css/bar-bottom-tooltip.css",
-      "css/bar-bottom.css",
-      "css/bar-green-red.css",
-      "css/bar-green-red-video-page.css",
-      "css/bar-tooltip.css",
-      "css/bar-top-separator.css",
-      "css/bar-top-tooltip.css",
-      "css/bar-top.css",
-      "css/bar.css"
-    ],
-    "matches": [],
-    "extension_ids": []
-  }]
+  "web_accessible_resources": [
+    "css/bar-blue-gray.css",
+    "css/bar-blue-gray-video-page.css",
+    "css/bar-bottom-separator.css",
+    "css/bar-bottom-tooltip.css",
+    "css/bar-bottom.css",
+    "css/bar-green-red.css",
+    "css/bar-green-red-video-page.css",
+    "css/bar-tooltip.css",
+    "css/bar-top-separator.css",
+    "css/bar-top-tooltip.css",
+    "css/bar-top.css",
+    "css/bar.css"
+  ]
 }

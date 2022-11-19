@@ -489,7 +489,7 @@ function handleDomMutations() {
 // An observer for watching changes to the body element.
 const mutationObserver = new MutationObserver(handleDomMutations)
 
-chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
+chrome.storage.local.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
   // In Firefox, `storedSettings` will be undeclared if not previously set.
   if (storedSettings) {
     userSettings = storedSettings
