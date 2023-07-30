@@ -419,7 +419,7 @@ function processNewThumbnails() {
 function getVideoDataFromTooltipText(text) {
   let likes = 0
   let dislikes = 0
-  let match = text.match(/\s*([0-9,.]+)([^0-9,.]+)([0-9,.]+)/)
+  let match = text.match(/\s*([0-9,. ]+)([^0-9,. ]+)([0-9,. ]+)/)
   if (match && match.length >= 4) {
     likes = parseInt(match[1].replaceAll(/[^0-9]/g, ''), 10)
     dislikes = parseInt(match[3].replaceAll(/[^0-9]/g, ''), 10)
