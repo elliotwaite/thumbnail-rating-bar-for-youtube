@@ -419,7 +419,7 @@ function processNewThumbnails() {
 function getVideoDataFromTooltipText(text) {
   let likes = 0
   let dislikes = 0
-  let match = text.match(/\s*([0-9,. ]+)([^0-9,. ]+)([0-9,. ]+)/)
+  let match = text.match(/\s*([0-9,.\xA0]+)([^0-9,.\xA0]+)([0-9,.\xA0]+)/)
   if (match && match.length >= 4) {
     likes = parseInt(match[1].replaceAll(/[^0-9]/g, ''), 10)
     dislikes = parseInt(match[3].replaceAll(/[^0-9]/g, ''), 10)
@@ -432,7 +432,7 @@ function updateVideoRatingBar() {
     const tooltip = $(rydTooltip).find('#tooltip')
     const curText = $(tooltip).text()
 
-    // We add a zero width space to the end of any processed tooltip text to
+    // We add a zero-width space to the end of any processed tooltip text to
     // prevent it from being reprocessed.
     if (!curText.endsWith('\u200b')) {
       const videoData = getVideoDataFromTooltipText(curText)
