@@ -118,12 +118,17 @@ const DEFAULT_USER_SETTINGS = {
 let userSettings = DEFAULT_USER_SETTINGS
 
 function ratingToPercentage(rating) {
+  // When the rating is 100%, we display "100%" instead of "100.0%".
   if (rating === 1) {
-    return '100%'
+    return (100).toLocaleString() + '%'
   }
-  // Note: We use floor instead of round to ensure that anything lower than
-  // 100% does not display "100.0%".
-  return (Math.floor(rating * 1000) / 10).toFixed(1) + '%'
+
+  // We use `floor` instead of `round` to ensure that any rating lower than 100%
+  // does not round up to 100% and display as "100.0%".
+  return (Math.floor(rating * 1000) / 10).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + '%'
 }
 
 function getToolTipText(videoData) {
@@ -518,7 +523,7 @@ function updateVideoRatingBar() {
 
       if (userSettings.barTooltip && videoData) {
         $(tooltip).text(`${curText} \u00A0\u00A0 ` +
-          `${videoData.rating == null ? '0%' : ratingToPercentage(videoData.rating)} \u00A0\u00A0 ` +
+          `${ratingToPercentage(videoData.rating ?? 0)} \u00A0\u00A0 ` +
           `${videoData.total.toLocaleString()} total\u200b`)
       } else {
         $(tooltip).text(`${curText}\u200b`)
