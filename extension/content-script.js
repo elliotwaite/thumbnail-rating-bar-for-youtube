@@ -181,8 +181,8 @@ function getRatingPercentageHtml(videoData) {
   }
   const rgb = 'rgb(' + r + ',' + g + ',0)'
 
-  return '<span class="style-scope ytd-video-meta-block ytrb-percentage" style="color:' +
-      rgb + ' !important">' + ratingToPercentage(videoData.rating) + '</span>'
+  return '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage"><span style="color:' +
+      rgb + ' !important">' + ratingToPercentage(videoData.rating) + '</span></span>'
 }
 
 function getNewThumbnails() {
