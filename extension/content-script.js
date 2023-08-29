@@ -174,6 +174,14 @@ function getRatingBarHtml(videoData) {
 }
 
 function getRatingPercentageHtml(videoData) {
+  if (videoData.likes === 0) {
+    // Don't colorize the text percentage for videos with 0 likes, since that
+    // could mean that the creator of the video has disabled showing the like
+    // count for that video.
+    // See: https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/83
+    return '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage">' + ratingToPercentage(videoData.rating) + '</span>'
+  }
+
   const r = (1 - videoData.rating) * 1275
   let g = videoData.rating * 637.5 - 255
   if (!isDarkTheme) {
@@ -382,7 +390,12 @@ function addRatingPercentage(thumbnail, videoData) {
     }
 
     // Add new percentage.
-    if (videoData.rating != null) {
+    //
+    // We also check if the video has 0 likes and 10+ dislikes, since that
+    // probably means that the creator of the video has disabled showing the
+    // like count for that video.
+    // See: https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/83
+    if (videoData.rating != null && !(videoData.likes === 0 && videoData.dislikes >= 10)) {
       const ratingPercentageHtml = getRatingPercentageHtml(videoData)
       const lastSpan = metadataLine.children('span').last()
       if (lastSpan.length) {
