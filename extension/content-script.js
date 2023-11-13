@@ -10,20 +10,21 @@ let isPendingApiRetry = false
 let thumbnailsToRetry = []
 
 // Enum values for which YouTube theme is currently being viewed.
-let curTheme = 0  // No theme set yet.
-const THEME_MODERN = 1  // The new Material Design theme.
-const THEME_CLASSIC = 2  // The classic theme.
-const THEME_GAMING = 3  // The YouTube Gaming theme.
-const THEME_MOBILE = 4  // The YouTube mobile theme (m.youtube.com).
+let curTheme = 0 // No theme set yet.
+const THEME_MODERN = 1 // The new Material Design theme.
+const THEME_CLASSIC = 2 // The classic theme.
+const THEME_GAMING = 3 // The YouTube Gaming theme.
+const THEME_MOBILE = 4 // The YouTube mobile theme (m.youtube.com).
 const NUM_THEMES = 4
 
 // `isDarkTheme` will be true if the appearance setting is in dark theme mode.
-const isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-general-background-a') === ' #181818'
+const isDarkTheme =
+  getComputedStyle(document.body).getPropertyValue(
+    '--yt-spec-general-background-a',
+  ) === ' #181818'
 
-// We use these JQuery selectors to find new thumbnails on the page. We use
-// :not([data-ytrb-processed]) to make sure these aren't thumbnails that we've
-// already added a rating bar to. We need to check all combinations of these
-// modes and types:
+// We use these JQuery selectors to find new thumbnails on the page. We need to
+// check all combinations of these modes and types:
 //   Modes:
 //     * Classic (Can be enabled by add &disable_polymer=true to the URL)
 //     * Modern (The new Material Design theme)
@@ -50,54 +51,56 @@ const isDarkTheme = getComputedStyle(document.body).getPropertyValue('--yt-spec-
 // and where the link tag element is relative to the thumbnail element for
 // figuring out the video ID associated with that thumbnail.
 const THUMBNAIL_SELECTORS = []
-THUMBNAIL_SELECTORS[THEME_MODERN] = '' +
-    // All types except the video wall. The URL is on the selected a link.
-    // The mini-player thumbnail will not have an href attribute, which is why
-    // we require that it exists.
-    'a#thumbnail[href]'
+THUMBNAIL_SELECTORS[THEME_MODERN] =
+  '' +
+  // All types except the video wall. The URL is on the selected a link.
+  // The mini-player thumbnail will not have an href attribute, which is why
+  // we require that it exists.
+  'a#thumbnail[href]'
 
-THUMBNAIL_SELECTORS[THEME_CLASSIC] = '' +
-    // Search results videos. (url on parent)
-    // Creator's videos. (url on parent)
-    // Playlist page small thumbnails. (url on parent)
-    // Sidebar suggested playlist. (url on grandparent)
-    // Playing playlist small thumbnails. (url on parent)
-    '.video-thumb' +
-    ':not(.yt-thumb-20)' +
-    ':not(.yt-thumb-27)' +
-    ':not(.yt-thumb-32)' +
-    ':not(.yt-thumb-36)' +
-    ':not(.yt-thumb-48)' +
-    ':not(.yt-thumb-64), ' +
-    // (For search results, if a channel is in the results, it's thumbnail will
-    //  be caught by this selector, but won't have an matchable video URL.
-    //  Since this does not cause an error, it should be fine to ignore it.)
+THUMBNAIL_SELECTORS[THEME_CLASSIC] =
+  '' +
+  // Search results videos. (url on parent)
+  // Creator's videos. (url on parent)
+  // Playlist page small thumbnails. (url on parent)
+  // Sidebar suggested playlist. (url on grandparent)
+  // Playing playlist small thumbnails. (url on parent)
+  '.video-thumb' +
+  ':not(.yt-thumb-20)' +
+  ':not(.yt-thumb-27)' +
+  ':not(.yt-thumb-32)' +
+  ':not(.yt-thumb-36)' +
+  ':not(.yt-thumb-48)' +
+  ':not(.yt-thumb-64), ' +
+  // (For search results, if a channel is in the results, it's thumbnail will
+  //  be caught by this selector, but won't have an matchable video URL.
+  //  Since this does not cause an error, it should be fine to ignore it.)
 
-    // Sidebar suggested video. (url on first child)
-    '.thumb-wrapper, ' +
+  // Sidebar suggested video. (url on first child)
+  '.thumb-wrapper, ' +
+  // Playlist page big thumbnail. (url on second child)
+  '.pl-header-thumb'
 
-    // Playlist page big thumbnail. (url on second child)
-    '.pl-header-thumb'
+THUMBNAIL_SELECTORS[THEME_GAMING] =
+  '' +
+  // Gaming all types except video wall. URL is on the great-grandparent,
+  // except for search result playlists it is on the grandparent.
+  'ytg-thumbnail' +
+  ':not([avatar])' +
+  ':not(.avatar)' +
+  ':not(.ytg-user-avatar)' +
+  ':not(.ytg-box-art)' +
+  ':not(.ytg-compact-gaming-event-renderer)' +
+  ':not(.ytg-playlist-header-renderer)'
 
-THUMBNAIL_SELECTORS[THEME_GAMING] = '' +
-    // Gaming all types except video wall. URL is on the great-grandparent,
-    // except for search result playlists it is on the grandparent.
-    'ytg-thumbnail' +
-    ':not([avatar])' +
-    ':not(.avatar)' +
-    ':not(.ytg-user-avatar)' +
-    ':not(.ytg-box-art)' +
-    ':not(.ytg-compact-gaming-event-renderer)' +
-    ':not(.ytg-playlist-header-renderer)'
-
-THUMBNAIL_SELECTORS[THEME_MOBILE] = '' +
-    'a.media-item-thumbnail-container, ' +
-    'a.compact-media-item-image, ' +
-    'a.video-card-image'
+THUMBNAIL_SELECTORS[THEME_MOBILE] =
+  '' +
+  'a.media-item-thumbnail-container, ' +
+  'a.compact-media-item-image, ' +
+  'a.video-card-image'
 
 // All themes use this selector for video wall videos.
-const THUMBNAIL_SELECTOR_VIDEOWALL = '' +
-    'a.ytp-videowall-still'
+const THUMBNAIL_SELECTOR_VIDEOWALL = '' + 'a.ytp-videowall-still'
 
 // The default user settings. `userSettings` is replaced with the stored user's
 // settings once they are loaded.
@@ -125,17 +128,25 @@ function ratingToPercentage(rating) {
 
   // We use `floor` instead of `round` to ensure that any rating lower than 100%
   // does not round up to 100% and display as "100.0%".
-  return (Math.floor(rating * 1000) / 10).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }) + '%'
+  return (
+    (Math.floor(rating * 1000) / 10).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }) + '%'
+  )
 }
 
 function getToolTipText(videoData) {
-  return videoData.likes.toLocaleString() + '&nbsp;/&nbsp;' +
-    videoData.dislikes.toLocaleString() + ' &nbsp;&nbsp; ' +
-    ratingToPercentage(videoData.rating) + ' &nbsp;&nbsp; ' +
-    videoData.total.toLocaleString() + '&nbsp;total'
+  return (
+    videoData.likes.toLocaleString() +
+    '&nbsp;/&nbsp;' +
+    videoData.dislikes.toLocaleString() +
+    ' &nbsp;&nbsp; ' +
+    ratingToPercentage(videoData.rating) +
+    ' &nbsp;&nbsp; ' +
+    videoData.total.toLocaleString() +
+    '&nbsp;total'
+  )
 }
 
 function exponentialRatingWidthPercentage(rating) {
@@ -153,24 +164,29 @@ function getRatingBarHtml(videoData) {
     } else {
       likesWidthPercentage = 100 * videoData.rating
     }
-    ratingElement = '<ytrb-rating>' +
-                      '<ytrb-likes style="width:' + likesWidthPercentage + '%"></ytrb-likes>' +
-                      '<ytrb-dislikes></ytrb-dislikes>' +
-                    '</ytrb-rating>'
+    ratingElement =
+      '<ytrb-rating>' +
+      '<ytrb-likes style="width:' +
+      likesWidthPercentage +
+      '%"></ytrb-likes>' +
+      '<ytrb-dislikes></ytrb-dislikes>' +
+      '</ytrb-rating>'
   }
 
-  return '<ytrb-bar' +
-      (userSettings.barOpacity !== 100
-          ? ' style="opacity:' + (userSettings.barOpacity / 100) + '"'
-          : ''
-      ) +
-      '>' +
-      ratingElement +
-      (userSettings.barTooltip
-          ? '<ytrb-tooltip><div>' + getToolTipText(videoData) + '</div></ytrb-tooltip>'
-          : ''
-      ) +
-      '</ytrb-bar>'
+  return (
+    '<ytrb-bar' +
+    (userSettings.barOpacity !== 100
+      ? ' style="opacity:' + userSettings.barOpacity / 100 + '"'
+      : '') +
+    '>' +
+    ratingElement +
+    (userSettings.barTooltip
+      ? '<ytrb-tooltip><div>' +
+        getToolTipText(videoData) +
+        '</div></ytrb-tooltip>'
+      : '') +
+    '</ytrb-bar>'
+  )
 }
 
 function getRatingPercentageHtml(videoData) {
@@ -179,7 +195,11 @@ function getRatingPercentageHtml(videoData) {
     // could mean that the creator of the video has disabled showing the like
     // count for that video.
     // See: https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/83
-    return '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage">' + ratingToPercentage(videoData.rating) + '</span>'
+    return (
+      '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage">' +
+      ratingToPercentage(videoData.rating) +
+      '</span>'
+    )
   }
 
   const r = (1 - videoData.rating) * 1275
@@ -189,8 +209,13 @@ function getRatingPercentageHtml(videoData) {
   }
   const rgb = 'rgb(' + r + ',' + g + ',0)'
 
-  return '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage"><span style="color:' +
-      rgb + ' !important">' + ratingToPercentage(videoData.rating) + '</span></span>'
+  return (
+    '<span class="style-scope ytd-video-meta-block ytd-grid-video-renderer ytrb-percentage"><span style="color:' +
+    rgb +
+    ' !important">' +
+    ratingToPercentage(videoData.rating) +
+    '</span></span>'
+  )
 }
 
 function getNewThumbnails() {
@@ -216,27 +241,27 @@ function getThumbnailsAndIds(thumbnails) {
   // Finds the video ID associated with each thumbnail and returns an array of
   // arrays of [thumbnail element, video ID string].
   const thumbnailsAndVideoIds = []
-  $(thumbnails).each(function(_, thumbnail) {
+  $(thumbnails).each(function (_, thumbnail) {
     // Find the link tag element of the thumbnail and its URL.
     let url
     if (curTheme === THEME_MODERN) {
       // The URL should be on the current element.
       url = $(thumbnail).attr('href')
-
     } else if (curTheme === THEME_CLASSIC) {
       // Check the current element, then the parent, then the grandparent,
       // then the first child, then the second child.
-      url = $(thumbnail).attr('href')
-          || $(thumbnail).parent().attr('href')
-          || $(thumbnail).parent().parent().attr('href')
-          || $(thumbnail).children(':first').attr('href')
-          || $(thumbnail).children(':first').next().attr('href')
-
+      url =
+        $(thumbnail).attr('href') ||
+        $(thumbnail).parent().attr('href') ||
+        $(thumbnail).parent().parent().attr('href') ||
+        $(thumbnail).children(':first').attr('href') ||
+        $(thumbnail).children(':first').next().attr('href')
     } else if (curTheme === THEME_GAMING) {
       // Check the current element, then the grandparent.
-      url = $(thumbnail).attr('href')
-          || $(thumbnail).parent().parent().attr('href')
-          || $(thumbnail).parent().parent().parent().attr('href')
+      url =
+        $(thumbnail).attr('href') ||
+        $(thumbnail).parent().parent().attr('href') ||
+        $(thumbnail).parent().parent().parent().attr('href')
 
       // Unless the element is a video wall thumbnail, change the thumbnail
       // element to the parent element, so that it will show over the thumbnail
@@ -244,7 +269,6 @@ function getThumbnailsAndIds(thumbnails) {
       if (!$(thumbnail).is('a')) {
         thumbnail = $(thumbnail).parent()
       }
-
     } else if (curTheme === THEME_MOBILE) {
       // The URL should be on the current element.
       url = $(thumbnail).attr('href')
@@ -255,7 +279,6 @@ function getThumbnailsAndIds(thumbnails) {
       if ($(firstChild).is('.video-thumbnail-container-compact')) {
         thumbnail = firstChild
       }
-
     } else {
       // The theme may not be set if only video-wall thumbnails were found.
       url = $(thumbnail).attr('href')
@@ -266,7 +289,7 @@ function getThumbnailsAndIds(thumbnails) {
     }
 
     // Check if this thumbnail was previously found.
-    const previousUrl = $(thumbnail).attr('data-ytrb-processed')
+    const previousUrl = $(thumbnail).attr('data-ytrb-url')
     if (previousUrl) {
       // Check if this thumbnail is for the same URL as previously.
       if (previousUrl === url) {
@@ -288,12 +311,15 @@ function getThumbnailsAndIds(thumbnails) {
         $(thumbnail).removeAttr('data-ytrb-retries')
       }
     }
-    // Add an attribute that marks this thumbnail as found, and give it the
-    // value of the URL the thumbnail is for.
-    $(thumbnail).attr('data-ytrb-processed', url)
+
+    // Save the URL that corresponds with this thumbnail in a separate
+    // attribute so that we can check if the URL has changed in the future, in
+    // which case we'll have to update the rating bar.
+    $(thumbnail).attr('data-ytrb-url', url)
 
     // Extract the video ID from the URL.
-    const match = url.match(/.*[?&]v=([^&]+).*/)
+    const match =
+      url.match(/.*[?&]v=([^&]+).*/) || url.match(/^\/shorts\/(.+)$/)
     if (match) {
       const id = match[1]
       thumbnailsAndVideoIds.push([thumbnail, id])
@@ -319,12 +345,12 @@ function retryProcessingThumbnailInTheFuture(thumbnail) {
     isPendingApiRetry = true
     setTimeout(() => {
       isPendingApiRetry = false
-      thumbnailsToRetry.forEach(thumbnail => {
+      thumbnailsToRetry.forEach((thumbnail) => {
         const retriesAttr = $(thumbnail).attr('data-ytrb-retries')
         const retriesNum = retriesAttr ? Number.parseInt(retriesAttr, 10) : 0
         if (retriesNum < MAX_RETRIES_PER_THUMBNAIL) {
           $(thumbnail).attr('data-ytrb-retries', retriesNum + 1)
-          $(thumbnail).removeAttr('data-ytrb-processed')
+          $(thumbnail).removeAttr('data-ytrb-url')
           hasUnseenDomMutations = true
         }
       })
@@ -339,9 +365,9 @@ function retryProcessingThumbnailInTheFuture(thumbnail) {
 }
 
 function getVideoData(thumbnail, videoId) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     chrome.runtime.sendMessage(
-      {query: 'videoApiRequest', videoId: videoId},
+      { query: 'videoApiRequest', videoId: videoId },
       (likesData) => {
         if (likesData === null) {
           // The API request failed, which is usually due to rate limiting, so
@@ -351,7 +377,7 @@ function getVideoData(thumbnail, videoId) {
         } else {
           resolve(getVideoDataObject(likesData.likes, likesData.dislikes))
         }
-      }
+      },
     )
   })
 }
@@ -365,17 +391,23 @@ function addRatingPercentage(thumbnail, videoData) {
   // Add the rating text percentage below or next to the thumbnail.
   let metadataLine
   if (curTheme === THEME_MOBILE) {
-    metadataLine = $(thumbnail).closest('ytm-media-item').find('ytm-badge-and-byline-renderer').last()
+    metadataLine = $(thumbnail)
+      .closest('ytm-media-item')
+      .find('ytm-badge-and-byline-renderer')
+      .last()
   } else {
-    metadataLine = $(thumbnail).closest(
-      '.ytd-rich-item-renderer, ' +  // Home page.
-      '.ytd-grid-renderer, ' +  // Trending and subscriptions page.
-      '.ytd-expanded-shelf-contents-renderer, ' +  // Subscriptions page.
-      '.yt-horizontal-list-renderer, ' +  // Channel page.
-      '.ytd-item-section-renderer, ' +  // History page.
-      '.ytd-horizontal-card-list-renderer, ' +  // Gaming page.
-      '.ytd-playlist-video-list-renderer' // Playlist page.
-    ).find('#metadata-line').last()
+    metadataLine = $(thumbnail)
+      .closest(
+        '.ytd-rich-item-renderer, ' + // Home page.
+          '.ytd-grid-renderer, ' + // Trending and subscriptions page.
+          '.ytd-expanded-shelf-contents-renderer, ' + // Subscriptions page.
+          '.yt-horizontal-list-renderer, ' + // Channel page.
+          '.ytd-item-section-renderer, ' + // History page.
+          '.ytd-horizontal-card-list-renderer, ' + // Gaming page.
+          '.ytd-playlist-video-list-renderer', // Playlist page.
+      )
+      .find('#metadata-line')
+      .last()
   }
 
   if (metadataLine) {
@@ -384,7 +416,9 @@ function addRatingPercentage(thumbnail, videoData) {
       oldPercentage.remove()
     }
     if (curTheme === THEME_MOBILE) {
-      for (const oldPercentage of metadataLine.children('.ytrb-percentage-separator')) {
+      for (const oldPercentage of metadataLine.children(
+        '.ytrb-percentage-separator',
+      )) {
         oldPercentage.remove()
       }
     }
@@ -395,14 +429,19 @@ function addRatingPercentage(thumbnail, videoData) {
     // probably means that the creator of the video has disabled showing the
     // like count for that video.
     // See: https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/83
-    if (videoData.rating != null && !(videoData.likes === 0 && videoData.dislikes >= 10)) {
+    if (
+      videoData.rating != null &&
+      !(videoData.likes === 0 && videoData.dislikes >= 10)
+    ) {
       const ratingPercentageHtml = getRatingPercentageHtml(videoData)
       const lastSpan = metadataLine.children('span').last()
       if (lastSpan.length) {
         lastSpan.after(ratingPercentageHtml)
         if (curTheme === THEME_MOBILE) {
           // On mobile, we have to add the separator dot manually.
-          lastSpan.after('<span class="ytm-badge-and-byline-separator ytrb-percentage-separator" aria-hidden="true">•</span>')
+          lastSpan.after(
+            '<span class="ytm-badge-and-byline-separator ytrb-percentage-separator" aria-hidden="true">•</span>',
+          )
         }
       } else {
         // This handles metadata lines that are initially empty, which
@@ -410,7 +449,9 @@ function addRatingPercentage(thumbnail, videoData) {
         // as an empty meta block element to add a separating dot before the
         // rating percentage.
         metadataLine.prepend(ratingPercentageHtml)
-        metadataLine.prepend('<span class="style-scope ytd-video-meta-block"></span>')
+        metadataLine.prepend(
+          '<span class="style-scope ytd-video-meta-block"></span>',
+        )
       }
     }
   }
@@ -421,7 +462,7 @@ function processNewThumbnails() {
   const thumbnailsAndVideoIds = getThumbnailsAndIds(thumbnails)
 
   for (const [thumbnail, videoId] of thumbnailsAndVideoIds) {
-    getVideoData(thumbnail, videoId).then(videoData => {
+    getVideoData(thumbnail, videoId).then((videoData) => {
       if (videoData !== null) {
         if (userSettings.barHeight !== 0) {
           addRatingBar(thumbnail, videoData)
@@ -459,37 +500,37 @@ function processNewThumbnails() {
 //   )
 //
 const NUMBERING_SYSTEM_DIGIT_STRINGS = [
-  "٠١٢٣٤٥٦٧٨٩",
-  "۰۱۲۳۴۵۶۷۸۹",
-  "᭐᭑᭒᭓᭔᭕᭖᭗᭘᭙",
-  "০১২৩৪৫৬৭৮৯",
-  "०१२३४५६७८९",
-  "０１２３４５６７８９",
-  "૦૧૨૩૪૫૬૭૮૯",
-  "੦੧੨੩੪੫੬੭੮੯",
-  "〇一二三四五六七八九",
-  "០១២៣៤៥៦៧៨៩",
-  "೦೧೨೩೪೫೬೭೮೯",
-  "໐໑໒໓໔໕໖໗໘໙",
-  "0123456789",
-  "᥆᥇᥈᥉᥊᥋᥌᥍᥎᥏",
-  "൦൧൨൩൪൫൬൭൮൯",
-  "᠐᠑᠒᠓᠔᠕᠖᠗᠘᠙",
-  "၀၁၂၃၄၅၆၇၈၉",
-  "୦୧୨୩୪୫୬୭୮୯",
-  "௦௧௨௩௪௫௬௭௮௯",
-  "౦౧౨౩౪౫౬౭౮౯",
-  "๐๑๒๓๔๕๖๗๘๙",
-  "༠༡༢༣༤༥༦༧༨༩",
+  '٠١٢٣٤٥٦٧٨٩',
+  '۰۱۲۳۴۵۶۷۸۹',
+  '᭐᭑᭒᭓᭔᭕᭖᭗᭘᭙',
+  '০১২৩৪৫৬৭৮৯',
+  '०१२३४५६७८९',
+  '０１２３４５６７８９',
+  '૦૧૨૩૪૫૬૭૮૯',
+  '੦੧੨੩੪੫੬੭੮੯',
+  '〇一二三四五六七八九',
+  '០១២៣៤៥៦៧៨៩',
+  '೦೧೨೩೪೫೬೭೮೯',
+  '໐໑໒໓໔໕໖໗໘໙',
+  '0123456789',
+  '᥆᥇᥈᥉᥊᥋᥌᥍᥎᥏',
+  '൦൧൨൩൪൫൬൭൮൯',
+  '᠐᠑᠒᠓᠔᠕᠖᠗᠘᠙',
+  '၀၁၂၃၄၅၆၇၈၉',
+  '୦୧୨୩୪୫୬୭୮୯',
+  '௦௧௨௩௪௫௬௭௮௯',
+  '౦౧౨౩౪౫౬౭౮౯',
+  '๐๑๒๓๔๕๖๗๘๙',
+  '༠༡༢༣༤༥༦༧༨༩',
 ]
 
 function parseInternationalInt(string) {
   // Parses an internationalized integer string (e.g. "1,234" or "١٬٢٣٤") into a
   // JavaScript integer.
-  string = string.replace(/[\s,.]/g, "")
+  string = string.replace(/[\s,.]/g, '')
 
   if (/[^0-9]/.test(string)) {
-    let newString = ""
+    let newString = ''
     for (const char of string) {
       for (const digitString of NUMBERING_SYSTEM_DIGIT_STRINGS) {
         const index = digitString.indexOf(char)
@@ -525,7 +566,7 @@ function getVideoDataFromTooltipText(text) {
 }
 
 function updateVideoRatingBar() {
-  $('.ryd-tooltip').each(function(_, rydTooltip) {
+  $('.ryd-tooltip').each(function (_, rydTooltip) {
     const tooltip = $(rydTooltip).find('#tooltip')
     const curText = $(tooltip).text()
 
@@ -535,15 +576,18 @@ function updateVideoRatingBar() {
       const videoData = getVideoDataFromTooltipText(curText)
 
       if (userSettings.barTooltip && videoData) {
-        $(tooltip).text(`${curText} \u00A0\u00A0 ` +
-          `${ratingToPercentage(videoData.rating ?? 0)} \u00A0\u00A0 ` +
-          `${videoData.total.toLocaleString()} total\u200b`)
+        $(tooltip).text(
+          `${curText} \u00A0\u00A0 ` +
+            `${ratingToPercentage(videoData.rating ?? 0)} \u00A0\u00A0 ` +
+            `${videoData.total.toLocaleString()} total\u200b`,
+        )
       } else {
         $(tooltip).text(`${curText}\u200b`)
       }
 
       if (userSettings.useExponentialScaling && videoData && videoData.rating) {
-        $(rydTooltip).find('#ryd-bar')[0].style.width =  exponentialRatingWidthPercentage(videoData.rating) + '%'
+        $(rydTooltip).find('#ryd-bar')[0].style.width =
+          exponentialRatingWidthPercentage(videoData.rating) + '%'
       }
     }
   })
@@ -570,7 +614,7 @@ function handleDomMutations() {
 
     hasUnseenDomMutations = false
 
-    setTimeout(function() {
+    setTimeout(function () {
       // After the timeout, turn off throttling.
       domMutationsAreThrottled = false
 
@@ -578,7 +622,6 @@ function handleDomMutations() {
       if (hasUnseenDomMutations) {
         handleDomMutations()
       }
-
     }, HANDLE_DOM_MUTATIONS_THROTTLE_MS)
   }
 }
@@ -586,7 +629,7 @@ function handleDomMutations() {
 // An observer for watching changes to the body element.
 const mutationObserver = new MutationObserver(handleDomMutations)
 
-chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
+chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function (storedSettings) {
   // In Firefox, `storedSettings` will be undeclared if not previously set.
   if (storedSettings) {
     userSettings = storedSettings
@@ -631,38 +674,65 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function(storedSettings) {
     })
   }
 
-  document.documentElement.style.setProperty('--ytrb-bar-height', userSettings.barHeight + 'px')
-  document.documentElement.style.setProperty('--ytrb-bar-opacity',  userSettings.barOpacity / 100)
+  document.documentElement.style.setProperty(
+    '--ytrb-bar-height',
+    userSettings.barHeight + 'px',
+  )
+  document.documentElement.style.setProperty(
+    '--ytrb-bar-opacity',
+    userSettings.barOpacity / 100,
+  )
 
   if (userSettings.barColor === 'blue-gray') {
-    document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#3095e3')
-    document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#cfcfcf')
-    document.documentElement.style.setProperty('--ytrb-bar-likes-shadow', 'none')
-    document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'none')
-  } else if (userSettings.barColor === 'green-red') {
-    document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#060')
-    document.documentElement.style.setProperty('--ytrb-bar-dislikes-color', '#c00')
-    document.documentElement.style.setProperty('--ytrb-bar-likes-shadow', '1px 0 #fff')
-    document.documentElement.style.setProperty('--ytrb-bar-dislikes-shadow', 'inset 1px 0 #fff')
-  } else if (userSettings.barColor === 'custom-colors') {
     document.documentElement.style.setProperty(
       '--ytrb-bar-likes-color',
-      userSettings.barLikesColor
+      '#3095e3',
     )
     document.documentElement.style.setProperty(
       '--ytrb-bar-dislikes-color',
-      userSettings.barDislikesColor
+      '#cfcfcf',
     )
     document.documentElement.style.setProperty(
       '--ytrb-bar-likes-shadow',
-      userSettings.barColorsSeparator ? '1px 0 #fff' : 'none'
+      'none',
     )
     document.documentElement.style.setProperty(
       '--ytrb-bar-dislikes-shadow',
-      userSettings.barColorsSeparator ? 'inset 1px 0 #fff' : 'none'
+      'none',
+    )
+  } else if (userSettings.barColor === 'green-red') {
+    document.documentElement.style.setProperty('--ytrb-bar-likes-color', '#060')
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-color',
+      '#c00',
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-likes-shadow',
+      '1px 0 #fff',
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-shadow',
+      'inset 1px 0 #fff',
+    )
+  } else if (userSettings.barColor === 'custom-colors') {
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-likes-color',
+      userSettings.barLikesColor,
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-color',
+      userSettings.barDislikesColor,
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-likes-shadow',
+      userSettings.barColorsSeparator ? '1px 0 #fff' : 'none',
+    )
+    document.documentElement.style.setProperty(
+      '--ytrb-bar-dislikes-shadow',
+      userSettings.barColorsSeparator ? 'inset 1px 0 #fff' : 'none',
     )
   }
 
   handleDomMutations()
-  mutationObserver.observe(document.body, {childList: true, subtree: true})
+  mutationObserver.observe(document.body, { childList: true, subtree: true })
 })

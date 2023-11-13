@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Thumbnail Rating Bar for YouTube™",
-  "version": "1.8.14",
+  "version": "1.8.15",
   "description": "Displays a rating bar (likes/dislikes) on the bottom of every YouTube™ video thumbnail.",
   "author": "Elliot Waite",
   "icons": {
@@ -40,22 +40,24 @@
     "*://*.youtube.com/*",
     "*://*.returnyoutubedislikeapi.com/*"
   ],
-  "web_accessible_resources": [{
-    "resources": [
-      "css/bar-blue-gray.css",
-      "css/bar-blue-gray-video-page.css",
-      "css/bar-bottom-separator.css",
-      "css/bar-bottom-tooltip.css",
-      "css/bar-bottom.css",
-      "css/bar-green-red.css",
-      "css/bar-green-red-video-page.css",
-      "css/bar-tooltip.css",
-      "css/bar-top-separator.css",
-      "css/bar-top-tooltip.css",
-      "css/bar-top.css",
-      "css/bar.css"
-    ],
-    "matches": [],
-    "extension_ids": []
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "css/bar-blue-gray.css",
+        "css/bar-blue-gray-video-page.css",
+        "css/bar-bottom-separator.css",
+        "css/bar-bottom-tooltip.css",
+        "css/bar-bottom.css",
+        "css/bar-green-red.css",
+        "css/bar-green-red-video-page.css",
+        "css/bar-tooltip.css",
+        "css/bar-top-separator.css",
+        "css/bar-top-tooltip.css",
+        "css/bar-top.css",
+        "css/bar.css"
+      ],
+      "matches": [],
+      "extension_ids": []
+    }
+  ]
 }
