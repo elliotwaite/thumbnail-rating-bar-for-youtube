@@ -17,6 +17,8 @@ const THEME_GAMING = 3 // The YouTube Gaming theme.
 const THEME_MOBILE = 4 // The YouTube mobile theme (m.youtube.com).
 const NUM_THEMES = 4
 
+const ADD_RATING_BAR_TO_SHORTS = false
+
 // `isDarkTheme` will be true if the appearance setting is in dark theme mode.
 const isDarkTheme =
   getComputedStyle(document.body).getPropertyValue(
@@ -319,7 +321,8 @@ function getThumbnailsAndIds(thumbnails) {
 
     // Extract the video ID from the URL.
     const match =
-      url.match(/.*[?&]v=([^&]+).*/) || url.match(/^\/shorts\/(.+)$/)
+      url.match(/.*[?&]v=([^&]+).*/) ||
+      (ADD_RATING_BAR_TO_SHORTS && url.match(/^\/shorts\/(.+)$/))
     if (match) {
       const id = match[1]
       thumbnailsAndVideoIds.push([thumbnail, id])
