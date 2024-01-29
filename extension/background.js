@@ -3,10 +3,10 @@
 
 let cache = {}
 let cacheTimes = []
-let cacheDuration = 600000  // Default is 10 mins.
+let cacheDuration = 600000 // Default is 10 mins.
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get({cacheDuration: 600000}, function(settings) {
+  chrome.storage.sync.get({ cacheDuration: 600000 }, function (settings) {
     if (settings && settings.cacheDuration !== undefined) {
       cacheDuration = settings.cacheDuration
     }
@@ -38,24 +38,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       // Otherwise, fetch new data and cache it.
-      fetch('https://returnyoutubedislikeapi.com/Votes?videoId=' + message.videoId)
-        .then(response => {
-          if (!response.ok) {
-            sendResponse(null)
-          } else {
-            response.json().then(data => {
-              const likesData = {
-                'likes': data.likes,
-                'dislikes': data.dislikes,
-              }
-              if (!(message.videoId in cache)) {
-                cache[message.videoId] = likesData
-                cacheTimes.push([Date.now(), message.videoId])
-              }
-              sendResponse(likesData)
-            })
-          }
-        })
+      fetch(
+        'https://returnyoutubedislikeapi.com/Votes?videoId=' + message.videoId,
+      ).then((response) => {
+        if (!response.ok) {
+          sendResponse(null)
+        } else {
+          response.json().then((data) => {
+            const likesData = {
+              likes: data.likes,
+              dislikes: data.dislikes,
+            }
+            if (!(message.videoId in cache)) {
+              cache[message.videoId] = likesData
+              cacheTimes.push([Date.now(), message.videoId])
+            }
+            sendResponse(likesData)
+          })
+        }
+      })
 
       // Returning `true` signals to the browser that we will send our
       // response asynchronously using `sendResponse()`.
