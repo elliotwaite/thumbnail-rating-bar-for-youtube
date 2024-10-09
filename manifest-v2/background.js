@@ -4,6 +4,25 @@
 let cache = {}
 let cacheTimes = []
 let cacheDuration = 600000 // Default is 10 mins.
+let videoApiRequestCallbacks = {}
+
+function removeExpiredCacheData() {
+  const now = Date.now()
+  let numRemoved = 0
+
+  for (const [fetchTime, videoId] of cacheTimes) {
+    if (now - fetchTime > cacheDuration) {
+      delete cache[videoId]
+      numRemoved++
+    } else {
+      break
+    }
+  }
+
+  if (numRemoved > 0) {
+    cacheTimes = cacheTimes.slice(numRemoved)
+  }
+}
 
 chrome.storage.local.get({ cacheDuration: 600000 }, function (settings) {
   if (settings && settings.cacheDuration !== undefined) {
@@ -13,60 +32,64 @@ chrome.storage.local.get({ cacheDuration: 600000 }, function (settings) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.query) {
-    case 'videoApiRequest':
-      // Remove expired cache data.
-      const now = Date.now()
-      let numRemoved = 0
-      for (const [fetchTime, videoId] of cacheTimes) {
-        if (now - fetchTime > cacheDuration) {
-          delete cache[videoId]
-          numRemoved++
-        } else {
-          break
-        }
-      }
-      if (numRemoved > 0) {
-        cacheTimes = cacheTimes.slice(numRemoved)
-      }
+    case "videoApiRequest":
+      removeExpiredCacheData()
 
+      // If the data is in the cache, return it.
       if (message.videoId in cache) {
-        // Use cached data if it exists.
+        // Return the cached data if it exists.
         sendResponse(cache[message.videoId])
         return
       }
 
-      // Otherwise, fetch new data and cache it.
-      fetch(
-        'https://returnyoutubedislikeapi.com/Votes?videoId=' + message.videoId,
-      ).then((response) => {
-        if (!response.ok) {
-          sendResponse(null)
-        } else {
-          response.json().then((data) => {
-            const likesData = {
-              likes: data.likes,
-              dislikes: data.dislikes,
-            }
-            if (!(message.videoId in cache)) {
-              cache[message.videoId] = likesData
+      if (message.videoId in videoApiRequestCallbacks) {
+        // If a request for the same video ID is already in progress, add the
+        // current `sendResponse` function to the `videoApiRequestCallbacks`
+        // array for this video ID.
+        videoApiRequestCallbacks[message.videoId].push(sendResponse)
+      } else {
+        // Otherwise, insert a new callbacks array for this video ID, then
+        // start a new request to fetch the likes/dislikes data.
+        videoApiRequestCallbacks[message.videoId] = [sendResponse]
+
+        fetch(
+          "https://returnyoutubedislikeapi.com/Votes?videoId=" +
+            message.videoId,
+        )
+          .then(
+            (response) =>
+              response.ok
+                ? response.json().then((data) => ({
+                    likes: data.likes,
+                    dislikes: data.dislikes,
+                  }))
+                : null, // If the response failed, we return `null`.
+          )
+          .then((data) => {
+            if (data !== null) {
+              cache[message.videoId] = data
               cacheTimes.push([Date.now(), message.videoId])
             }
-            sendResponse(likesData)
+
+            for (const callback of videoApiRequestCallbacks[message.videoId]) {
+              callback(data)
+            }
+
+            delete videoApiRequestCallbacks[message.videoId]
           })
-        }
-      })
+      }
 
       // Returning `true` signals to the browser that we will send our
       // response asynchronously using `sendResponse()`.
       return true
 
-    case 'insertCss':
+    case "insertCss":
       for (const file of message.files) {
         chrome.tabs.insertCSS(sender.tab.id, { file })
       }
       break
 
-    case 'updateSettings':
+    case "updateSettings":
       cacheDuration = message.cacheDuration
       break
   }
