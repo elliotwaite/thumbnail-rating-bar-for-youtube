@@ -4,7 +4,7 @@
 let cache = {}
 let cacheTimes = []
 let cacheDuration = 600000 // Default is 10 mins.
-let videoApiRequestCallbacks = {}
+let getLikesDataCallbacks = {}
 
 function removeExpiredCacheData() {
   const now = Date.now()
@@ -34,7 +34,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.query) {
-    case "videoApiRequest":
+    case "getLikesData":
       removeExpiredCacheData()
 
       // If the data is in the cache, return it.
@@ -44,15 +44,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return
       }
 
-      if (message.videoId in videoApiRequestCallbacks) {
+      if (message.videoId in getLikesDataCallbacks) {
         // If a request for the same video ID is already in progress, add the
-        // current `sendResponse` function to the `videoApiRequestCallbacks`
+        // current `sendResponse` function to the `getLikesDataCallbacks`
         // array for this video ID.
-        videoApiRequestCallbacks[message.videoId].push(sendResponse)
+        getLikesDataCallbacks[message.videoId].push(sendResponse)
       } else {
         // Otherwise, insert a new callbacks array for this video ID, then
         // start a new request to fetch the likes/dislikes data.
-        videoApiRequestCallbacks[message.videoId] = [sendResponse]
+        getLikesDataCallbacks[message.videoId] = [sendResponse]
 
         fetch(
           "https://returnyoutubedislikeapi.com/Votes?videoId=" +
@@ -73,11 +73,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               cacheTimes.push([Date.now(), message.videoId])
             }
 
-            for (const callback of videoApiRequestCallbacks[message.videoId]) {
+            for (const callback of getLikesDataCallbacks[message.videoId]) {
               callback(data)
             }
 
-            delete videoApiRequestCallbacks[message.videoId]
+            delete getLikesDataCallbacks[message.videoId]
           })
       }
 

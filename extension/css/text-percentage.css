@@ -1,0 +1,21 @@
+.ytrb-percentage::before {
+    content: "•";
+    margin: 0 4px;
+}
+
+/* YouTube mobile home page. */
+ytm-badge-and-byline-renderer .ytrb-percentage::before {
+    margin: 0 4px 0 0;
+}
+
+/* YouTube mobile profile page my videos. */
+.compact-media-item-stats~.compact-media-item-stats.ytrb-percentage::before {
+    margin: 0;
+}
+
+/* By using :where(), this selector has zero specificity, so it will only set
+the color if not already been set, which is the case for the Your Courses page
+playlist videos. */
+:where(.ytrb-percentage) {
+    color: var(--yt-spec-text-secondary);
+}

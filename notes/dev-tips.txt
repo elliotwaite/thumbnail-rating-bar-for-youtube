@@ -1,0 +1,10 @@
+Dev tips:
+
+To have the developer tools window auto open for new tabs, quite Chrome, then
+re-open it by running one of the following commands in a terminal:
+
+  On mac:
+  $ open -a "Google Chrome" --args --auto-open-devtools-for-tabs
+
+  On Windows:
+  $ "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --auto-open-devtools-for-tabs

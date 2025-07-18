@@ -1,0 +1,53 @@
+To ensure the extension is working correctly, we need to test it on both the desktop
+and mobile for all these URLs:
+- Desktop: http://www.youtube.com
+- Mobile: http://m.youtube.com
+- Music: http://music.youtube.com
+- Kids: https://www.youtubekids.com
+
+And we need to make sure the rating bars and text percentages are being added
+correctly in all of the locations below. Text percentages should be shown next
+to all thumbnails where possible, unless the thumbnail represents a collection
+of videos, like the big thumbnail on the left side of the playlist page.
+
+Locations to check:
+
+---
+- Home page
+- Shorts
+- Subscriptions
+---
+You:
+- History
+- Playlists
+- Your videos
+- Your movies
+- Your courses
+- Your podcasts
+- Watch later
+- Liked videos
+- Your clips
+---
+Explore:
+- Trending
+- Music
+- Movies
+- Gaming
+- News
+- Sports
+---
+Profile:
+- Profile Home
+- Profile Videos
+- Profile Shorts
+- Profile Live
+- Profile Podcasts
+- Profile Playlists
+- Profile Posts
+- Profile Store
+---
+- Search results
+- Video page
+- Sidebar suggested videos
+- Playlist page small thumbnails
+- Video wall (the wall of suggested videos shown when a video ends)
