@@ -213,7 +213,14 @@ function removeOldPercentages(element) {
 // - The CSS selector for the metadata line element.
 // - The classes that should be added to the inserted percentage text span.
 const METADATA_LINE_DATA_DESKTOP = [
-  // - Homepage videos
+  // - Homepage videos v1.
+  [
+    "yt-lockup-view-model",
+    ".yt-content-metadata-view-model__metadata-row:last-child",
+    "yt-core-attributed-string yt-content-metadata-view-model__metadata-text yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
+  ],
+  // - Homepage videos v2 (this version may not be used anymore, but I'm not
+  //   sure, so I'm keeping it for now).
   [
     "ytd-rich-grid-media",
     "#metadata-line",
