@@ -213,21 +213,17 @@ function removeOldPercentages(element) {
 // - The CSS selector for the metadata line element.
 // - The classes that should be added to the inserted percentage text span.
 const METADATA_LINE_DATA_DESKTOP = [
-  // - Homepage videos v1.
+  // - Homepage videos
+  // - Subscriptions page videos
+  // - Search results playlists
+  // - Sidebar suggested videos
   [
-    "yt-lockup-view-model",
+    ".yt-lockup-view-model",
     ".yt-content-metadata-view-model__metadata-row:last-child",
     "yt-core-attributed-string yt-content-metadata-view-model__metadata-text yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
   ],
-  // - Homepage videos v2 (this version may not be used anymore, but I'm not
-  //   sure, so I'm keeping it for now).
-  [
-    "ytd-rich-grid-media",
-    "#metadata-line",
-    "style-scope ytd-video-meta-block ytd-grid-video-renderer",
-  ],
-  // - Search result videos
-  // - Search result Shorts listed individually
+  // - Search results videos
+  // - Search results Shorts listed individually
   [
     // The `div.` is required for the playlist page small thumbnails because
     // they have a closer `ytd-thumbnail` element that also has the
@@ -236,17 +232,14 @@ const METADATA_LINE_DATA_DESKTOP = [
     "#metadata-line",
     "inline-metadata-item style-scope ytd-video-meta-block",
   ],
-  // - Search result Shorts in horizontal carousel
+  // - Homepage Shorts in horizontal carousel
+  // - Subscriptions page Shorts in horizontal carousel
+  // - Search results Shorts in horizontal carousel
+  // - Sidebar suggested Shorts in horizontal carousel
   [
     "ytm-shorts-lockup-view-model",
     ".shortsLockupViewModelHostMetadataSubhead",
     "yt-core-attributed-string yt-core-attributed-string--white-space-pre-wrap",
-  ],
-  // - Subscriptions page videos
-  [
-    ".yt-lockup-view-model-wiz",
-    ".yt-content-metadata-view-model-wiz__metadata-row:last-child",
-    "yt-core-attributed-string yt-content-metadata-view-model-wiz__metadata-text yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
   ],
   // - Playlist page small thumbnails
   [
