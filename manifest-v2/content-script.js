@@ -241,6 +241,12 @@ const METADATA_LINE_DATA_DESKTOP = [
     ".shortsLockupViewModelHostMetadataSubhead",
     "yt-core-attributed-string yt-core-attributed-string--white-space-pre-wrap",
   ],
+  // - Profile page "Videos" tab videos
+  [
+    "ytd-rich-grid-media",
+    "#metadata-line",
+    "inline-metadata-item style-scope ytd-video-meta-block",
+  ],
   // - Playlist page small thumbnails
   [
     // The `div.` part is required because there is a closer `ytd-thumbnail`
