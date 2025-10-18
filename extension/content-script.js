@@ -10,9 +10,6 @@ const API_RETRY_UNIFORM_DISTRIBUTION_WIDTH_MS = 3000
 let isPendingApiRetry = false
 let thumbnailsToRetry = []
 
-// Used for marking thumbnails as processed.
-const PROCESSED_DATA_ATTRIBUTE_NAME = "data-ytrb-processed"
-
 // Whether we are currently viewing the mobile version of the YouTube website.
 const IS_MOBILE_SITE = window.location.href.startsWith("https://m.youtube.com")
 const IS_YOUTUBE_KIDS_SITE = window.location.href.startsWith(
@@ -200,10 +197,9 @@ function addRatingBar(thumbnailElement, videoData) {
   }
 }
 
-function removeOldPercentages(element) {
-  element.querySelectorAll(".ytrb-percentage").forEach((oldPercentage) => {
-    oldPercentage.remove()
-  })
+// Removes the rating bar after the thumbnail img tag.
+function removeRatingBar(thumbnailElement) {
+  thumbnailElement.parentElement.querySelectorAll("ytrb-bar").forEach((el) => el.remove())
 }
 
 // This provides a list of ways we try to find the metadata line for appending
@@ -313,9 +309,8 @@ const METADATA_LINE_DATA_MOBILE = [
   [".compact-media-item", ".subhead", "compact-media-item-stats small-text"],
 ]
 
-// Adds the rating text percentage below or next to the thumbnail in the video
-// metadata line.
-function addRatingPercentage(thumbnailElement, videoData) {
+// Returns the metadata line element and the classes of the metadata line items.
+function getMetadataLineElementAndItemClasses(thumbnailElement) {
   let metadataLineFinderAndElementClasses = IS_MOBILE_SITE
     ? METADATA_LINE_DATA_MOBILE
     : METADATA_LINE_DATA_DESKTOP
@@ -323,31 +318,67 @@ function addRatingPercentage(thumbnailElement, videoData) {
   for (let i = 0; i < metadataLineFinderAndElementClasses.length; i++) {
     const [containerSelector, metadataLineSelector, metadataLineItemClasses] =
       metadataLineFinderAndElementClasses[i]
-    const container = thumbnailElement.closest(containerSelector)
-    if (container) {
+
+    const containerElement = thumbnailElement.closest(containerSelector)
+
+    if (containerElement) {
       // We found the container.
-      const metadataLine = container.querySelector(metadataLineSelector)
-      if (metadataLine) {
-        // We found the metadata line. Remove any old percentages.
-        removeOldPercentages(metadataLine)
+      const metadataLineElement = containerElement.querySelector(metadataLineSelector)
 
-        // We create the rating percentage element and give it the same classes
-        // as the other metadata line items in the metadata line, plus
-        // "ytrb-percentage".
-        const ratingPercentageElement = getRatingPercentageElement(videoData)
-        ratingPercentageElement.className =
-          metadataLineItemClasses + " ytrb-percentage"
-
-        // Append the rating percentage element to the end of the metadata line.
-        metadataLine.appendChild(ratingPercentageElement)
-
-        return
+      if (metadataLineElement) {
+        // We found the metadata line.
+        return [metadataLineElement, metadataLineItemClasses]
       }
     }
   }
+
+  return [null, null]
 }
 
-async function processNewThumbnail(thumbnailElement, thumbnailUrl) {
+// Adds the rating text percentage to the video metadata line.
+function addRatingPercentage(thumbnailElement, videoData) {
+  const [metadataLineElement, metadataLineItemClasses] =
+    getMetadataLineElementAndItemClasses(thumbnailElement)
+
+  if (!metadataLineElement) {
+    // The metadata line was not found.
+    return
+  }
+
+  // If the metadata line already has a rating percentage, we skip adding it.
+  // This fixes this issue:
+  // https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/101
+  if (metadataLineElement.querySelector(".ytrb-percentage")) {
+    return
+  }
+
+  // We create the rating percentage element and give it the same classes as the
+  // other metadata line items in the metadata line, plus "ytrb-percentage".
+  const ratingPercentageElement = getRatingPercentageElement(videoData)
+  ratingPercentageElement.className =
+    metadataLineItemClasses + " ytrb-percentage"
+
+  // Append the rating percentage element to the end of the metadata line.
+  metadataLineElement.appendChild(ratingPercentageElement)
+}
+
+// Removes the rating text percentage in the video metadata line.
+function removeRatingPercentage(thumbnailElement) {
+  const [metadataLineElement, _] =
+    getMetadataLineElementAndItemClasses(thumbnailElement)
+
+  if (!metadataLineElement) {
+    // The metadata line was not found.
+    return
+  }
+
+  // Remove any old percentages.
+  metadataLineElement.querySelectorAll(".ytrb-percentage").forEach((el) => {
+    el.remove()
+  })
+}
+
+async function processThumbnail(thumbnailElement, thumbnailUrl) {
   let splitUrl = thumbnailUrl.split("/")
 
   // We don't want to add rating bars to the chapter thumbnails. Chapter
@@ -365,12 +396,35 @@ async function processNewThumbnail(thumbnailElement, thumbnailUrl) {
   }
 
   let videoId = splitUrl[4]
+
+  // Check if this thumbnail has already been processed for its video ID.
+  let prevVideoId = thumbnailElement.getAttribute("data-ytrb-video-id")
+  if (prevVideoId) {
+    if (prevVideoId === videoId) {
+      // This thumbnail has already been processed for its current video ID.
+      return
+    }
+
+    // This thumbnail has already been processed, but for a different video ID,
+    // so we remove the previous rating bar and percentage.
+    if (userSettings.barHeight !== 0) {
+      removeRatingBar(thumbnailElement)
+    }
+    if (userSettings.showPercentage) {
+      removeRatingPercentage(thumbnailElement)
+    }
+  }
+
+  // Set an attribute to remember what video ID the thumbnail was processed for.
+  thumbnailElement.setAttribute("data-ytrb-video-id", videoId)
+
   let videoData = await getVideoDataFromApi(videoId)
 
   if (videoData === null) {
-    // We failed to retrieve the video data so we mark the thumbnail as
-    // unprocessed so that we can try again in the future.
-    thumbnailElement.removeAttribute(PROCESSED_DATA_ATTRIBUTE_NAME)
+    // We failed to retrieve the video data so we remove the attribute that
+    // remembers what video ID the thumbnail was processed for so that we can
+    // try again in the future.
+    thumbnailElement.removeAttribute("data-ytrb-video-id")
     return
   }
 
@@ -397,7 +451,7 @@ async function processNewThumbnail(thumbnailElement, thumbnailUrl) {
 
 function processNewThumbnails() {
   // Process the unprocessed standard thumbnail images that use an img tag.
-  const unprocessedThumbnailImgs = document.querySelectorAll(
+  const thumbnailElements = document.querySelectorAll(
     // This will match:
     // - https://i.ytimg.com/vi/<videoId>/... (standard thumbnails)
     // - https://i9.ytimg.com/vi/<videoId>/... (certain thumbnails, like the one for: https://youtu.be/XFl4q2FfkVg)
@@ -407,33 +461,25 @@ function processNewThumbnails() {
     // `:not(.ytCinematicContainerViewModelBackgroundImage` is added to avoid
     // matching the thumbnails that are used for the blurred backgrounds the big
     // playlist thumbnail on the playlist page.
-    'img[src*=".ytimg.com/"]:not([data-ytrb-processed]):not(.ytCinematicContainerViewModelBackgroundImage)',
+    'img[src*=".ytimg.com/"]:not(.ytCinematicContainerViewModelBackgroundImage)',
   )
-  for (const thumbnailImg of unprocessedThumbnailImgs) {
-    // Mark it as processed.
-    thumbnailImg.setAttribute(PROCESSED_DATA_ATTRIBUTE_NAME, "")
-
-    let thumbnailUrl = thumbnailImg.getAttribute("src")
-    processNewThumbnail(thumbnailImg, thumbnailUrl)
+  for (const thumbnailElement of thumbnailElements) {
+    let thumbnailUrl = thumbnailElement.getAttribute("src")
+    processThumbnail(thumbnailElement, thumbnailUrl)
   }
 
-  // Process the unprocessed video wall still images that use a div with a
-  // background image.
-  const unprocessedVideoWallStillImages = document.querySelectorAll(
-    ".ytp-videowall-still-image:not([data-ytrb-processed])",
-  )
-  for (const videoWallStillImage of unprocessedVideoWallStillImages) {
-    // Mark it as processed.
-    videoWallStillImage.setAttribute(PROCESSED_DATA_ATTRIBUTE_NAME, "")
+  // Process the video wall still images that use a div with a background image.
+  const videoWallStillImageElements = document.querySelectorAll(".ytp-videowall-still-image")
 
-    const backgroundImageUrl = videoWallStillImage.style.backgroundImage
+  for (const videoWallStillImageElement of videoWallStillImageElements) {
+    const backgroundImageUrl = videoWallStillImageElement.style.backgroundImage
 
     // `backgroundImageUrl` will be something like
     // 'url("https://i.ytimg.com/vi/..."', so this removes the 'url("' from the
     // start and the '")' from the end.
     const thumbnailUrl = backgroundImageUrl.slice(5, -2)
 
-    processNewThumbnail(videoWallStillImage, thumbnailUrl)
+    processThumbnail(videoWallStillImageElement, thumbnailUrl)
   }
 }
 
@@ -713,5 +759,12 @@ chrome.storage.sync.get(DEFAULT_USER_SETTINGS, function (storedSettings) {
   }
 
   handleDomMutations()
-  mutationObserver.observe(document.body, { childList: true, subtree: true })
+  mutationObserver.observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    // We watch `src` for most thumbnail images and `style` for the background
+    // image of the video wall still images.
+    attributeFilter: ["src", "style"],
+  })
 })
