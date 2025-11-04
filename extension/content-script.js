@@ -381,6 +381,14 @@ function removeRatingPercentage(thumbnailElement) {
 async function processThumbnail(thumbnailElement, thumbnailUrl) {
   let splitUrl = thumbnailUrl.split("/")
 
+  // Skip thumbnails inside the chapter expandable panel or snackbar.
+  const isInChapterExpandable = thumbnailElement.closest("ytd-expandable-metadata-renderer") !== null
+  const isInSnackBar =
+    thumbnailElement.closest("snackbar-container") !== null
+  if (isInChapterExpandable || isInSnackBar) {
+    return
+  }
+
   // We don't want to add rating bars to the chapter thumbnails. Chapter
   // thumbnail filenames use the format: "hqdefault_*.jpg", where `*` is an
   // integer that is the number of milliseconds into the video that the
