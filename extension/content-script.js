@@ -379,30 +379,22 @@ function removeRatingPercentage(thumbnailElement) {
 }
 
 async function processThumbnail(thumbnailElement, thumbnailUrl) {
-  let splitUrl = thumbnailUrl.split("/")
-
-  // Skip thumbnails inside the chapter expandable panel or snackbar.
-  const isInChapterExpandable = thumbnailElement.closest("ytd-expandable-metadata-renderer") !== null
-  const isInSnackBar =
-    thumbnailElement.closest("snackbar-container") !== null
-  if (isInChapterExpandable || isInSnackBar) {
-    return
-  }
-
-  // We don't want to add rating bars to the chapter thumbnails. Chapter
-  // thumbnail filenames use the format: "hqdefault_*.jpg", where `*` is an
-  // integer that is the number of milliseconds into the video that the
-  // thumbnail was taken from. But we have to make sure not to match custom
-  // thumbnails that use the format: "hqdefault_custom_*.jpg", where `*` is an
-  // integer that is the ID of the custom thumbnail.
-  let filenameAndQueryParams = splitUrl[5]
+  // We skip these specific thumbnails.
+  // - In snackbars (e.g. the "Saved to Watch Later" snackbar shown after saving
+  //   a video to your Watch Later playlist).
+  // - Chapter thumbnails, in both search results and on the video page in the
+  //   expanded video description.
+  // - The frame preview shown when hovering over the progress bar of Short
+  //   videos.
   if (
-    filenameAndQueryParams.startsWith("hqdefault_") &&
-    !filenameAndQueryParams.startsWith("hqdefault_custom_")
+    thumbnailElement.closest(
+      "snackbar-container, ytd-macro-markers-list-item-renderer, yt-player-storyboard",
+    ) !== null
   ) {
     return
   }
 
+  let splitUrl = thumbnailUrl.split("/")
   let videoId = splitUrl[4]
 
   // Check if this thumbnail has already been processed for its video ID.
