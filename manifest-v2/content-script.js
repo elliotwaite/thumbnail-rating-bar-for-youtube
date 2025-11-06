@@ -385,13 +385,14 @@ async function processThumbnail(thumbnailElement, thumbnailUrl) {
   // We skip these specific thumbnails.
   // - In snackbars (e.g. the "Saved to Watch Later" snackbar shown after saving
   //   a video to your Watch Later playlist).
-  // - Chapter thumbnails, in both search results and on the video page in the
-  //   expanded video description.
+  // - Chapter thumbnails in search results (when the chapters container is both
+  //   collapsed and expanded)
+  // - Chapter thumbnails on the video page in the expanded video description.
   // - The frame preview shown when hovering over the progress bar of Short
   //   videos.
   if (
     thumbnailElement.closest(
-      "snackbar-container, ytd-macro-markers-list-item-renderer, yt-player-storyboard",
+      "snackbar-container, ytd-expandable-metadata-renderer, ytd-macro-markers-list-item-renderer, yt-player-storyboard",
     ) !== null
   ) {
     return
