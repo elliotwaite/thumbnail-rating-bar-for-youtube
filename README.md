@@ -9,14 +9,16 @@ This extension adds a likes/dislikes rating bar to the bottom of every YouTube v
 
 ## Install
 
-Chrome Extension:<br />
-https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmihdmfhaacemlpgfbpoeb
+**[Chrome Extension](https://chrome.google.com/webstore/detail/thumbnail-rating-bar-for/cmlddjbnoehmihdmfhaacemlpgfbpoeb)** | **[Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/)** | **[Edge Add-on](https://microsoftedge.microsoft.com/addons/detail/thumbnail-rating-bar-for-/mglepphnjnfcljjafdgafoipiakakbin)**
 
-Firefox Add-on:<br />
-https://addons.mozilla.org/en-US/firefox/addon/youtube-thumbnail-rating-bar/
+## Sponsors
 
-Edge Add-on:<br />
-https://microsoftedge.microsoft.com/addons/detail/thumbnail-rating-bar-for-/mglepphnjnfcljjafdgafoipiakakbin
+Special thanks to these supporters who help keep this extension free and maintained:
+
+- **Josh Babbitt** ([@ikingjosh](https://github.com/ikingjosh))
+- *Your name here?* [Become a sponsor!](https://github.com/sponsors/elliotwaite)
+
+**Support this project:** [GitHub Sponsors](https://github.com/sponsors/elliotwaite) | [PayPal](https://paypal.me/elliotnwaite)
 
 ## The API
 
@@ -30,9 +32,9 @@ extension](https://returnyoutubedislike.com/install).
 ## Mobile Support
 
 This extension also works on mobile browsers that support Chrome extensions,
-such as [Kiwi Browser](https://kiwibrowser.com) for Android.  
+such as [Kiwi Browser](https://kiwibrowser.com) for Android.
 
-## Rate Limiting and the Cache Duration Setting 
+## Rate Limiting and the Cache Duration Setting
 
 The Return YouTube Dislike API is rate limited by IP address, so if you notice
 that some thumbnails aren't receiving rating bars, you may be getting
