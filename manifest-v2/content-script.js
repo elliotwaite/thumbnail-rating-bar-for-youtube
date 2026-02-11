@@ -424,7 +424,7 @@ async function processThumbnail(thumbnailElement, thumbnailUrl) {
 
   let videoData = await getVideoDataFromApi(videoId);
 
-  if (videoData === null) {
+  if (!videoData) {
     // We failed to retrieve the video data so we remove the attribute that
     // remembers what video ID the thumbnail was processed for so that we can
     // try again in the future.
