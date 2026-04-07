@@ -241,8 +241,8 @@ const METADATA_LINE_DATA_DESKTOP = [
   // - Sidebar suggested videos
   [
     ".yt-lockup-view-model",
-    ".yt-content-metadata-view-model__metadata-row:last-child",
-    "yt-core-attributed-string yt-content-metadata-view-model__metadata-text yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
+    ".ytContentMetadataViewModelMetadataRow:last-child",
+    "yt-core-attributed-string ytContentMetadataViewModelMetadataText yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
   ],
   // - Search results videos
   // - Search results Shorts listed individually
