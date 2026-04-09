@@ -216,7 +216,7 @@ const METADATA_LINE_DATA_DESKTOP = [
   // - Search results playlists
   // - Sidebar suggested videos
   [
-    ".yt-lockup-view-model",
+    "yt-lockup-view-model",
     ".ytContentMetadataViewModelMetadataRow:last-child",
     "yt-core-attributed-string ytContentMetadataViewModelMetadataText yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
   ],
