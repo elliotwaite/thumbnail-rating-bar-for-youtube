@@ -37,13 +37,9 @@ ytg-thumbnail-overlay-time-status-renderer {
   bottom: calc(var(--ytrb-bar-height) + 4px) !important
 }
 
-/* Moves the watch history progress bar to the top of the thumbnail. */
-ytd-thumbnail-overlay-resume-playback-renderer,  /* Modern */
-.resume-playback-background,  /* Classic */
-.resume-playback-progress-bar,  /* Classic */
-ytg-thumbnail-overlay-resume-playback-renderer  /* Gaming */
-{
-  top: 0 !important;
+/* Moves the watch history progress bar up so it's above the rating bar. */
+.ytThumbnailOverlayProgressBarHostUseLegacyBar {
+  bottom: var(--ytrb-bar-height) !important
 }
 
 #bottom-thumbnail-overlay-badges  /* Gaming */
