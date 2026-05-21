@@ -218,7 +218,7 @@ const METADATA_LINE_DATA_DESKTOP = [
   [
     "yt-lockup-view-model",
     ".ytContentMetadataViewModelMetadataRow:last-child",
-    "yt-core-attributed-string ytContentMetadataViewModelMetadataText yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color",
+    "ytAttributedStringHost ytContentMetadataViewModelMetadataText ytAttributedStringWhiteSpacePreWrap ytAttributedStringLinkInheritColor",
   ],
   // - Search results videos
   // - Search results Shorts listed individually
