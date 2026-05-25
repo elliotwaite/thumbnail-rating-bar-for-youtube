@@ -182,9 +182,17 @@ function getRatingPercentageElement(videoData) {
   return span;
 }
 
+function getRatingBarTargetParent(thumbnailElement) {
+  return (
+    thumbnailElement.closest(
+      "yt-thumbnail-view-model, div[id='media-container']",
+    ) ?? thumbnailElement.parentElement
+  );
+}
+
 // Adds the rating bar after the thumbnail img tag.
 function addRatingBar(thumbnailElement, videoData) {
-  let parent = thumbnailElement.parentElement;
+  let parent = getRatingBarTargetParent(thumbnailElement);
 
   // Sometimes by the time we are ready to add a rating bar after the thumbnail
   // element, it won't have a parent. I'm not sure why this happens, but it
@@ -199,7 +207,7 @@ function addRatingBar(thumbnailElement, videoData) {
 
 // Removes the rating bar after the thumbnail img tag.
 function removeRatingBar(thumbnailElement) {
-  thumbnailElement.parentElement
+  getRatingBarTargetParent(thumbnailElement)
     .querySelectorAll("ytrb-bar")
     .forEach((el) => el.remove());
 }
