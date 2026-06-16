@@ -470,10 +470,11 @@ function processNewThumbnails() {
     // - https://i.ytimg.com/vi_webp/<videoId>/movieposter_en.webp" (Movies page)
     // - https://i.ytimg.com/an_webp/<videoId>/... (YouTube Kids)
     //
-    // `:not(.ytCinematicContainerViewModelBackgroundImage` is added to avoid
-    // matching the thumbnails that are used for the blurred backgrounds the big
-    // playlist thumbnail on the playlist page.
-    'img[src*=".ytimg.com/"]:not(.ytCinematicContainerViewModelBackgroundImage)',
+    // `:not(...)` is added to avoid matching:
+    // - `.ytCinematicContainerViewModelBackgroundImage`: blurred backgrounds
+    //   for the big playlist thumbnail on the playlist page.
+    // - `.branding-img`: channel watermark branding image.
+    'img[src*=".ytimg.com/"]:not(.ytCinematicContainerViewModelBackgroundImage):not(.branding-img)',
   );
   for (const thumbnailElement of thumbnailElements) {
     let thumbnailUrl = thumbnailElement.getAttribute("src");
