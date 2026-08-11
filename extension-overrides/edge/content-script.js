@@ -31,8 +31,11 @@ let hasUnseenDomMutations = false;
 const MAX_API_RETRIES_PER_THUMBNAIL = 10;
 const API_RETRY_DELAY_MIN_MS = 3000;
 const API_RETRY_UNIFORM_DISTRIBUTION_WIDTH_MS = 3000;
-let isPendingApiRetry = false;
-let thumbnailsToRetry = [];
+
+// Content-script cache and in-flight dedupe for likes/dislikes data. Prevents
+// spamming the service worker when thumbnail nodes are recreated.
+const videoDataCache = new Map();
+const videoDataInFlight = new Map();
 
 // Whether we are currently viewing the mobile version of the YouTube website.
 const IS_MOBILE_SITE = window.location.href.startsWith("https://m.youtube.com");
@@ -81,7 +84,7 @@ function getVideoDataObject(likes, dislikes) {
   };
 }
 
-async function getVideoDataFromApi(videoId) {
+async function fetchVideoDataFromApi(videoId) {
   for (let i = 0; i <= MAX_API_RETRIES_PER_THUMBNAIL; i++) {
     let likesData = await chrome.runtime.sendMessage({
       query: "getLikesData",
@@ -97,6 +100,30 @@ async function getVideoDataFromApi(videoId) {
         Math.random() * API_RETRY_UNIFORM_DISTRIBUTION_WIDTH_MS,
     );
   }
+}
+
+async function getVideoDataFromApi(videoId) {
+  if (videoDataCache.has(videoId)) {
+    return videoDataCache.get(videoId);
+  }
+
+  if (videoDataInFlight.has(videoId)) {
+    return videoDataInFlight.get(videoId);
+  }
+
+  const promise = fetchVideoDataFromApi(videoId)
+    .then((videoData) => {
+      if (videoData) {
+        videoDataCache.set(videoId, videoData);
+      }
+      return videoData;
+    })
+    .finally(() => {
+      videoDataInFlight.delete(videoId);
+    });
+
+  videoDataInFlight.set(videoId, promise);
+  return promise;
 }
 
 function ratingToPercentageString(rating) {
@@ -225,15 +252,19 @@ function addRatingBar(thumbnailElement, videoData) {
   // skip trying to add a rating bar after it. Also the code we use below to
   // add the rating bar after the thumbnail requires the parent to exist.
   if (parent) {
+    // The thumbnail <img> may be recreated while our previous bar remains on
+    // the parent, so clear any existing bars before adding the current one.
+    parent.querySelectorAll("ytrb-bar").forEach((el) => el.remove());
     parent.appendChild(getRatingBarElement(videoData));
   }
 }
 
 // Removes the rating bar after the thumbnail img tag.
 function removeRatingBar(thumbnailElement) {
-  getRatingBarTargetParent(thumbnailElement)
-    .querySelectorAll("ytrb-bar")
-    .forEach((el) => el.remove());
+  const parent = getRatingBarTargetParent(thumbnailElement);
+  if (parent) {
+    parent.querySelectorAll("ytrb-bar").forEach((el) => el.remove());
+  }
 }
 
 // This provides a list of ways we try to find the metadata line for appending
@@ -380,12 +411,14 @@ function addRatingPercentage(thumbnailElement, videoData) {
     return;
   }
 
-  // If the metadata line already has a rating percentage, we skip adding it.
-  // This fixes this issue:
-  // https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/101
-  if (metadataLineElement.querySelector(".ytrb-percentage")) {
-    return;
-  }
+  // Clear any existing percentage first. The metadata line can retain an old
+  // one when the thumbnail's video ID changes or nodes are recreated.
+  // Previously we skipped when one existed, which avoided duplicates
+  // (https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/101)
+  // but could leave a stale percentage for the wrong video.
+  metadataLineElement.querySelectorAll(".ytrb-percentage").forEach((el) => {
+    el.remove();
+  });
 
   // We create the rating percentage element and give it the same classes as the
   // other metadata line items in the metadata line, plus "ytrb-percentage".
@@ -433,16 +466,22 @@ async function processThumbnail(thumbnailElement, thumbnailUrl) {
   let splitUrl = thumbnailUrl.split("/");
   let videoId = splitUrl[4];
 
+  // Skip URLs that don't have a parseable video ID in the expected path spot.
+  if (!videoId) {
+    return;
+  }
+
   // Check if this thumbnail has already been processed for its video ID.
   let prevVideoId = thumbnailElement.getAttribute("data-ytrb-video-id");
-  if (prevVideoId) {
-    if (prevVideoId === videoId) {
-      // This thumbnail has already been processed for its current video ID.
-      return;
-    }
+  if (prevVideoId === videoId) {
+    // This thumbnail has already been processed for its current video ID.
+    return;
+  }
 
-    // This thumbnail has already been processed, but for a different video ID,
-    // so we remove the previous rating bar and percentage.
+  // If this element was previously processed for a different video, remove the
+  // old rating UI before the async fetch so it isn't left showing the wrong
+  // video's data while we wait.
+  if (prevVideoId) {
     if (userSettings.barHeight !== 0) {
       removeRatingBar(thumbnailElement);
     }
@@ -459,7 +498,8 @@ async function processThumbnail(thumbnailElement, thumbnailUrl) {
   if (!videoData) {
     // We failed to retrieve the video data so we remove the attribute that
     // remembers what video ID the thumbnail was processed for so that we can
-    // try again in the future.
+    // try again in the future. Any previous rating UI was already cleared
+    // above when the video ID changed.
     thumbnailElement.removeAttribute("data-ytrb-video-id");
     return;
   }
@@ -476,12 +516,17 @@ async function processThumbnail(thumbnailElement, thumbnailUrl) {
   // video (videos with 0 likes and 10+ dislikes probably mean the creator has
   // disabled showing like counts for that video, see:
   // https://github.com/elliotwaite/thumbnail-rating-bar-for-youtube/issues/83).
-  if (
-    userSettings.showPercentage &&
-    videoData.rating != null &&
-    !(videoData.likes === 0 && videoData.dislikes >= 10)
-  ) {
-    addRatingPercentage(thumbnailElement, videoData);
+  if (userSettings.showPercentage) {
+    if (
+      videoData.rating != null &&
+      !(videoData.likes === 0 && videoData.dislikes >= 10)
+    ) {
+      addRatingPercentage(thumbnailElement, videoData);
+    } else {
+      // This video shouldn't show a percentage; clear any previous one (e.g. if
+      // the thumbnail node was recreated and still has a stale percentage).
+      removeRatingPercentage(thumbnailElement);
+    }
   }
 }
 
@@ -503,22 +548,6 @@ function processNewThumbnails() {
   for (const thumbnailElement of thumbnailElements) {
     let thumbnailUrl = thumbnailElement.getAttribute("src");
     processThumbnail(thumbnailElement, thumbnailUrl);
-  }
-
-  // Process the video wall still images that use a div with a background image.
-  const videoWallStillImageElements = document.querySelectorAll(
-    ".ytp-videowall-still-image",
-  );
-
-  for (const videoWallStillImageElement of videoWallStillImageElements) {
-    const backgroundImageUrl = videoWallStillImageElement.style.backgroundImage;
-
-    // `backgroundImageUrl` will be something like
-    // 'url("https://i.ytimg.com/vi/..."', so this removes the 'url("' from the
-    // start and the '")' from the end.
-    const thumbnailUrl = backgroundImageUrl.slice(5, -2);
-
-    processThumbnail(videoWallStillImageElement, thumbnailUrl);
   }
 }
 
@@ -646,10 +675,69 @@ function updateVideoRatingBar() {
   }
 }
 
+function isOwnModificationNode(node) {
+  return (
+    node.nodeType === Node.ELEMENT_NODE &&
+    (node.tagName.startsWith("YTRB-") ||
+      node.classList.contains("ytrb-percentage") ||
+      node.closest("ytrb-bar") !== null)
+  );
+}
+
+function mutationIsRelevant(mutation) {
+  if (mutation.type === "childList") {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE && !isOwnModificationNode(node)) {
+        return true;
+      }
+    }
+    for (const node of mutation.removedNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE && !isOwnModificationNode(node)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (mutation.type === "attributes") {
+    const target = mutation.target;
+    if (!(target instanceof Element) || target.closest("ytrb-bar")) {
+      return false;
+    }
+
+    if (mutation.attributeName === "src") {
+      // Only re-scan when an image points at a YouTube thumbnail host. This
+      // ignores src changes to data/blob/other CDN URLs.
+      if (target.tagName !== "IMG") {
+        return false;
+      }
+      const src = target.getAttribute("src") || "";
+      return src.includes(".ytimg.com/");
+    }
+  }
+
+  return false;
+}
+
 // Handles when the DOM is mutated, which is when we search for items that
 // should be modified. However, we throttle these searches to not over tax the
 // CPU.
-function handleDomMutations() {
+function handleDomMutations(mutations) {
+  // Skip batches that only contain our own nodes or irrelevant attribute
+  // changes (e.g. thumbnail src swapping away from ytimg).
+  if (mutations && mutations.length > 0) {
+    let relevant = false;
+    for (const mutation of mutations) {
+      if (mutationIsRelevant(mutation)) {
+        relevant = true;
+        break;
+      }
+    }
+    if (!relevant) {
+      return;
+    }
+  }
+
   if (domMutationsAreThrottled) {
     // If updates are currently being throttled, we'll remember to handle
     // them later.
@@ -680,7 +768,7 @@ function handleDomMutations() {
   }
 }
 
-// An observer for watching changes to the body element.
+// Observer for page-wide childList/src changes.
 const mutationObserver = new MutationObserver(handleDomMutations);
 
 chrome.storage.local.get(DEFAULT_USER_SETTINGS, function (storedSettings) {
@@ -805,8 +893,6 @@ chrome.storage.local.get(DEFAULT_USER_SETTINGS, function (storedSettings) {
     subtree: true,
     childList: true,
     attributes: true,
-    // We watch `src` for most thumbnail images and `style` for the background
-    // image of the video wall still images.
-    attributeFilter: ["src", "style"],
+    attributeFilter: ["src"],
   });
 });

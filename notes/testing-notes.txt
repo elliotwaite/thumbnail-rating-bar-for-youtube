@@ -50,4 +50,4 @@ Profile:
 - Video page
 - Sidebar suggested videos
 - Playlist page small thumbnails
-- Video wall (the wall of suggested videos shown when a video ends)
+- Video wall (suggested shown after a video) (we dropped support for adding rating bars to these in version 1.9.21)
